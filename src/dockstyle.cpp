@@ -1,3 +1,4 @@
+#include "dockgroup.h"
 #include "dockgroupresizehandler.h"
 #include "dockstyle.h"
 #include "docktabbar.h"
@@ -16,6 +17,46 @@ QFont DockStyle::defaultFont() const
     return QFont();
 }
 
+qreal DockStyle::tabBarHeight() const
+{
+    return 34;
+}
+
+qreal DockStyle::tabBarButtonHeight() const
+{
+    return 25;
+}
+
+qreal DockStyle::tabBarButtonY() const
+{
+    return 4;
+}
+
+qreal DockStyle::tabMargin() const
+{
+    return 6;
+}
+
+QColor DockStyle::mainColor() const
+{
+    return Qt::white;
+}
+
+QColor DockStyle::hoverColor() const
+{
+    return QColor(220, 220, 220);
+}
+
+QColor DockStyle::pressColor() const
+{
+    return QColor(200, 200, 200);
+}
+
+QColor DockStyle::borderColor() const
+{
+    return QColor(30, 30, 30);
+}
+
 void DockStyle::paintDropButton(QPainter *p, Dock::Area area) {}
 
 void DockStyle::paintTabBar(QPainter *p, DockTabBar *item)
@@ -23,7 +64,7 @@ void DockStyle::paintTabBar(QPainter *p, DockTabBar *item)
     //    qreal pos{0};
     //    for (auto t : item->tabs())
     //        drawTab(p, &pos, t, 0);
-    p->drawLine(0, item->height() - 2, item->width() - 1, item->height() - 2);
+//    p->drawLine(0, 29, item->width() - 1, 29);
 }
 
 void DockStyle::paintTabButton(QPainter *p,
@@ -34,19 +75,22 @@ void DockStyle::paintTabButton(QPainter *p,
 
     switch (status) {
     case Dock::Normal:
+        p->setBrush(pressColor());
         rc = QRectF(1, 4, item->width() - 2, item->height() - 5);
+        p->drawRect(rc);
         break;
 
     case Dock::Hovered:
-        p->setBrush(Qt::yellow);
+        p->setBrush(hoverColor());
         rc = QRectF(1, 4, item->width() - 2, item->height() - 5);
         p->drawRect(rc);
         break;
 
     case Dock::Checked:
-        case Dock::Pressed:
-        p->setBrush(Qt::white);
-        rc = QRectF(0, 0, item->width() - 1, item->height() - 1);
+    case Dock::Pressed:
+        p->setPen(borderColor());
+        p->setBrush(mainColor());
+        rc = QRectF(0, 0, item->width() - 1, item->height());
         p->fillRect(rc, Qt::white);
         p->drawLine(rc.topLeft(), rc.topRight());
         p->drawLine(rc.topLeft(), rc.bottomLeft());
@@ -104,6 +148,17 @@ void DockStyle::paintResizeHandler(QPainter *p, DockGroupResizeHandler *item, Do
         center.setY(center.y() + 20);
         drawCircle(p, center);
         break;
+    }
+}
+
+void DockStyle::paintGroup(QPainter *p, DockGroup *item)
+{
+    if (item->displayType() == Dock::TabbedView && item->widgets().count()) {
+        p->setPen(borderColor());
+        p->fillRect(0, 29, item->width() - 1, item->height() - 30, Qt::white);
+        p->drawLine(0, 29, 0, item->height() - 1);
+        p->drawLine(item->width() - 1, 29, item->width() - 1, item->height() - 1);
+        p->drawLine(0, item->height() - 1, item->width() - 1, item->height() - 1);
     }
 }
 

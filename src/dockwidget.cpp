@@ -33,6 +33,7 @@ DockWidget::DockWidget(QQuickItem *parent) : QQuickPage(parent)
     _header->setZ(999);
 
     setBackground(new DockWidgetBackground(this));
+//    setBackground(new DebugRect(Qt::green, this));
     contentItem()->setClip(true);
 
     setTopPadding(1);

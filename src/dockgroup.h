@@ -16,7 +16,6 @@ class DockGroup : public QQuickPaintedItem
     Q_PROPERTY(Dock::Area area READ area WRITE setArea NOTIFY areaChanged)
     Q_PROPERTY(bool enableResizing READ enableResizing WRITE setEnableResizing
                    NOTIFY enableResizingChanged)
-
     Q_PROPERTY(Dock::DockWidgetDisplayType displayType READ displayType WRITE setDisplayType NOTIFY displayTypeChanged)
 
     Q_DECLARE_PRIVATE(DockGroup);
@@ -33,6 +32,8 @@ public:
     Dock::Area area() const;
 
     bool enableResizing() const;
+
+    QList<DockWidget *> widgets() const;
 
     Dock::DockWidgetDisplayType displayType() const;
 

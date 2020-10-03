@@ -3,6 +3,7 @@
 #include "debugrect.h"
 #include "dockgroup_p.h"
 #include "dockgroupresizehandler.h"
+#include "dockstyle.h"
 #include "docktabbar.h"
 #include "dockwidget.h"
 
@@ -124,8 +125,13 @@ void DockGroupPrivate::fitItem(QQuickItem *item)
         break;
 
     case Dock::Center:
-        item->setPosition(QPointF(q->x(), q->y() + 30));
-        item->setSize(QSizeF(q->width(), q->height() - 30));
+        item->setPosition(QPointF(q->x() + DockStyle::instance()->tabMargin(),
+                                  q->y() + DockStyle::instance()->tabMargin()
+                                      + DockStyle::instance()->tabBarHeight()));
+        item->setSize(
+            QSizeF(q->width() - 2 * +DockStyle::instance()->tabMargin(),
+                   q->height() - (2 * +DockStyle::instance()->tabMargin())
+                       - DockStyle::instance()->tabBarHeight()));
         break;
 
     case Dock::Float:
@@ -432,7 +438,7 @@ void DockGroup::geometryChanged(const QRectF &newGeometry,
     if (d->tabBar) {
         if (d->area == Dock::Center) {
             d->tabBar->setWidth(width());
-            d->tabBar->setHeight(30);
+            d->tabBar->setHeight(DockStyle::instance()->tabBarHeight());
             d->tabBar->setVisible(true);
         } else {
             d->tabBar->setVisible(false);
@@ -558,6 +564,12 @@ bool DockGroup::enableResizing() const
     return d->enableResizing;
 }
 
+QList<DockWidget *> DockGroup::widgets() const
+{
+    Q_D(const DockGroup);
+    return d->dockWidgets;
+}
+
 Dock::DockWidgetDisplayType DockGroup::displayType() const
 {
        Q_D(const DockGroup);
@@ -671,6 +683,7 @@ void DockGroup::setDisplayType(Dock::DockWidgetDisplayType displayType)
 
 void DockGroup::paint(QPainter *painter)
 {
+    DockStyle::instance()->paintGroup(painter, this);
     //    painter->setOpacity(1);
     //    painter->setPen(Qt::gray);
     //    painter->setBrush(Qt::white);

@@ -7,6 +7,7 @@
 class QPainter;
 class DockTabBar;
 class DockTabButton;
+class DockGroup;
 class DockGroupResizeHandler;
 class DockWidgetHeaderButton;
 class DockGroupResizeHandler;
@@ -26,6 +27,15 @@ public:
     explicit DockStyle(QObject *parent = nullptr);
 
     QFont defaultFont() const;
+    qreal tabBarHeight() const;
+    qreal tabBarButtonHeight() const;
+    qreal tabBarButtonY() const;
+    qreal tabMargin() const;
+
+    QColor mainColor() const;
+    QColor hoverColor() const;
+    QColor pressColor() const;
+    QColor borderColor() const;
 
     void paintDropButton(QPainter *p, Dock::Area area);
     void paintTabBar(QPainter *p, DockTabBar *item);
@@ -34,6 +44,7 @@ public:
                            DockWidgetHeaderButton *item,
                            Dock::ButtonStatus status);
     void paintResizeHandler(QPainter *p, DockGroupResizeHandler *item, Dock::ButtonStatus status);
+    void paintGroup(QPainter *p, DockGroup *item);
 signals:
 
 };

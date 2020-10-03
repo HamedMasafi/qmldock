@@ -8,6 +8,7 @@ DockTabButton::DockTabButton(QString title, QQuickItem *parent)
 {
     setAcceptedMouseButtons(Qt::LeftButton);
     setAcceptHoverEvents(true);
+    setHeight(DockStyle::instance()->tabBarButtonHeight());
 }
 
 void DockTabButton::paint(QPainter *painter)

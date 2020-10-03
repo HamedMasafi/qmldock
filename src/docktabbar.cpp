@@ -4,7 +4,7 @@
 
 #include <QPainter>
 #include <QApplication>
-#include <QStyle>
+#include <QDebug>
 
 QStringList DockTabBar::tabs() const
 {
@@ -24,16 +24,23 @@ void DockTabBar::setCurrentIndex(int currentIndex)
     if (m_currentIndex == currentIndex)
         return;
 
-    if (!_tabs.count()) {
+    if (currentIndex > _tabs.count() - 1) {
+        qDebug() << "Invalid index";
+        return;
+    }
+    if (currentIndex == -1) {
+        for (auto &t : _tabs)
+            t->setChecked(false);
         m_currentIndex = -1;
         emit currentIndexChanged(m_currentIndex);
         return;
     }
 
-    if (m_currentIndex >= 0 && m_currentIndex < _tabs.count() - 1)
+    if (m_currentIndex != -1 && m_currentIndex <= _tabs.count() - 1)
         _tabs.at(m_currentIndex)->setChecked(false);
 
-    m_currentIndex = qBound(0, currentIndex, _tabs.count() - 1);
+        m_currentIndex = currentIndex;
+            //qBound(0, currentIndex, _tabs.count() - 1);
     _tabs.at(m_currentIndex)->setChecked(true);
 
     emit currentIndexChanged(m_currentIndex);
@@ -48,6 +55,8 @@ int DockTabBar::addTab(const QString &name)
 {
     auto t = new DockTabButton{name, this};
     t->setWidth(QFontMetrics(DockStyle::instance()->defaultFont()).horizontalAdvance(name) + 15);
+    t->setY(DockStyle::instance()->tabBarButtonY());
+    t->setHeight(DockStyle::instance()->tabBarButtonHeight());
     connect(t, &DockTabButton::clicked, this, &DockTabBar::tabButton_clicked);
     _tabs.append(t);
     return _tabs.count() - 1;
@@ -64,7 +73,7 @@ void DockTabBar::removeTab(int index)
     _tabs.removeAt(index);
 
     if (index >= _tabs.count())
-        setCurrentIndex(_tabs.count() - 1);
+        setCurrentIndex(qBound(0, m_currentIndex, _tabs.count() - 1));
 
     geometryChanged(QRect(), QRect());
 }
@@ -105,8 +114,6 @@ void DockTabBar::geometryChanged(const QRectF &newGeometry,
 {
     qreal xx{0};
     for (auto btn : _tabs) {
-        btn->setHeight(height());
-        btn->setY(0);
         btn->setX(xx);
         xx += btn->width();
     }
