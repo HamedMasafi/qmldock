@@ -88,7 +88,7 @@ void DockWidget::detach()
 
 void DockWidget::close()
 {
-
+    setVisible(false);
 }
 
 void DockWidget::restoreSize()

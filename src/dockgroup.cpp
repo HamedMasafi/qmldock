@@ -624,7 +624,7 @@ void DockGroup::removeDockWidget(DockWidget *item)
             h->deleteLater();
         }
     }
-
+    geometryChanged(QRect(), QRect());
     d->normalizeItemSizes();
     d->reorderHandles();
     d->reorderItems();

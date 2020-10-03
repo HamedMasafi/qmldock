@@ -65,6 +65,7 @@ void DockArea::itemChange(QQuickItem::ItemChange change,
 
             connect(dw, &DockWidget::moving, this, &DockArea::dockWidget_moving);
             connect(dw, &DockWidget::moved, this, &DockArea::dockWidget_moved);
+            connect(dw, &QQuickItem::visibleChanged, this, &DockArea::dockWidget_visibleChanged);
 
             switch (dw->area()) {
             case Dock::Left:
@@ -182,6 +183,17 @@ void DockArea::dockWidget_moved()
 
     case Dock::Float:
         break;
+    }
+}
+
+void DockArea::dockWidget_visibleChanged()
+{
+    auto dw = qobject_cast<DockWidget *>(sender());
+    if (!dw)
+        return;
+
+    if (dw->dockGroup()) {
+        dw->dockGroup()->removeDockWidget(dw);
     }
 }
 

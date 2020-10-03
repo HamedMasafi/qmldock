@@ -30,6 +30,7 @@ private slots:
     void dockWidget_beginMove();
     void dockWidget_moving(const QPointF &pt);
     void dockWidget_moved();
+    void dockWidget_visibleChanged();
 
 protected:
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
