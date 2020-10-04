@@ -256,6 +256,7 @@ QRectF DockGroupPrivate::updateUsableArea()
     } else {
         usableArea = q->childrenRect();
     }
+    return usableArea;
 }
 
 DockGroup::DockGroup(QQuickItem *parent)
