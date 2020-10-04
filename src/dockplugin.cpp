@@ -14,11 +14,11 @@ DockPlugin::DockPlugin(QObject *parent) : QObject(parent)
 
 void DockPlugin::registerDockPlugin()
 {
-    qmlRegisterType<DockArea>("AI", 1, 0, "DockArea");
-    qmlRegisterType<DockWidget>("AI", 1, 0, "DockWidget");
-    qmlRegisterType<DockGroup>("AI", 1, 0, "DockGroup");
+    qmlRegisterType<DockArea>("Kaj.Dock", 1, 0, "DockArea");
+    qmlRegisterType<DockWidget>("Kaj.Dock", 1, 0, "DockWidget");
+    qmlRegisterType<DockGroup>("Kaj.Dock", 1, 0, "DockGroup");
     qmlRegisterUncreatableMetaObject(Dock::staticMetaObject,
-                                     "AI",
+                                     "Kaj.Dock",
                                      1,
                                      0,
                                      "Dock",
