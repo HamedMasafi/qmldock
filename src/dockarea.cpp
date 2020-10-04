@@ -48,37 +48,18 @@ void DockArea::paint(QPainter *painter)
     painter->fillRect(clipRect(), Qt::lightGray);
 }
 
+QList<DockWidget *> DockArea::dockWidgets() const
+{
+    return _dockWidgets;
+}
+
 void DockArea::itemChange(QQuickItem::ItemChange change,
                           const QQuickItem::ItemChangeData &data)
 {
     if (change == QQuickItem::ItemChildAddedChange) {
         auto dw = qobject_cast<DockWidget *>(data.item);
         if (dw) {
-
-                dw->setZ(Z_WIDGET);
-
-            _dockWidgets.append(dw);
-            connect(dw,
-                    &DockWidget::beginMove,
-                    this,
-                    &DockArea::dockWidget_beginMove);
-
-            connect(dw, &DockWidget::moving, this, &DockArea::dockWidget_moving);
-            connect(dw, &DockWidget::moved, this, &DockArea::dockWidget_moved);
-            connect(dw, &QQuickItem::visibleChanged, this, &DockArea::dockWidget_visibleChanged);
-
-            switch (dw->area()) {
-            case Dock::Left:
-            case Dock::Right:
-            case Dock::Top:
-            case Dock::Bottom:
-            case Dock::Center:
-                _dockGroups[dw->area()]->addDockWidget(dw);
-
-                break;
-            case Dock::Float:
-                break;
-            }
+            addDockWidget(dw);
         }
     }
 
@@ -92,6 +73,39 @@ void DockArea::itemChange(QQuickItem::ItemChange change,
     }
 
     QQuickItem::itemChange(change, data);
+}
+
+void DockArea::addDockWidget(DockWidget *widget)
+{
+    widget->setZ(Z_WIDGET);
+
+    _dockWidgets.append(widget);
+    connect(widget,
+            &DockWidget::beginMove,
+            this,
+            &DockArea::dockWidget_beginMove);
+
+    connect(widget, &DockWidget::moving, this, &DockArea::dockWidget_moving);
+    connect(widget, &DockWidget::moved, this, &DockArea::dockWidget_moved);
+    connect(widget,
+            &QQuickItem::visibleChanged,
+            this,
+            &DockArea::dockWidget_visibleChanged);
+
+    switch (widget->area()) {
+    case Dock::Left:
+    case Dock::Right:
+    case Dock::Top:
+    case Dock::Bottom:
+    case Dock::Center:
+        _dockGroups[widget->area()]->addDockWidget(widget);
+
+        break;
+    case Dock::Float:
+        break;
+    }
+
+    emit dockWidgetsChanged(_dockWidgets);
 }
 
 void DockArea::reorderDockGroups()
@@ -121,8 +135,8 @@ void DockArea::reorderDockGroups()
 //        handler = _resizeHandlers[Dock::Left];
 
 //        handler->setVisible(true);
-//        handler->setPosition(QPointF(rc.left() - Dock::resizeHandleSize, 0));
-//        rc.setLeft(rc.left() + Dock::resizeHandleSize);
+//        handler->setPosition(QPointF(rc.left() - DockStyle::instance()->resizeHandleSize(), 0));
+//        rc.setLeft(rc.left() + DockStyle::instance()->resizeHandleSize());
 //        handler->setHeight(_resizeHandlers[Dock::Left]->height());
 //        handler->setWidth(20);
 //    } else {

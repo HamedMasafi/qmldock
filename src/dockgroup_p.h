@@ -43,6 +43,9 @@ public:
     void normalizeItemSizes();
     QRectF updateUsableArea();
     DockGroupResizeHandler *createHandlers();
+
+    qreal minimumSize;
+    qreal maximumSize;
 };
 
 #endif // DOCKGROUP_P_H

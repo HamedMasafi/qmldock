@@ -23,6 +23,7 @@ void DockPlugin::registerDockPlugin()
                                      0,
                                      "Dock",
                                      "Error: only enums");
+    qRegisterMetaType<QList<DockWidget *>>();
 
     QFontDatabase::addApplicationFont(":/icons.ttf");
 }

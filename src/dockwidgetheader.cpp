@@ -36,6 +36,16 @@ void DockWidgetHeader::setEnableMove(bool enableMove)
     _enableMove = enableMove;
 }
 
+bool DockWidgetHeader::pinButtonVisible() const
+{
+    return pinButton->isVisible();
+}
+
+void DockWidgetHeader::setPinButtonVisible(bool pinButtonVisible)
+{
+    pinButton->setVisible(pinButtonVisible);
+}
+
 DockWidgetHeader::DockWidgetHeader(DockWidget *parent)
     : QQuickPaintedItem(parent), parentDock(parent)
     , pinButton(new DockWidgetHeaderButton(this))

@@ -42,10 +42,15 @@ bool DockWidget::showHeader() const
     return m_showHeader;
 }
 
+bool DockWidget::detachable() const
+{
+    return m_detachable;
+}
+
 DockWidget::DockWidget(QQuickItem *parent)
     : QQuickPage(parent), _dockGroup{nullptr}, _originalSize{200, 200}
       , isDetached{false}, m_closable{true}, m_resizable{true}, m_movable{true}
-      , m_showHeader{true}
+      , m_showHeader{true}, m_detachable{false}
 {
     _header = new DockWidgetHeader(this);
     setHeader(_header);
@@ -166,6 +171,16 @@ void DockWidget::setShowHeader(bool showHeader)
     header()->setVisible(showHeader);
     m_showHeader = showHeader;
     emit showHeaderChanged(m_showHeader);
+}
+
+void DockWidget::setDetachable(bool detachable)
+{
+    if (m_detachable == detachable)
+        return;
+
+    m_detachable = detachable;
+    _header->setPinButtonVisible(detachable);
+    emit detachableChanged(m_detachable);
 }
 
 void DockWidget::header_moveStarted()

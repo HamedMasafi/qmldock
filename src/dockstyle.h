@@ -31,6 +31,7 @@ public:
     qreal tabBarButtonHeight() const;
     qreal tabBarButtonY() const;
     qreal tabMargin() const;
+    qreal resizeHandleSize() const;
 
     QColor mainColor() const;
     QColor hoverColor() const;

@@ -17,6 +17,8 @@ class DockGroup : public QQuickPaintedItem
     Q_PROPERTY(bool enableResizing READ enableResizing WRITE setEnableResizing
                    NOTIFY enableResizingChanged)
     Q_PROPERTY(Dock::DockWidgetDisplayType displayType READ displayType WRITE setDisplayType NOTIFY displayTypeChanged)
+    Q_PROPERTY(qreal minimumSize READ minimumSize WRITE setMinimumSize NOTIFY minimumSizeChanged)
+    Q_PROPERTY(qreal maximumSize READ maximumSize WRITE setMaximumSize NOTIFY maximumSizeChanged)
 
     Q_DECLARE_PRIVATE(DockGroup);
     DockGroupPrivate *d_ptr;
@@ -37,6 +39,10 @@ public:
 
     Dock::DockWidgetDisplayType displayType() const;
 
+    qreal minimumSize() const;
+
+    qreal maximumSize() const;
+
 public slots:
     void addDockWidget(DockWidget *item);
     void removeDockWidget(DockWidget *item);
@@ -49,6 +55,10 @@ public slots:
 
     void setDisplayType(Dock::DockWidgetDisplayType displayType);
 
+    void setMinimumSize(qreal minimumSize);
+
+    void setMaximumSize(qreal maximumSize);
+
 signals:
     void requestResize(const QRectF &rect, bool *ok);
     void isOpenChanged(bool isOpen);
@@ -60,6 +70,10 @@ signals:
 
     void displayTypeChanged(Dock::DockWidgetDisplayType displayType);
 
+    void minimumSizeChanged(qreal minimumSize);
+
+    void maximumSizeChanged(qreal maximumSize);
+
 protected:
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
 
@@ -67,30 +81,6 @@ private slots:
     void tabBar_currentIndexChanged(int index);
     void handler_moving(qreal pos, bool *ok);
     void handler_moved();
-
-private:
-//    bool isHorizontal() const;
-//    bool isVertical() const;
-//    bool acceptResizeEvent(const QPointF &point);
-//    void fitItem(QQuickItem *item);
-
-//    bool m_isOpen;
-//    bool m_ownStartArea;
-//    bool m_ownEndArea;
-//    qreal m_panelSize;
-//    QColor _color;
-//    QList<DockWidget *> _dockWidgets;
-//    QList<DockGroupResizeHandler *> _handlers;
-//    QMap<int, qreal> _itemSizes;
-//    qreal _lastGroupSize;
-//    qreal _lastMousePos;
-//    bool _mousepRessed;
-
-//    void reorderItems();
-//    void reorderHandles();
-//    DockGroupResizeHandler *createHandlers();
-//    Dock::Area m_area;
-//    bool m_enableResizing;
 
 protected:
     void hoverMoveEvent(QHoverEvent *event);

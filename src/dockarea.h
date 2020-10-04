@@ -11,6 +11,8 @@ class DockGroupResizeHandler;
 class DockArea : public QQuickPaintedItem
 {
     Q_OBJECT
+    Q_PROPERTY(QList<DockWidget *> dockWidgets READ dockWidgets NOTIFY dockWidgetsChanged)
+
     QList<DockWidget *> _dockWidgets;
     DockMoveGuide *_dockMoveGuide;
     QMap<Dock::Area, DockGroup *> _dockGroups;
@@ -18,12 +20,17 @@ public:
     DockArea(QQuickItem *parent = nullptr);
     void paint(QPainter *painter);
 
+    QList<DockWidget *> dockWidgets() const;
+
 signals:
+
+    void dockWidgetsChanged(QList<DockWidget *> dockWidgets);
 
 protected:
     void itemChange(ItemChange, const ItemChangeData &);
 
 public slots:
+    void addDockWidget(DockWidget *widget);
     void reorderDockGroups();
 
 private slots:

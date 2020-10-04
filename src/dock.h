@@ -30,6 +30,6 @@ namespace Dock {
         TabbedView
     };
     Q_ENUM_NS(DockWidgetDisplayType)
-    extern const qreal resizeHandleSize;
+//    extern const qreal resizeHandleSize;
 }
 #endif // DOCK_H

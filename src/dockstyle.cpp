@@ -37,6 +37,11 @@ qreal DockStyle::tabMargin() const
     return 6;
 }
 
+qreal DockStyle::resizeHandleSize() const
+{
+    return 8;
+}
+
 QColor DockStyle::mainColor() const
 {
     return Qt::white;
@@ -121,7 +126,7 @@ void DockStyle::paintWidgetButton(QPainter *p,
         break;
     }
     p->setFont(QFont("icons"));
-    p->drawText(item->clipRect(), Qt::AlignCenter, "B");
+    p->drawText(item->clipRect(), Qt::AlignCenter, item->icon());
 }
 
 void DockStyle::paintResizeHandler(QPainter *p, DockGroupResizeHandler *item, Dock::ButtonStatus status)

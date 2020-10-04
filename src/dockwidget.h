@@ -17,6 +17,7 @@ class DockWidget : public QQuickPage {
     Q_PROPERTY(bool resizable READ resizable WRITE setResizable NOTIFY resizableChanged)
     Q_PROPERTY(bool movable READ movable WRITE setMovable NOTIFY movableChanged)
     Q_PROPERTY(bool showHeader READ showHeader WRITE setShowHeader NOTIFY showHeaderChanged)
+    Q_PROPERTY(bool detachable READ detachable WRITE setDetachable NOTIFY detachableChanged)
 
 public:
     DockWidget(QQuickItem *parent = nullptr);
@@ -34,6 +35,8 @@ public:
 
     bool showHeader() const;
 
+    bool detachable() const;
+
 public slots:
     void detach();
     void close();
@@ -47,6 +50,8 @@ public slots:
     void setMovable(bool movable);
 
     void setShowHeader(bool showHeader);
+
+    void setDetachable(bool detachable);
 
 private slots:
     void header_moveStarted();
@@ -71,6 +76,8 @@ signals:
 
     void showHeaderChanged(bool showHeader);
 
+    void detachableChanged(bool detachable);
+
 private:
     Dock::Area m_area;
     QSizeF _originalSize;
@@ -84,6 +91,8 @@ private:
     bool m_movable;
 
     bool m_showHeader;
+
+    bool m_detachable;
 
 protected:
     void itemChange(ItemChange, const ItemChangeData &);

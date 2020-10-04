@@ -43,6 +43,9 @@ public:
     bool enableMove() const;
     void setEnableMove(bool enableMove);
 
+    bool pinButtonVisible() const;
+    void setPinButtonVisible(bool pinButtonVisible);
+
 public slots:
     void setTitle(const QString &title);
 
