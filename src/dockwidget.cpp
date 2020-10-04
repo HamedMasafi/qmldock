@@ -22,8 +22,30 @@ Dock::Area DockWidget::area() const
     return m_area;
 }
 
-DockWidget::DockWidget(QQuickItem *parent) : QQuickPage(parent)
-      , _dockGroup{nullptr}, _originalSize{200, 200}, isDetached{false}
+bool DockWidget::closable() const
+{
+    return m_closable;
+}
+
+bool DockWidget::resizable() const
+{
+    return m_resizable;
+}
+
+bool DockWidget::movable() const
+{
+    return m_movable;
+}
+
+bool DockWidget::showHeader() const
+{
+    return m_showHeader;
+}
+
+DockWidget::DockWidget(QQuickItem *parent)
+    : QQuickPage(parent), _dockGroup{nullptr}, _originalSize{200, 200}
+      , isDetached{false}, m_closable{true}, m_resizable{true}, m_movable{true}
+      , m_showHeader{true}
 {
     _header = new DockWidgetHeader(this);
     setHeader(_header);
@@ -31,6 +53,7 @@ DockWidget::DockWidget(QQuickItem *parent) : QQuickPage(parent)
     _header->setSize(QSizeF(width(), 30));
     _header->setVisible(true);
     _header->setZ(999);
+    qDebug() << "ctor";
 
     setBackground(new DockWidgetBackground(this));
 //    setBackground(new DebugRect(Qt::green, this));
@@ -103,6 +126,46 @@ void DockWidget::setArea(Dock::Area area)
 
     m_area = area;
     emit areaChanged(m_area);
+}
+
+void DockWidget::setClosable(bool closable)
+{
+    if (m_closable == closable)
+        return;
+
+    _header->setCloseButtonVisible(closable);
+    m_closable = closable;
+    emit closableChanged(m_closable);
+}
+
+void DockWidget::setResizable(bool resizable)
+{
+    if (m_resizable == resizable)
+        return;
+
+    m_resizable = resizable;
+    emit resizableChanged(m_resizable);
+}
+
+void DockWidget::setMovable(bool movable)
+{
+    if (m_movable == movable)
+        return;
+
+    m_movable = movable;
+    emit movableChanged(m_movable);
+}
+
+void DockWidget::setShowHeader(bool showHeader)
+{
+    if (m_showHeader == showHeader)
+        return;
+
+    qDebug() << "set show";
+    _header->setVisible(showHeader);
+    header()->setVisible(showHeader);
+    m_showHeader = showHeader;
+    emit showHeaderChanged(m_showHeader);
 }
 
 void DockWidget::header_moveStarted()

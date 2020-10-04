@@ -21,7 +21,7 @@ class DockWidgetHeader : public QQuickPaintedItem
         Hovered,
         Pressed
     };
-
+    bool _enableMove;
 public:
     DockWidgetHeader(DockWidget *parent = nullptr);
 
@@ -36,6 +36,12 @@ public:
 
 //    // QQuickItem interface
     QString title() const;
+
+    bool closeButtonVisible() const;
+    void setCloseButtonVisible(bool closeButtonVisible);
+
+    bool enableMove() const;
+    void setEnableMove(bool enableMove);
 
 public slots:
     void setTitle(const QString &title);

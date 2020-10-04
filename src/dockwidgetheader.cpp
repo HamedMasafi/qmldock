@@ -16,10 +16,31 @@ void DockWidgetHeader::setTitle(const QString &title)
     update();
 }
 
+bool DockWidgetHeader::closeButtonVisible() const
+{
+    return closeButton->isVisible();
+}
+
+void DockWidgetHeader::setCloseButtonVisible(bool closeButtonVisible)
+{
+    closeButton->setVisible(closeButtonVisible);
+}
+
+bool DockWidgetHeader::enableMove() const
+{
+    return _enableMove;
+}
+
+void DockWidgetHeader::setEnableMove(bool enableMove)
+{
+    _enableMove = enableMove;
+}
+
 DockWidgetHeader::DockWidgetHeader(DockWidget *parent)
     : QQuickPaintedItem(parent), parentDock(parent)
-      , pinButton(new DockWidgetHeaderButton(this))
-      , closeButton(new DockWidgetHeaderButton(this))
+    , pinButton(new DockWidgetHeaderButton(this))
+    , closeButton(new DockWidgetHeaderButton(this))
+      , _enableMove(true)
 
 {
     setHeight(20);
@@ -54,6 +75,10 @@ void DockWidgetHeader::paint(QPainter *painter)
 
 void DockWidgetHeader::mousePressEvent(QMouseEvent *event)
 {
+    if (!_enableMove) {
+        event->ignore();
+        return;
+    }
     _moveEmitted = false;
     _lastMousePos = event->windowPos();
     _lastParentPos = parentDock->position();
