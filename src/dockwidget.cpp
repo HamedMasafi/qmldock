@@ -116,7 +116,10 @@ void DockWidget::detach()
 
 void DockWidget::close()
 {
-    setVisible(false);
+    if (isDetached && dockWindow)
+        dockWindow->setVisible(false);
+    else
+        setVisible(false);
 }
 
 void DockWidget::restoreSize()
