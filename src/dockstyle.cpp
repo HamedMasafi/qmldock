@@ -77,7 +77,9 @@ void DockStyle::paintTabButton(QPainter *p,
                                Dock::ButtonStatus status)
 {
     QRectF rc;
-
+    QTransform t;
+    t.rotate(90);
+    p->setTransform(t);
     switch (status) {
     case Dock::Normal:
         p->setBrush(pressColor());
@@ -158,13 +160,13 @@ void DockStyle::paintResizeHandler(QPainter *p, DockGroupResizeHandler *item, Do
 
 void DockStyle::paintGroup(QPainter *p, DockGroup *item)
 {
-    if (item->displayType() == Dock::TabbedView && item->widgets().count()) {
-        p->setPen(borderColor());
-        p->fillRect(0, 29, item->width() - 1, item->height() - 30, Qt::white);
-        p->drawLine(0, 29, 0, item->height() - 1);
-        p->drawLine(item->width() - 1, 29, item->width() - 1, item->height() - 1);
-        p->drawLine(0, item->height() - 1, item->width() - 1, item->height() - 1);
-    }
+//    if (item->displayType() == Dock::TabbedView && item->widgets().count()) {
+//        p->setPen(borderColor());
+//        p->fillRect(0, 29, item->width() - 1, item->height() - 30, Qt::white);
+//        p->drawLine(0, 29, 0, item->height() - 1);
+//        p->drawLine(item->width() - 1, 29, item->width() - 1, item->height() - 1);
+//        p->drawLine(0, item->height() - 1, item->width() - 1, item->height() - 1);
+//    }
 }
 
 void DockStyle::drawCircle(QPainter *painter, const QPointF &center, bool hover)

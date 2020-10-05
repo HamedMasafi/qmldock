@@ -16,12 +16,12 @@ DockGroupResizeHandler::DockGroupResizeHandler(Qt::Orientation orientation,
 {
     switch (orientation) {
     case Qt::Horizontal:
-        setCursor(Qt::SizeVerCursor);
+        setCursor(Qt::SplitVCursor);
         setHeight(DockStyle::instance()->resizeHandleSize());
         break;
 
     case Qt::Vertical:
-        setCursor(Qt::SizeHorCursor);
+        setCursor(Qt::SplitHCursor);
         setWidth(DockStyle::instance()->resizeHandleSize());
         break;
     }

@@ -46,6 +46,7 @@ public:
 
     qreal minimumSize;
     qreal maximumSize;
+    Qt::Edge tabPosition;
 };
 
 #endif // DOCKGROUP_P_H

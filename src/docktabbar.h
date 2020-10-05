@@ -10,7 +10,7 @@ class DockTabBar : public QQuickPaintedItem
     Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentIndexChanged)
 
     QList<DockTabButton *> _tabs;
-
+    Qt::Edge _edge;
 
 public:
     DockTabBar(QQuickItem *parent = nullptr);
@@ -20,6 +20,9 @@ public:
 
 
     int currentIndex() const;
+
+    Qt::Edge edge() const;
+    void setEdge(const Qt::Edge &edge);
 
 public slots:
     int addTab(const QString &name);
@@ -32,7 +35,7 @@ signals:
     void currentIndexChanged(int currentIndex);
 
 private:
-    void drawTab(QPainter *p, qreal *pos, const QString &title, int status);
+    void reorderTabs();
 
     int m_currentIndex;
 

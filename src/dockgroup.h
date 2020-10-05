@@ -19,9 +19,11 @@ class DockGroup : public QQuickPaintedItem
     Q_PROPERTY(Dock::DockWidgetDisplayType displayType READ displayType WRITE setDisplayType NOTIFY displayTypeChanged)
     Q_PROPERTY(qreal minimumSize READ minimumSize WRITE setMinimumSize NOTIFY minimumSizeChanged)
     Q_PROPERTY(qreal maximumSize READ maximumSize WRITE setMaximumSize NOTIFY maximumSizeChanged)
+    Q_PROPERTY(Qt::Edge tabPosition READ tabPosition WRITE setTabPosition NOTIFY tabPositionChanged)
 
     Q_DECLARE_PRIVATE(DockGroup);
     DockGroupPrivate *d_ptr;
+
 public:
     DockGroup(QQuickItem *parent = nullptr);
     DockGroup(Dock::Area area, QQuickItem *parent = nullptr);
@@ -43,6 +45,8 @@ public:
 
     qreal maximumSize() const;
 
+    Qt::Edge tabPosition() const;
+
 public slots:
     void addDockWidget(DockWidget *item);
     void removeDockWidget(DockWidget *item);
@@ -59,6 +63,8 @@ public slots:
 
     void setMaximumSize(qreal maximumSize);
 
+    void setTabPosition(Qt::Edge tabPosition);
+
 signals:
     void requestResize(const QRectF &rect, bool *ok);
     void isOpenChanged(bool isOpen);
@@ -73,6 +79,8 @@ signals:
     void minimumSizeChanged(qreal minimumSize);
 
     void maximumSizeChanged(qreal maximumSize);
+
+    void tabPositionChanged(Qt::Edge tabPosition);
 
 protected:
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);

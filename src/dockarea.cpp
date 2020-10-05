@@ -22,6 +22,7 @@ DockArea::DockArea(QQuickItem *parent) : QQuickPaintedItem(parent)
     createGroup(Dock::Bottom);
 
     _dockGroups[Dock::Center]->setDisplayType(Dock::TabbedView);
+    _dockGroups[Dock::Center]->setTabPosition(Qt::LeftEdge);
 
     _dockMoveGuide = new DockMoveGuide(this);
     _dockMoveGuide->setVisible(false);

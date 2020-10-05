@@ -56,9 +56,10 @@ int DockTabBar::addTab(const QString &name)
     auto t = new DockTabButton{name, this};
     t->setWidth(QFontMetrics(DockStyle::instance()->defaultFont()).horizontalAdvance(name) + 15);
     t->setY(DockStyle::instance()->tabBarButtonY());
-    t->setHeight(DockStyle::instance()->tabBarButtonHeight());
+    t->setHeight(t->width());
     connect(t, &DockTabButton::clicked, this, &DockTabBar::tabButton_clicked);
     _tabs.append(t);
+    reorderTabs();
     return _tabs.count() - 1;
 }
 
@@ -75,29 +76,36 @@ void DockTabBar::removeTab(int index)
     if (index >= _tabs.count())
         setCurrentIndex(qBound(0, m_currentIndex, _tabs.count() - 1));
 
-    geometryChanged(QRect(), QRect());
+    reorderTabs();
 }
 
 void DockTabBar::paint(QPainter *painter)
 {
-    //    painter->fillRect(clipRect(), Qt::green);
-    //    qreal p{0};
-    //    for (auto t : _tabs)
-    //        drawTab(painter, &p, t->title, 0);
     DockStyle::instance()->paintTabBar(painter, this);
 }
 
-void DockTabBar::drawTab(QPainter *p,
-                         qreal *pos,
-                         const QString &title,
-                         int status)
+void DockTabBar::reorderTabs()
 {
-    p->setPen(Qt::black);
-    p->setBrush(Qt::yellow);
-    QRectF rc(*pos, 0, p->fontMetrics().horizontalAdvance(title) + 20, height());
-    p->drawRoundedRect(rc, 5, 5);
-    p->drawText(rc, Qt::AlignCenter, title);
-    *pos += rc.width() + 2;
+    qreal xx{0};
+    for (auto btn : _tabs) {
+        switch (_edge) {
+        case Qt::TopEdge:
+        case Qt::BottomEdge:
+            btn->setY(DockStyle::instance()->tabBarButtonY());
+            btn->setHeight(DockStyle::instance()->tabBarButtonHeight());
+            btn->setX(xx);
+            xx += btn->width();
+            break;
+
+        case Qt::LeftEdge:
+        case Qt::RightEdge:
+            btn->setX(0);
+            btn->setWidth(width());
+            btn->setY(xx);
+            xx += btn->height();
+            break;
+        }
+    }
 }
 
 void DockTabBar::tabButton_clicked()
@@ -112,9 +120,17 @@ void DockTabBar::tabButton_clicked()
 void DockTabBar::geometryChanged(const QRectF &newGeometry,
                                  const QRectF &oldGeometry)
 {
-    qreal xx{0};
-    for (auto btn : _tabs) {
-        btn->setX(xx);
-        xx += btn->width();
-    }
+    reorderTabs();
+    QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);
+}
+
+Qt::Edge DockTabBar::edge() const
+{
+    return _edge;
+}
+
+void DockTabBar::setEdge(const Qt::Edge &edge)
+{
+    _edge = edge;
+    reorderTabs();
 }
