@@ -19,15 +19,19 @@ class DockGroup : public QQuickPaintedItem
     Q_PROPERTY(Dock::DockWidgetDisplayType displayType READ displayType WRITE setDisplayType NOTIFY displayTypeChanged)
     Q_PROPERTY(qreal minimumSize READ minimumSize WRITE setMinimumSize NOTIFY minimumSizeChanged)
     Q_PROPERTY(qreal maximumSize READ maximumSize WRITE setMaximumSize NOTIFY maximumSizeChanged)
+    Q_PROPERTY(QList<DockWidget*> dockWidgets READ dockWidgets NOTIFY dockWidgetsChanged)
+    Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentIndexChanged)
+    Q_PROPERTY(bool showTabBar READ showTabBar WRITE setShowTabBar NOTIFY showTabBarChanged)
 
     Q_DECLARE_PRIVATE(DockGroup);
     DockGroupPrivate *d_ptr;
+    QList<DockWidget*> m_name;
+
 public:
     DockGroup(QQuickItem *parent = nullptr);
     DockGroup(Dock::Area area, QQuickItem *parent = nullptr);
 
     void paint(QPainter *painter);
-    void setColor(const QColor &color);
     bool isOpen() const;
     qreal panelSize() const;
 
@@ -42,6 +46,12 @@ public:
     qreal minimumSize() const;
 
     qreal maximumSize() const;
+
+    QList<DockWidget*> dockWidgets() const;
+
+    int currentIndex() const;
+
+    bool showTabBar() const;
 
 public slots:
     void addDockWidget(DockWidget *item);
@@ -59,6 +69,10 @@ public slots:
 
     void setMaximumSize(qreal maximumSize);
 
+    void setCurrentIndex(int currentIndex);
+
+    void setShowTabBar(bool showTabBar);
+
 signals:
     void requestResize(const QRectF &rect, bool *ok);
     void isOpenChanged(bool isOpen);
@@ -73,6 +87,12 @@ signals:
     void minimumSizeChanged(qreal minimumSize);
 
     void maximumSizeChanged(qreal maximumSize);
+
+    void dockWidgetsChanged(QList<DockWidget*> name);
+
+    void currentIndexChanged(int currentIndex);
+
+    void showTabBarChanged(bool showTabBar);
 
 protected:
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);

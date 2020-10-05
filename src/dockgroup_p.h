@@ -46,6 +46,7 @@ public:
 
     qreal minimumSize;
     qreal maximumSize;
+    bool showTabBar;
 };
 
 #endif // DOCKGROUP_P_H

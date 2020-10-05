@@ -158,6 +158,7 @@ void DockWidget::setMovable(bool movable)
         return;
 
     m_movable = movable;
+    _header->setEnableMove(movable);
     emit movableChanged(m_movable);
 }
 
@@ -209,7 +210,7 @@ bool DockWidget::childMouseEventFilter(QQuickItem *item, QEvent *e)
     static QPointF _lastChildPos;
     static bool _moveEmitted = false;
 
-    if (item != header())
+    if (item != header() || !m_movable)
         return false;
 
     auto me = static_cast<QMouseEvent *>(e);

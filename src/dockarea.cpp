@@ -12,16 +12,12 @@
 #define Z_RESIZER 400
 #define Z_GUIDE 500
 DockArea::DockArea(QQuickItem *parent) : QQuickPaintedItem(parent)
+        , m_topLeftOwner(Qt::LeftEdge)
+        , m_topRightOwner(Qt::RightEdge)
+        , m_bottomLeftOwner(Qt::LeftEdge)
+        , m_bottomRightOwner(Qt::RightEdge)
 {
     setClip(true);
-
-    createGroup(Dock::Center);
-    createGroup(Dock::Left);
-    createGroup(Dock::Right);
-    createGroup(Dock::Top);
-    createGroup(Dock::Bottom);
-
-    _dockGroups[Dock::Center]->setDisplayType(Dock::TabbedView);
 
     _dockMoveGuide = new DockMoveGuide(this);
     _dockMoveGuide->setVisible(false);
@@ -29,18 +25,21 @@ DockArea::DockArea(QQuickItem *parent) : QQuickPaintedItem(parent)
     _dockMoveGuide->setSize(QSizeF(30, 30));
     _dockMoveGuide->setZ(Z_GUIDE);
     _dockMoveGuide->update();
+}
 
-    _dockGroups[Dock::Center]->setColor(Qt::gray);
-    _dockGroups[Dock::Top]->setColor(Qt::red);
-    _dockGroups[Dock::Right]->setColor(Qt::green);
-    _dockGroups[Dock::Bottom]->setColor(Qt::blue);
-    _dockGroups[Dock::Left]->setColor(Qt::transparent);
+void DockArea::componentComplete()
+{
+    createGroup(Dock::Center);
+    createGroup(Dock::Left);
+    createGroup(Dock::Right);
+    createGroup(Dock::Top);
+    createGroup(Dock::Bottom);
+    _dockGroups[Dock::Center]->setDisplayType(Dock::TabbedView);
 
-//    auto d = new DockWidget(_dockGroups[1]);
-//    _dockGroups[1]->addDockWidget(d);
+    for (auto &dw : _initialWidgets)
+        addDockWidget(dw);
 
-//    auto d2 = new DockWidget(_dockGroups[1]);
-    //    _dockGroups[1]->addDockWidget(d2);
+    QQuickItem::componentComplete();
 }
 
 void DockArea::paint(QPainter *painter)
@@ -59,7 +58,16 @@ void DockArea::itemChange(QQuickItem::ItemChange change,
     if (change == QQuickItem::ItemChildAddedChange) {
         auto dw = qobject_cast<DockWidget *>(data.item);
         if (dw) {
-            addDockWidget(dw);
+            if (isComponentComplete())
+                addDockWidget(dw);
+            else
+                _initialWidgets.append(dw);
+        }
+
+        auto dg = qobject_cast<DockGroup *>(data.item);
+        if (dg) {
+            if (!_dockGroups.contains(dg->area()))
+                _dockGroups.insert(dg->area(), dg);
         }
     }
 
@@ -77,7 +85,7 @@ void DockArea::itemChange(QQuickItem::ItemChange change,
 
 void DockArea::addDockWidget(DockWidget *widget)
 {
-    widget->setZ(Z_WIDGET);
+    widget->setZ(widget->area() == Dock::Float ? Z_WIDGET_FLOAT : Z_WIDGET);
 
     _dockWidgets.append(widget);
     connect(widget,
@@ -117,35 +125,115 @@ void DockArea::reorderDockGroups()
     rc.setWidth(width() - panelSize(Dock::Right) - panelSize(Dock::Left));
     rc.setHeight(height() - panelSize(Dock::Top) - panelSize(Dock::Bottom));
 
-    _dockGroups[Dock::Left]->setPosition(QPointF(0, 0));
-    _dockGroups[Dock::Left]->setSize(QSizeF(rc.left(), height()));
+    qreal leftStart, leftEnd;
+    qreal topStart, topEnd;
+    qreal rightStart, rightEnd;
+    qreal bottomStart, bottomEnd;
 
-    _dockGroups[Dock::Top]->setPosition(QPointF(rc.left(), 0));
-    _dockGroups[Dock::Top]->setSize(QSizeF(rc.width(), rc.top()));
+    if (m_topLeftOwner == Qt::LeftEdge) {
+        leftStart = 0;
+        topStart = rc.left();
+    } else {
+        leftStart = rc.top();
+        topStart = 0;
+    }
 
-    _dockGroups[Dock::Right]->setPosition(QPointF(rc.right(), 0));
-    _dockGroups[Dock::Right]->setSize(QSizeF(width() - rc.right(), height()));
+    if (m_topRightOwner == Qt::RightEdge) {
+        topEnd = rc.right();
+        rightStart = 0;
+    } else {
+        topEnd = width();
+        rightStart = rc.top();
+    }
 
-    _dockGroups[Dock::Bottom]->setPosition(rc.bottomLeft());
-    _dockGroups[Dock::Bottom]->setSize(
-        QSizeF(rc.width(), height() - rc.height()));
+    if (m_bottomLeftOwner == Qt::LeftEdge) {
+        leftEnd = height();
+        bottomStart = rc.left();
+    } else {
+        leftEnd = rc.bottom();
+        bottomStart = 0;
+    }
 
-//    DockGroupResizeHandler *handler;
-//    if (_dockGroups[Dock::Left]->isOpen()) {
-//        handler = _resizeHandlers[Dock::Left];
+    if (m_bottomRightOwner == Qt::RightEdge) {
+        bottomEnd = rc.right();
+        rightEnd = height();
+    } else {
+        bottomEnd = width();
+        rightEnd = rc.bottom();
+    }
+    _dockGroups[Dock::Left]->setPosition(QPointF(0, leftStart));
+    _dockGroups[Dock::Left]->setSize(QSizeF(rc.left(), leftEnd - leftStart));
 
-//        handler->setVisible(true);
-//        handler->setPosition(QPointF(rc.left() - DockStyle::instance()->resizeHandleSize(), 0));
-//        rc.setLeft(rc.left() + DockStyle::instance()->resizeHandleSize());
-//        handler->setHeight(_resizeHandlers[Dock::Left]->height());
-//        handler->setWidth(20);
-//    } else {
-//        _resizeHandlers[Dock::Left]->setVisible(false);
-//    }
+    _dockGroups[Dock::Top]->setPosition(QPointF(topStart, 0));
+    _dockGroups[Dock::Top]->setSize(QSizeF(topEnd - topStart, rc.top()));
 
+    _dockGroups[Dock::Right]->setPosition(QPointF(rc.right(), rightStart));
+    _dockGroups[Dock::Right]->setSize(QSizeF(width() - rc.right(), rightEnd - rightStart));
+
+    _dockGroups[Dock::Bottom]->setPosition(QPointF(bottomStart, rc.bottom()));
+    _dockGroups[Dock::Bottom]->setSize(QSizeF(bottomEnd - bottomStart, height() - rc.height()));
 
     _dockGroups[Dock::Center]->setPosition(rc.topLeft());
     _dockGroups[Dock::Center]->setSize(rc.size());
+}
+
+void DockArea::setTopLeftOwner(Qt::Edge topLeftOwner)
+{
+    if (topLeftOwner != Qt::LeftEdge && topLeftOwner != Qt::TopEdge) {
+        qDebug() << "Invalid value for topLeftOwner";
+        return;
+    }
+    if (m_topLeftOwner == topLeftOwner)
+        return;
+
+    m_topLeftOwner = topLeftOwner;
+    reorderDockGroups();
+    emit topLeftOwnerChanged(m_topLeftOwner);
+}
+
+void DockArea::setTopRightOwner(Qt::Edge topRightOwner)
+{
+    if (topRightOwner != Qt::TopEdge && topRightOwner != Qt::RightEdge) {
+        qDebug() << "Invalid value for topRightOwner";
+        return;
+    }
+
+    if (m_topRightOwner == topRightOwner)
+        return;
+
+    m_topRightOwner = topRightOwner;
+    reorderDockGroups();
+    emit topRightOwnerChanged(m_topRightOwner);
+}
+
+void DockArea::setBottomLeftOwner(Qt::Edge bottomLeftOwner)
+{
+    if (bottomLeftOwner != Qt::BottomEdge && bottomLeftOwner != Qt::LeftEdge) {
+        qDebug() << "Invalid value for bottomLeftOwner";
+        return;
+    }
+
+    if (m_bottomLeftOwner == bottomLeftOwner)
+        return;
+
+    m_bottomLeftOwner = bottomLeftOwner;
+    reorderDockGroups();
+    emit bottomLeftOwnerChanged(m_bottomLeftOwner);
+}
+
+void DockArea::setBottomRightOwner(Qt::Edge bottomRightOwner)
+{
+    if (bottomRightOwner != Qt::BottomEdge && bottomRightOwner != Qt::RightEdge) {
+        qDebug() << "Invalid value for bottomRightOwner";
+        return;
+    }
+
+    if (m_bottomRightOwner == bottomRightOwner)
+        return;
+
+    m_bottomRightOwner = bottomRightOwner;
+    reorderDockGroups();
+    emit bottomRightOwnerChanged(m_bottomRightOwner);
 }
 
 void DockArea::dockWidget_beginMove()
@@ -206,8 +294,12 @@ void DockArea::dockWidget_visibleChanged()
     if (!dw)
         return;
 
-    if (dw->dockGroup()) {
-        dw->dockGroup()->removeDockWidget(dw);
+    if (dw->isVisible()) {
+        _dockGroups[dw->area()]->addDockWidget(dw);
+    } else {
+        if (dw->dockGroup()) {
+            dw->dockGroup()->removeDockWidget(dw);
+        }
     }
 }
 
@@ -227,18 +319,39 @@ int DockArea::panelSize(Dock::Area area) const
                : 0.;
 }
 
-DockGroup *DockArea::createGroup(Dock::Area area)
+DockGroup *DockArea::createGroup(Dock::Area area, DockGroup *item)
 {
     if (_dockGroups.contains(area))
         return _dockGroups.value(area);
 
-    auto d = new DockGroup(area, this);
-    d->setVisible(true);
-    d->setZ(Z_GROUP);
-    d->setPanelSize(200);
-    d->setDisplayType(Dock::SplitView);
-    connect(d, &DockGroup::panelSizeChanged, this, &DockArea::reorderDockGroups);
-    _dockGroups.insert(area, d);
+    if (!item)
+        item = new DockGroup(area, this);
+    item->setVisible(true);
+    item->setZ(Z_GROUP);
+    item->setPanelSize(200);
+    item->setDisplayType(Dock::SplitView);
+    connect(item, &DockGroup::panelSizeChanged, this, &DockArea::reorderDockGroups);
+    _dockGroups.insert(area, item);
 
-    return d;
+    return item;
+}
+
+Qt::Edge DockArea::topLeftOwner() const
+{
+    return m_topLeftOwner;
+}
+
+Qt::Edge DockArea::topRightOwner() const
+{
+    return m_topRightOwner;
+}
+
+Qt::Edge DockArea::bottomLeftOwner() const
+{
+    return m_bottomLeftOwner;
+}
+
+Qt::Edge DockArea::bottomRightOwner() const
+{
+    return m_bottomRightOwner;
 }

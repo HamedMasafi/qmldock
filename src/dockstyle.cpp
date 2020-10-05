@@ -158,7 +158,7 @@ void DockStyle::paintResizeHandler(QPainter *p, DockGroupResizeHandler *item, Do
 
 void DockStyle::paintGroup(QPainter *p, DockGroup *item)
 {
-    if (item->displayType() == Dock::TabbedView && item->widgets().count()) {
+    if (item->displayType() == Dock::TabbedView && item->widgets().count() && item->showTabBar()) {
         p->setPen(borderColor());
         p->fillRect(0, 29, item->width() - 1, item->height() - 30, Qt::white);
         p->drawLine(0, 29, 0, item->height() - 1);

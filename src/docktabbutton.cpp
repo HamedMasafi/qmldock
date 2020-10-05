@@ -13,7 +13,6 @@ DockTabButton::DockTabButton(QString title, QQuickItem *parent)
 
 void DockTabButton::paint(QPainter *painter)
 {
-    qDebug() << _status;
     DockStyle::instance()->paintTabButton(painter, this, _status);
 }
 

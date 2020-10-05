@@ -15,7 +15,7 @@ DockGroupPrivate::DockGroupPrivate(DockGroup *parent)
     : q_ptr(parent), mousepRessed{false},
       area(Dock::Float), enableResizing{true}
       , tabBar{nullptr}, displayType{Dock::SplitView}
-      , minimumSize(80), maximumSize(400)
+      , minimumSize(80), maximumSize(400), showTabBar{true}
 {
 }
 
@@ -126,13 +126,19 @@ void DockGroupPrivate::fitItem(QQuickItem *item)
         break;
 
     case Dock::Center:
-        item->setPosition(QPointF(q->x() + DockStyle::instance()->tabMargin(),
-                                  q->y() + DockStyle::instance()->tabMargin()
-                                      + DockStyle::instance()->tabBarHeight()));
-        item->setSize(
-            QSizeF(q->width() - 2 * +DockStyle::instance()->tabMargin(),
-                   q->height() - (2 * +DockStyle::instance()->tabMargin())
-                       - DockStyle::instance()->tabBarHeight()));
+        if (showTabBar) {
+            item->setPosition(
+                QPointF(q->x() + DockStyle::instance()->tabMargin(),
+                        q->y() + DockStyle::instance()->tabMargin()
+                            + DockStyle::instance()->tabBarHeight()));
+            item->setSize(
+                QSizeF(q->width() - 2 * +DockStyle::instance()->tabMargin(),
+                       q->height() - (2 * +DockStyle::instance()->tabMargin())
+                           - DockStyle::instance()->tabBarHeight()));
+        } else {
+            item->setPosition(QPointF(q->x() + 1, q->y() + 1));
+            item->setSize(QSizeF(q->width() - 2, q->height() - 2));
+        }
         break;
 
     case Dock::Float:
@@ -269,6 +275,10 @@ DockGroup::DockGroup(QQuickItem *parent)
     setAcceptedMouseButtons(Qt::LeftButton);
 
     d->tabBar = new DockTabBar(this);
+    connect(d->tabBar,
+            &DockTabBar::currentIndexChanged,
+            this,
+            &DockGroup::tabBar_currentIndexChanged);
 }
 
 DockGroup::DockGroup(Dock::Area area, QQuickItem *parent)
@@ -421,12 +431,6 @@ void DockGroup::mouseReleaseEvent(QMouseEvent *event)
     setKeepMouseGrab(false);
 }
 
-void DockGroup::setColor(const QColor &color)
-{
-    Q_D(DockGroup);
-    //    setBackground(new DebugRect(_color, this));
-}
-
 void DockGroup::geometryChanged(const QRectF &newGeometry,
                                 const QRectF &oldGeometry)
 {
@@ -436,7 +440,7 @@ void DockGroup::geometryChanged(const QRectF &newGeometry,
         return;
 
     if (d->tabBar) {
-        if (d->area == Dock::Center) {
+        if (d->area == Dock::Center && d->showTabBar) {
             d->tabBar->setWidth(width());
             d->tabBar->setHeight(DockStyle::instance()->tabBarHeight());
             d->tabBar->setVisible(true);
@@ -588,6 +592,24 @@ qreal DockGroup::maximumSize() const
     return d->maximumSize;
 }
 
+QList<DockWidget *> DockGroup::dockWidgets() const
+{
+    Q_D(const DockGroup);
+    return d->dockWidgets;
+}
+
+int DockGroup::currentIndex() const
+{
+    Q_D(const DockGroup);
+    return d->tabBar->currentIndex();
+}
+
+bool DockGroup::showTabBar() const
+{
+    Q_D(const DockGroup);
+    return d->showTabBar;
+}
+
 void DockGroup::addDockWidget(DockWidget *item)
 {
     Q_D(DockGroup);
@@ -611,6 +633,8 @@ void DockGroup::addDockWidget(DockWidget *item)
     if (d->displayType == Dock::SplitView)
         d->reorderHandles();
     d->reorderItems();
+
+    emit dockWidgetsChanged(d->dockWidgets);
 }
 
 void DockGroup::removeDockWidget(DockWidget *item)
@@ -644,6 +668,8 @@ void DockGroup::removeDockWidget(DockWidget *item)
     d->normalizeItemSizes();
     d->reorderHandles();
     d->reorderItems();
+
+    emit dockWidgetsChanged(d->dockWidgets);
 }
 
 void DockGroup::setIsOpen(bool isOpen)
@@ -723,13 +749,29 @@ void DockGroup::setMaximumSize(qreal maximumSize)
         setPanelSize(maximumSize);
 }
 
+void DockGroup::setCurrentIndex(int currentIndex)
+{
+    Q_D(DockGroup);
+    if (d->tabBar->currentIndex() == currentIndex)
+        return;
+
+    d->tabBar->setCurrentIndex(currentIndex);
+    emit currentIndexChanged(currentIndex);
+}
+
+void DockGroup::setShowTabBar(bool showTabBar)
+{
+    Q_D(DockGroup);
+
+    if (d->showTabBar == showTabBar)
+        return;
+
+    d->showTabBar = showTabBar;
+    geometryChanged(QRectF(), QRectF());
+    emit showTabBarChanged(showTabBar);
+}
+
 void DockGroup::paint(QPainter *painter)
 {
     DockStyle::instance()->paintGroup(painter, this);
-    //    painter->setOpacity(1);
-    //    painter->setPen(Qt::gray);
-    //    painter->setBrush(Qt::white);
-    //    painter->drawRect(0, 0, width() - 1, height() - 1);
-    //    painter->fillRect(clipRect(), _color);
-    //    painter->setOpacity(0.3);
 }

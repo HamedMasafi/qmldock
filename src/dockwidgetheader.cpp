@@ -96,6 +96,10 @@ void DockWidgetHeader::mousePressEvent(QMouseEvent *event)
 
 void DockWidgetHeader::mouseMoveEvent(QMouseEvent *event)
 {
+    if (!_enableMove) {
+        event->ignore();
+        return;
+    }
     if (_moveEmitted) {
         emit moving(event->pos() + position());
     } else {
@@ -107,6 +111,10 @@ void DockWidgetHeader::mouseMoveEvent(QMouseEvent *event)
 
 void DockWidgetHeader::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (!_enableMove) {
+        event->ignore();
+        return;
+    }
     Q_UNUSED(event)
 
     if (_moveEmitted)
