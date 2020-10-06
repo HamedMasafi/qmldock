@@ -46,7 +46,7 @@ void DockTabBar::setCurrentIndex(int currentIndex)
 }
 
 DockTabBar::DockTabBar(QQuickItem *parent) : QQuickPaintedItem(parent)
-  , m_currentIndex{-1}
+      , m_currentIndex{-1}, _edge{Qt::TopEdge}
 {
 }
 
@@ -113,7 +113,10 @@ void DockTabBar::tabButton_clicked()
     if (!btn)
         return;
 
-    setCurrentIndex(_tabs.indexOf(btn));
+    auto index = _tabs.indexOf(btn);
+    if (m_currentIndex == index)
+        return;
+    setCurrentIndex(index);
 }
 
 void DockTabBar::geometryChanged(const QRectF &newGeometry,

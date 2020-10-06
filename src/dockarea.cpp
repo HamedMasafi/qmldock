@@ -30,12 +30,15 @@ DockArea::DockArea(QQuickItem *parent) : QQuickPaintedItem(parent)
 
 void DockArea::componentComplete()
 {
-    createGroup(Dock::Center);
+    if (!_dockGroups.contains(Dock::Center)) {
+        createGroup(Dock::Center);
+        _dockGroups[Dock::Center]->setDisplayType(Dock::TabbedView);
+    }
     createGroup(Dock::Left);
     createGroup(Dock::Right);
     createGroup(Dock::Top);
     createGroup(Dock::Bottom);
-    _dockGroups[Dock::Center]->setDisplayType(Dock::TabbedView);
+
 
     for (auto &dw : _initialWidgets)
         addDockWidget(dw);
@@ -181,7 +184,7 @@ void DockArea::reorderDockGroups()
 void DockArea::setTopLeftOwner(Qt::Edge topLeftOwner)
 {
     if (topLeftOwner != Qt::LeftEdge && topLeftOwner != Qt::TopEdge) {
-        qDebug() << "Invalid value for topLeftOwner";
+        qWarning() << "Invalid value for topLeftOwner";
         return;
     }
     if (m_topLeftOwner == topLeftOwner)
@@ -195,7 +198,7 @@ void DockArea::setTopLeftOwner(Qt::Edge topLeftOwner)
 void DockArea::setTopRightOwner(Qt::Edge topRightOwner)
 {
     if (topRightOwner != Qt::TopEdge && topRightOwner != Qt::RightEdge) {
-        qDebug() << "Invalid value for topRightOwner";
+        qWarning() << "Invalid value for topRightOwner";
         return;
     }
 
@@ -210,7 +213,7 @@ void DockArea::setTopRightOwner(Qt::Edge topRightOwner)
 void DockArea::setBottomLeftOwner(Qt::Edge bottomLeftOwner)
 {
     if (bottomLeftOwner != Qt::BottomEdge && bottomLeftOwner != Qt::LeftEdge) {
-        qDebug() << "Invalid value for bottomLeftOwner";
+        qWarning() << "Invalid value for bottomLeftOwner";
         return;
     }
 
@@ -225,7 +228,7 @@ void DockArea::setBottomLeftOwner(Qt::Edge bottomLeftOwner)
 void DockArea::setBottomRightOwner(Qt::Edge bottomRightOwner)
 {
     if (bottomRightOwner != Qt::BottomEdge && bottomRightOwner != Qt::RightEdge) {
-        qDebug() << "Invalid value for bottomRightOwner";
+        qWarning() << "Invalid value for bottomRightOwner";
         return;
     }
 
@@ -291,17 +294,17 @@ void DockArea::dockWidget_moved()
 
 void DockArea::dockWidget_visibleChanged()
 {
-    auto dw = qobject_cast<DockWidget *>(sender());
-    if (!dw)
-        return;
+//    auto dw = qobject_cast<DockWidget *>(sender());
+//    if (!dw)
+//        return;
 
-    if (dw->isVisible()) {
-        _dockGroups[dw->area()]->addDockWidget(dw);
-    } else {
-        if (dw->dockGroup()) {
-            dw->dockGroup()->removeDockWidget(dw);
-        }
-    }
+//    if (dw->isVisible()) {
+//        _dockGroups[dw->area()]->addDockWidget(dw);
+//    } else {
+//        if (dw->dockGroup()) {
+//            dw->dockGroup()->removeDockWidget(dw);
+//        }
+//    }
 }
 
 void DockArea::geometryChanged(const QRectF &newGeometry,
@@ -326,7 +329,8 @@ DockGroup *DockArea::createGroup(Dock::Area area, DockGroup *item)
         return _dockGroups.value(area);
 
     if (!item)
-        item = new DockGroup(area, this);
+        item = new DockGroup(this);
+    item->setArea(area);
     item->setVisible(true);
     item->setZ(Z_GROUP);
     item->setPanelSize(200);

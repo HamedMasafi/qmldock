@@ -6,6 +6,7 @@
 #include "dockstyle.h"
 
 #include <QDebug>
+#include <QPainter>
 #include <QQuickWindow>
 
 DockGroup *DockWidget::dockGroup() const
@@ -51,6 +52,7 @@ bool DockWidget::detachable() const
 void DockWidget::paint(QPainter *painter)
 {
     DockStyle::instance()->paintDockWidget(painter, this);
+//    QQuickPaintedItem::paint(painter);
 }
 
 DockWidget::DockWidget(QQuickItem *parent)
@@ -90,25 +92,9 @@ DockWidget::DockWidget(QQuickItem *parent)
 void DockWidget::detach()
 {
     dockWindow = new DockWindow(this);
-    //    window->setFlag(Qt::Tool);
     dockWindow->setTitle(title());
     isDetached = true;
-//    setSize(QSizeF(200, 200));
-
-    //    for (auto& i: contentItem()->childItems()) {
-    ////        if (i == header() || i->inherits("QQuickContentItem"))
-    ////            continue;
-
-    //        qDebug() << i << "moved to window";
-    //        i->setParentItem(window->contentItem());
-    //        i->setVisible(true);
-    //    }
-//    setParentItem(window->contentItem());
-//    setPosition(QPointF(0, 0));
-
-//    setPadding(10);
     dockWindow->show();
-//    setVisible(false);
 }
 
 void DockWidget::close()
@@ -167,7 +153,6 @@ void DockWidget::setShowHeader(bool showHeader)
     if (m_showHeader == showHeader)
         return;
 
-    qDebug() << "set show";
     _header->setVisible(showHeader);
     m_showHeader = showHeader;
     emit showHeaderChanged(m_showHeader);
@@ -189,6 +174,8 @@ void DockWidget::setContentItem(QQuickItem *contentItem)
         return;
 
     m_contentItem = contentItem;
+
+    m_contentItem->setParentItem(this);
     m_contentItem->setPosition(QPointF(
                                    DockStyle::instance()->widgetPadding(),
                                    (m_showHeader ? _header->height() : 0)
@@ -298,9 +285,10 @@ void DockWidget::geometryChanged(const QRectF &newGeometry,
                                        (m_showHeader ? _header->height() : 0)
                                         +DockStyle::instance()->widgetPadding()
                                        ));
-        m_contentItem -> setWidth(width() - 2 * DockStyle::instance()->widgetPadding());
-        m_contentItem -> setHeight(width() - (2 * DockStyle::instance()->widgetPadding())
-                                  - (m_showHeader ?  _header->height() : 0));
+        m_contentItem->setWidth(width() - 2 * DockStyle::instance()->widgetPadding());
+        m_contentItem->setHeight(height()
+                                 - (2 * DockStyle::instance()->widgetPadding())
+                                 - (m_showHeader ? _header->height() : 0));
     }
 
     QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);

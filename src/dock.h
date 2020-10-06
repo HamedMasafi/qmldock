@@ -27,7 +27,8 @@ namespace Dock {
     enum DockWidgetDisplayType {
         Hidden,
         SplitView,
-        TabbedView
+        TabbedView,
+        StackedView
     };
     Q_ENUM_NS(DockWidgetDisplayType)
 //    extern const qreal resizeHandleSize;
