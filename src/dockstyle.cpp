@@ -1,3 +1,4 @@
+#include "dockarea.h"
 #include "dockgroup.h"
 #include "dockgroupresizehandler.h"
 #include "dockstyle.h"
@@ -8,8 +9,17 @@
 #include <QPainter>
 
 DockStyle::DockStyle(QObject *parent) : QObject(parent)
+    , m_mainColor("#4fc1e9")
+    , m_borderColor(30, 30, 30)
+    , m_hoverColor(220, 220, 220)
+    , m_pressColor(200, 200, 200)
 {
 
+}
+
+void DockStyle::paintDockArea(QPainter *p, DockArea *item)
+{
+    p->fillRect(item->clipRect(), mainColor());
 }
 
 QFont DockStyle::defaultFont() const
@@ -42,25 +52,62 @@ qreal DockStyle::resizeHandleSize() const
     return 8;
 }
 
+void DockStyle::setMainColor(QColor mainColor)
+{
+    if (m_mainColor == mainColor)
+            return;
+
+        m_mainColor = mainColor;
+        emit mainColorChanged(m_mainColor);
+}
+
+void DockStyle::setBorderColor(QColor borderColor)
+{
+    if (m_borderColor == borderColor)
+            return;
+
+        m_borderColor = borderColor;
+        emit borderColorChanged(m_borderColor);
+}
+
+void DockStyle::setHoverColor(QColor hoverColor)
+{
+    if (m_hoverColor == hoverColor)
+            return;
+
+        m_hoverColor = hoverColor;
+        emit hoverColorChanged(m_hoverColor);
+}
+
+void DockStyle::setPressColor(QColor pressColor)
+{
+    if (m_pressColor == pressColor)
+            return;
+
+        m_pressColor = pressColor;
+        emit pressColorChanged(m_pressColor);
+}
+
 QColor DockStyle::mainColor() const
 {
-    return Qt::white;
-}
-
-QColor DockStyle::hoverColor() const
-{
-    return QColor(220, 220, 220);
-}
-
-QColor DockStyle::pressColor() const
-{
-    return QColor(200, 200, 200);
+    return m_mainColor;
 }
 
 QColor DockStyle::borderColor() const
 {
-    return QColor(30, 30, 30);
+    return m_borderColor;
 }
+
+QColor DockStyle::hoverColor() const
+{
+    return m_hoverColor;
+}
+
+QColor DockStyle::pressColor() const
+{
+    return m_pressColor;
+}
+
 
 void DockStyle::paintDropButton(QPainter *p, Dock::Area area) {}
 
