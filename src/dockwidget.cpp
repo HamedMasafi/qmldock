@@ -3,6 +3,7 @@
 #include "debugrect.h"
 #include "dockwidgetbackground.h"
 #include "dockwindow.h"
+#include "dockstyle.h"
 
 #include <QDebug>
 #include <QQuickWindow>
@@ -47,27 +48,21 @@ bool DockWidget::detachable() const
     return m_detachable;
 }
 
+void DockWidget::paint(QPainter *painter)
+{
+    DockStyle::instance()->paintDockWidget(painter, this);
+}
+
 DockWidget::DockWidget(QQuickItem *parent)
-    : QQuickPage(parent), _dockGroup{nullptr}, _originalSize{200, 200}
+    : QQuickPaintedItem(parent), _dockGroup{nullptr}, _originalSize{200, 200}
       , isDetached{false}, m_closable{true}, m_resizable{true}, m_movable{true}
-      , m_showHeader{true}, m_detachable{false}
+    , m_showHeader{true}, m_detachable{false}, m_contentItem{nullptr}
 {
     _header = new DockWidgetHeader(this);
-    setHeader(_header);
-    _header->setPosition(QPointF(0, 0));
+    _header->setPosition(QPointF(DockStyle::instance()->widgetPadding(), DockStyle::instance()->widgetPadding()));
     _header->setSize(QSizeF(width(), 30));
     _header->setVisible(true);
     _header->setZ(999);
-    qDebug() << "ctor";
-
-    setBackground(new DockWidgetBackground(this));
-//    setBackground(new DebugRect(Qt::green, this));
-    contentItem()->setClip(true);
-
-    setTopPadding(1);
-    setRightPadding(1);
-    setBottomPadding(1);
-    setLeftPadding(1);
 
     connect(_header,
             &DockWidgetHeader::moveStarted,
@@ -82,10 +77,10 @@ DockWidget::DockWidget(QQuickItem *parent)
             this,
             &DockWidget::header_moveEnded);
 
-    connect(this,
-            &QQuickPage::titleChanged,
-            this,
-            &DockWidget::this_titleChanged);
+//    connect(this,
+//            &QQuickPage::titleChanged,
+//            this,
+//            &DockWidget::this_titleChanged);
     setClip(true);
     setSize(QSizeF(200, 200));
     setFiltersChildMouseEvents(true);
@@ -110,6 +105,8 @@ void DockWidget::detach()
     //    }
 //    setParentItem(window->contentItem());
 //    setPosition(QPointF(0, 0));
+
+//    setPadding(10);
     dockWindow->show();
 //    setVisible(false);
 }
@@ -161,6 +158,7 @@ void DockWidget::setMovable(bool movable)
         return;
 
     m_movable = movable;
+    _header->setEnableMove(movable);
     emit movableChanged(m_movable);
 }
 
@@ -171,7 +169,6 @@ void DockWidget::setShowHeader(bool showHeader)
 
     qDebug() << "set show";
     _header->setVisible(showHeader);
-    header()->setVisible(showHeader);
     m_showHeader = showHeader;
     emit showHeaderChanged(m_showHeader);
 }
@@ -184,6 +181,31 @@ void DockWidget::setDetachable(bool detachable)
     m_detachable = detachable;
     _header->setPinButtonVisible(detachable);
     emit detachableChanged(m_detachable);
+}
+
+void DockWidget::setContentItem(QQuickItem *contentItem)
+{
+    if (m_contentItem == contentItem)
+        return;
+
+    m_contentItem = contentItem;
+    m_contentItem->setPosition(QPointF(
+                                   DockStyle::instance()->widgetPadding(),
+                                   (m_showHeader ? _header->height() : 0)
+                                    +DockStyle::instance()->widgetPadding()
+                                   ));
+    geometryChanged(QRectF(), QRectF());
+    emit contentItemChanged(m_contentItem);
+}
+
+void DockWidget::setTitle(QString title)
+{
+    if (m_title == title)
+        return;
+
+    m_title = title;
+    _header->setTitle(title);
+    emit titleChanged(m_title);
 }
 
 void DockWidget::header_moveStarted()
@@ -201,18 +223,13 @@ void DockWidget::header_moveEnded()
     emit moved();
 }
 
-void DockWidget::this_titleChanged()
-{
-    _header->setTitle(title());
-}
-
 bool DockWidget::childMouseEventFilter(QQuickItem *item, QEvent *e)
 {
     static QPointF _lastMousePos;
     static QPointF _lastChildPos;
     static bool _moveEmitted = false;
 
-    if (item != header())
+    if (item != _header || !m_movable)
         return false;
 
     auto me = static_cast<QMouseEvent *>(e);
@@ -271,5 +288,30 @@ void DockWidget::geometryChanged(const QRectF &newGeometry,
         _originalSize = newGeometry.size();
     }
 
-    QQuickPage::geometryChanged(newGeometry, oldGeometry);
+
+    _header->setWidth(width() - 2 * DockStyle::instance()->widgetPadding());
+    _header->setPosition(QPointF(DockStyle::instance()->widgetPadding(), DockStyle::instance()->widgetPadding()));
+
+    if (m_contentItem) {
+        m_contentItem->setPosition(QPointF(
+                                       DockStyle::instance()->widgetPadding(),
+                                       (m_showHeader ? _header->height() : 0)
+                                        +DockStyle::instance()->widgetPadding()
+                                       ));
+        m_contentItem -> setWidth(width() - 2 * DockStyle::instance()->widgetPadding());
+        m_contentItem -> setHeight(width() - (2 * DockStyle::instance()->widgetPadding())
+                                  - (m_showHeader ?  _header->height() : 0));
+    }
+
+    QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);
+}
+
+QQuickItem *DockWidget::contentItem() const
+{
+    return m_contentItem;
+}
+
+QString DockWidget::title() const
+{
+    return m_title;
 }

@@ -46,6 +46,7 @@ public:
 
     qreal minimumSize;
     qreal maximumSize;
+    bool showTabBar;
     Qt::Edge tabPosition;
 };
 

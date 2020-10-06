@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <QFontMetrics>
+
 DockTabButton::DockTabButton(QString title, QQuickItem *parent)
     : QQuickPaintedItem(parent), _title(title), _status(Dock::Normal)
 {
@@ -13,7 +14,6 @@ DockTabButton::DockTabButton(QString title, QQuickItem *parent)
 
 void DockTabButton::paint(QPainter *painter)
 {
-    qDebug() << _status;
     DockStyle::instance()->paintTabButton(painter, this, _status);
 }
 

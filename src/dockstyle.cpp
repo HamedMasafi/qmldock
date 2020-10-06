@@ -1,15 +1,28 @@
+#include "dockarea.h"
 #include "dockgroup.h"
 #include "dockgroupresizehandler.h"
 #include "dockstyle.h"
 #include "docktabbar.h"
 #include "docktabbutton.h"
+#include "dockwidget.h"
+#include "dockwidgetbackground.h"
+#include "dockwidgetheader.h"
 #include "dockwidgetheaderbutton.h"
 
 #include <QPainter>
 
 DockStyle::DockStyle(QObject *parent) : QObject(parent)
+    , m_mainColor("#4fc1e9")
+    , m_borderColor(30, 30, 30)
+    , m_hoverColor(220, 220, 220)
+    , m_pressColor(200, 200, 200)
 {
 
+}
+
+void DockStyle::paintDockArea(QPainter *p, DockArea *item)
+{
+//    p->fillRect(item->clipRect(), mainColor());
 }
 
 QFont DockStyle::defaultFont() const
@@ -42,25 +55,67 @@ qreal DockStyle::resizeHandleSize() const
     return 8;
 }
 
+qreal DockStyle::widgetPadding()
+{
+    return 3;
+}
+
+void DockStyle::setMainColor(QColor mainColor)
+{
+    if (m_mainColor == mainColor)
+            return;
+
+        m_mainColor = mainColor;
+        emit mainColorChanged(m_mainColor);
+}
+
+void DockStyle::setBorderColor(QColor borderColor)
+{
+    if (m_borderColor == borderColor)
+            return;
+
+        m_borderColor = borderColor;
+        emit borderColorChanged(m_borderColor);
+}
+
+void DockStyle::setHoverColor(QColor hoverColor)
+{
+    if (m_hoverColor == hoverColor)
+            return;
+
+        m_hoverColor = hoverColor;
+        emit hoverColorChanged(m_hoverColor);
+}
+
+void DockStyle::setPressColor(QColor pressColor)
+{
+    if (m_pressColor == pressColor)
+            return;
+
+        m_pressColor = pressColor;
+        emit pressColorChanged(m_pressColor);
+}
+
 QColor DockStyle::mainColor() const
 {
-    return Qt::white;
-}
-
-QColor DockStyle::hoverColor() const
-{
-    return QColor(220, 220, 220);
-}
-
-QColor DockStyle::pressColor() const
-{
-    return QColor(200, 200, 200);
+    return m_mainColor;
 }
 
 QColor DockStyle::borderColor() const
 {
-    return QColor(30, 30, 30);
+    return m_borderColor;
 }
+
+QColor DockStyle::hoverColor() const
+{
+    return m_hoverColor;
+}
+
+QColor DockStyle::pressColor() const
+{
+    return m_pressColor;
+}
+
 
 void DockStyle::paintDropButton(QPainter *p, Dock::Area area) {}
 
@@ -160,13 +215,36 @@ void DockStyle::paintResizeHandler(QPainter *p, DockGroupResizeHandler *item, Do
 
 void DockStyle::paintGroup(QPainter *p, DockGroup *item)
 {
-//    if (item->displayType() == Dock::TabbedView && item->widgets().count()) {
+//    if (item->displayType() == Dock::TabbedView && item->widgets().count() && item->showTabBar()) {
 //        p->setPen(borderColor());
 //        p->fillRect(0, 29, item->width() - 1, item->height() - 30, Qt::white);
 //        p->drawLine(0, 29, 0, item->height() - 1);
 //        p->drawLine(item->width() - 1, 29, item->width() - 1, item->height() - 1);
 //        p->drawLine(0, item->height() - 1, item->width() - 1, item->height() - 1);
 //    }
+}
+
+void DockStyle::paintDockWidget(QPainter *p, DockWidget *item)
+{
+    p->setBrush(Qt::white);
+    QPen pn(mainColor());
+    pn.setWidth(widgetPadding() * 2);
+    p->setPen(pn);
+    p->drawRect(0, 0, item->width() - 1, item->height() - 1);
+}
+
+void DockStyle::paintDockWidgetHeader(QPainter *p, DockWidgetHeader *item)
+{
+    p->fillRect(item->clipRect(), mainColor());
+    p->drawText(8, 0, item->width() - 60, item->height(), Qt::AlignVCenter, item->title());
+//    p->drawLine(5, item->height() - 1, item->width() - 5, item->height() - 1);
+}
+
+void DockStyle::paintDockWidgetBackground(QPainter *p, DockWidgetBackground *item)
+{
+    p->setPen(Qt::gray);
+    p->setBrush(Qt::white);
+    p->drawRect(0, 0, item->width() - 1, item->height() - 1);
 }
 
 void DockStyle::drawCircle(QPainter *painter, const QPointF &center, bool hover)

@@ -3,7 +3,6 @@
 
 #include <QQuickPaintedItem>
 #include "dock.h"
-#include <QtQuickTemplates2/private/qquickabstractbutton_p.h>
 
 class DockTabButton : public QQuickPaintedItem
 {

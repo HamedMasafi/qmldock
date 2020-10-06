@@ -40,7 +40,6 @@ void DockTabBar::setCurrentIndex(int currentIndex)
         _tabs.at(m_currentIndex)->setChecked(false);
 
         m_currentIndex = currentIndex;
-            //qBound(0, currentIndex, _tabs.count() - 1);
     _tabs.at(m_currentIndex)->setChecked(true);
 
     emit currentIndexChanged(m_currentIndex);

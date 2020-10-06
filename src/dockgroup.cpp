@@ -15,7 +15,7 @@ DockGroupPrivate::DockGroupPrivate(DockGroup *parent)
     : q_ptr(parent), mousepRessed{false},
       area(Dock::Float), enableResizing{true}
       , tabBar{nullptr}, displayType{Dock::SplitView}
-      , minimumSize(80), maximumSize(400)
+      , minimumSize(80), maximumSize(400), showTabBar{true}
 {
 }
 
@@ -100,7 +100,7 @@ bool DockGroupPrivate::acceptResizeEvent(const QPointF &point)
 void DockGroupPrivate::fitItem(QQuickItem *item)
 {
     Q_Q(DockGroup);
-//TODO: change this method to use usableArea
+
     switch (area) {
     case Dock::Right:
         item->setX(q->x() + (enableResizing ? DockStyle::instance()->resizeHandleSize() : 1.));
@@ -292,11 +292,8 @@ QRectF DockGroupPrivate::updateUsableArea()
         break;
 
     case Dock::Center:
-        usableArea.setTopLeft(QPointF(DockStyle::instance()->tabMargin(),
-                                      DockStyle::instance()->tabMargin()));
-        usableArea.setSize(
-                    QSizeF(q->width() - 2 * DockStyle::instance()->tabMargin(),
-                           q->height() - (2 * DockStyle::instance()->tabMargin())));
+        usableArea.setTopLeft(QPointF(1, 1));
+        usableArea.setSize(QSizeF(q->width() - 2, q->height() - 2));
         break;
 
     case Dock::Float:
@@ -338,6 +335,10 @@ DockGroup::DockGroup(QQuickItem *parent)
     setAcceptedMouseButtons(Qt::LeftButton);
 
     d->tabBar = new DockTabBar(this);
+    connect(d->tabBar,
+            &DockTabBar::currentIndexChanged,
+            this,
+            &DockGroup::tabBar_currentIndexChanged);
 }
 
 DockGroup::DockGroup(Dock::Area area, QQuickItem *parent)
@@ -488,12 +489,6 @@ void DockGroup::mouseReleaseEvent(QMouseEvent *event)
     Q_D(DockGroup);
     d->mousepRessed = false;
     setKeepMouseGrab(false);
-}
-
-void DockGroup::setColor(const QColor &color)
-{
-    Q_D(DockGroup);
-    //    setBackground(new DebugRect(_color, this));
 }
 
 void DockGroup::geometryChanged(const QRectF &newGeometry,
@@ -678,10 +673,27 @@ qreal DockGroup::maximumSize() const
     return d->maximumSize;
 }
 
+QList<DockWidget *> DockGroup::dockWidgets() const
+{
+    Q_D(const DockGroup);
+    return d->dockWidgets;
+}
 Qt::Edge DockGroup::tabPosition() const
 {
     Q_D(const DockGroup);
     return d->tabPosition;
+}
+
+int DockGroup::currentIndex() const
+{
+    Q_D(const DockGroup);
+    return d->tabBar->currentIndex();
+}
+
+bool DockGroup::showTabBar() const
+{
+    Q_D(const DockGroup);
+    return d->showTabBar;
 }
 
 void DockGroup::addDockWidget(DockWidget *item)
@@ -707,6 +719,8 @@ void DockGroup::addDockWidget(DockWidget *item)
     if (d->displayType == Dock::SplitView)
         d->reorderHandles();
     d->reorderItems();
+
+    emit dockWidgetsChanged(d->dockWidgets);
 }
 
 void DockGroup::removeDockWidget(DockWidget *item)
@@ -740,6 +754,8 @@ void DockGroup::removeDockWidget(DockWidget *item)
     d->normalizeItemSizes();
     d->reorderHandles();
     d->reorderItems();
+
+    emit dockWidgetsChanged(d->dockWidgets);
 }
 
 void DockGroup::setIsOpen(bool isOpen)
@@ -831,14 +847,29 @@ void DockGroup::setTabPosition(Qt::Edge tabPosition)
     d->tabBar->setEdge(tabPosition);
     emit tabPositionChanged(d->tabPosition);
 }
+void DockGroup::setCurrentIndex(int currentIndex)
+{
+    Q_D(DockGroup);
+    if (d->tabBar->currentIndex() == currentIndex)
+        return;
+
+    d->tabBar->setCurrentIndex(currentIndex);
+    emit currentIndexChanged(currentIndex);
+}
+
+void DockGroup::setShowTabBar(bool showTabBar)
+{
+    Q_D(DockGroup);
+
+    if (d->showTabBar == showTabBar)
+        return;
+
+    d->showTabBar = showTabBar;
+    geometryChanged(QRectF(), QRectF());
+    emit showTabBarChanged(showTabBar);
+}
 
 void DockGroup::paint(QPainter *painter)
 {
     DockStyle::instance()->paintGroup(painter, this);
-    //    painter->setOpacity(1);
-    //    painter->setPen(Qt::gray);
-    //    painter->setBrush(Qt::white);
-    //    painter->drawRect(0, 0, width() - 1, height() - 1);
-    //    painter->fillRect(clipRect(), _color);
-    //    painter->setOpacity(0.3);
 }

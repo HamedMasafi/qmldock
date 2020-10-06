@@ -1,5 +1,6 @@
-QT += widgets quick quickcontrols2 quickcontrols2-private \
-quicktemplates2 quicktemplates2-private quick-private
+QT += widgets quick
+#quickcontrols2 quickcontrols2-private \
+#quicktemplates2 quicktemplates2-private quick-private
 
 CONFIG += c++11
 

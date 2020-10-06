@@ -1,3 +1,4 @@
+#include "dockstyle.h"
 #include "dockwidget.h"
 #include "dockwidgetheader.h"
 #include "dockwidgetheaderbutton.h"
@@ -78,9 +79,7 @@ DockWidgetHeader::DockWidgetHeader(DockWidget *parent)
 
 void DockWidgetHeader::paint(QPainter *painter)
 {
-//    painter->fillRect(clipRect(), Qt::gray);
-    painter->drawText(8, 0, width() - 60, height(), Qt::AlignVCenter, _title);
-    painter->drawLine(5, height() - 1, width() - 5, height() - 1);
+    DockStyle::instance()->paintDockWidgetHeader(painter, this);
 }
 
 void DockWidgetHeader::mousePressEvent(QMouseEvent *event)
@@ -96,6 +95,10 @@ void DockWidgetHeader::mousePressEvent(QMouseEvent *event)
 
 void DockWidgetHeader::mouseMoveEvent(QMouseEvent *event)
 {
+    if (!_enableMove) {
+        event->ignore();
+        return;
+    }
     if (_moveEmitted) {
         emit moving(event->pos() + position());
     } else {
@@ -107,6 +110,10 @@ void DockWidgetHeader::mouseMoveEvent(QMouseEvent *event)
 
 void DockWidgetHeader::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (!_enableMove) {
+        event->ignore();
+        return;
+    }
     Q_UNUSED(event)
 
     if (_moveEmitted)
