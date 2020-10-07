@@ -18,7 +18,6 @@ DockArea::DockArea(QQuickItem *parent) : QQuickPaintedItem(parent)
         , m_bottomLeftOwner(Qt::LeftEdge)
         , m_bottomRightOwner(Qt::RightEdge)
 {
-    setClip(true);
 
     _dockMoveGuide = new DockMoveGuide(this);
     _dockMoveGuide->setVisible(false);
