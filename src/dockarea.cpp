@@ -295,6 +295,15 @@ void DockArea::dockWidget_visibleChanged()
     if (!dw)
         return;
 
+    if (dw->area() == Dock::Float)
+        return;
+
+    if (dw->dockGroup()) {
+        auto dt = dw->dockGroup()->displayType();
+        if (dt == Dock::TabbedView)
+            return;
+    }
+
     if (dw->isVisible()) {
         _dockGroups[dw->area()]->addDockWidget(dw);
     } else {
