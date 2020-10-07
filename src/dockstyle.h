@@ -6,6 +6,8 @@
 #include <QObject>
 #include "dock.h"
 
+#define dockStyle DockStyle::instance()
+
 class QPainter;
 
 class DockArea;

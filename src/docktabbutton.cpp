@@ -14,6 +14,7 @@ DockTabButton::DockTabButton(QString title, QQuickItem *parent)
 
 void DockTabButton::paint(QPainter *painter)
 {
+    qDebug() << "status is" << _status;
     DockStyle::instance()->paintTabButton(painter, this, _status);
 }
 
@@ -47,6 +48,9 @@ void DockTabButton::mousePressEvent(QMouseEvent *event)
 
 void DockTabButton::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (_status == Dock::Checked)
+        return;
+
     if (clipRect().contains(event->pos())) {
         _status = Dock::Hovered;
         emit clicked();
@@ -59,6 +63,9 @@ void DockTabButton::mouseReleaseEvent(QMouseEvent *event)
 void DockTabButton::hoverEnterEvent(QHoverEvent *event)
 {
     Q_UNUSED(event)
+    if (_status == Dock::Checked)
+        return;
+
     if (_status == Dock::Normal) {
         _status = Dock::Hovered;
         update();
@@ -68,6 +75,9 @@ void DockTabButton::hoverEnterEvent(QHoverEvent *event)
 void DockTabButton::hoverLeaveEvent(QHoverEvent *event)
 {
     Q_UNUSED(event)
+    if (_status == Dock::Checked)
+        return;
+
     if (_status == Dock::Hovered) {
         _status = Dock::Normal;
         update();

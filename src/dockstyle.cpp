@@ -32,7 +32,7 @@ QFont DockStyle::defaultFont() const
 
 qreal DockStyle::tabBarHeight() const
 {
-    return 34;
+    return 30;
 }
 
 qreal DockStyle::tabBarButtonHeight() const
@@ -121,10 +121,12 @@ void DockStyle::paintDropButton(QPainter *p, Dock::Area area) {}
 
 void DockStyle::paintTabBar(QPainter *p, DockTabBar *item)
 {
-    //    qreal pos{0};
-    //    for (auto t : item->tabs())
-    //        drawTab(p, &pos, t, 0);
-//    p->drawLine(0, 29, item->width() - 1, 29);
+//    p->fillRect(item->clipRect(), Qt::magenta);
+
+//    qreal pos{0};
+//    for (auto t : item->tabs())
+//        drawTab(p, &pos, t, 0);
+    p->drawLine(0, 29, item->width() - 1, 29);
 }
 
 void DockStyle::paintTabButton(QPainter *p,
@@ -132,9 +134,10 @@ void DockStyle::paintTabButton(QPainter *p,
                                Dock::ButtonStatus status)
 {
     QRectF rc;
-    QTransform t;
-    t.rotate(90);
-    p->setTransform(t);
+
+//    QTransform t;
+//    t.rotate(90);
+//    p->setTransform(t);
     switch (status) {
     case Dock::Normal:
         p->setBrush(pressColor());
