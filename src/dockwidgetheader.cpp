@@ -2,6 +2,7 @@
 #include "dockwidget.h"
 #include "dockwidgetheader.h"
 #include "dockwidgetheaderbutton.h"
+#include "dockwindow.h"
 
 #include <QDebug>
 #include <QPainter>
@@ -89,23 +90,35 @@ void DockWidgetHeader::mousePressEvent(QMouseEvent *event)
         return;
     }
     _moveEmitted = false;
-    _lastMousePos = event->windowPos();
-    _lastParentPos = parentDock->position();
+    if (parentDock->getIsDetached()) {
+        _lastParentPos = parentDock->dockWindow()->position();
+        _lastMousePos = event->globalPos();
+    } else {
+        _lastMousePos = event->windowPos();
+        _lastParentPos = parentDock->position();
+    }
+    setKeepMouseGrab(true);
 }
 
 void DockWidgetHeader::mouseMoveEvent(QMouseEvent *event)
 {
+    qDebug() << "move";
     if (!_enableMove) {
         event->ignore();
         return;
     }
     if (_moveEmitted) {
-        emit moving(event->pos() + position());
+        if (parentDock->getIsDetached())
+            emit moving(_lastParentPos + (event->globalPos() - _lastMousePos),
+                        event->pos() + parentDock->dockWindow()->position());
+        else
+            emit moving(_lastParentPos + (event->windowPos() - _lastMousePos),
+                    event->pos() + parentDock->position());
     } else {
         emit moveStarted();
         _moveEmitted = true;
     }
-    parentDock->setPosition(_lastParentPos + (event->windowPos() - _lastMousePos));
+//    parentDock->setPosition(_lastParentPos + (event->windowPos() - _lastMousePos));
 }
 
 void DockWidgetHeader::mouseReleaseEvent(QMouseEvent *event)
@@ -120,7 +133,7 @@ void DockWidgetHeader::mouseReleaseEvent(QMouseEvent *event)
         emit moveEnded();
 
     _moveEmitted = false;
-
+    setKeepMouseGrab(false);
     //    QQuickPaintedItem::mouseReleaseEvent(event);
 }
 

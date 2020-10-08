@@ -52,6 +52,7 @@ HEADERS += \
     $$PWD/docktabbar.h \
     $$PWD/docktabbutton.h \
     $$PWD/dockwidget.h \
+    $$PWD/dockwidget_p.h \
     $$PWD/dockwidgetbackground.h \
     $$PWD/dockwidgetheader.h \
     $$PWD/dockwidgetheaderbutton.h \

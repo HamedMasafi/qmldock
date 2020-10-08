@@ -657,6 +657,7 @@ int DockGroup::currentIndex() const
 void DockGroup::addDockWidget(DockWidget *item)
 {
     Q_D(DockGroup);
+    item->setArea(d->area);
     item->setDockGroup(this);
     //    addItem(item);
     d->dockWidgets.append(item);
@@ -678,6 +679,7 @@ void DockGroup::addDockWidget(DockWidget *item)
         d->reorderHandles();
     d->reorderItems();
 
+    setIsOpen(d->dockWidgets.count());
     emit dockWidgetsChanged(d->dockWidgets);
 }
 
@@ -708,6 +710,8 @@ void DockGroup::removeDockWidget(DockWidget *item)
     if (!d->dockWidgets.count()){
         update();
     }
+
+    setIsOpen(d->dockWidgets.count());
     geometryChanged(QRect(), QRect());
     d->normalizeItemSizes();
     d->reorderHandles();

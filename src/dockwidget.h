@@ -7,10 +7,13 @@
 class DockGroup;
 class DockWidgetHeader;
 class DockWindow;
+class DockArea;
+class DockWidgetPrivate;
 class DockWidget : public QQuickPaintedItem {
     Q_OBJECT
-    DockGroup *_dockGroup;
-    DockWidgetHeader *_header;
+
+    Q_DECLARE_PRIVATE(DockWidget);
+    DockWidgetPrivate *d_ptr;
 
     Q_PROPERTY(Dock::Area area READ area WRITE setArea NOTIFY areaChanged)
     Q_PROPERTY(bool closable READ closable WRITE setClosable NOTIFY closableChanged)
@@ -20,6 +23,7 @@ class DockWidget : public QQuickPaintedItem {
     Q_PROPERTY(bool detachable READ detachable WRITE setDetachable NOTIFY detachableChanged)
     Q_PROPERTY(QQuickItem *contentItem READ contentItem WRITE setContentItem NOTIFY contentItemChanged FINAL)
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    Q_PROPERTY(Dock::Areas allowedAreas READ allowedAreas WRITE setAllowedAreas NOTIFY allowedAreasChanged)
 
 public:
     DockWidget(QQuickItem *parent = nullptr);
@@ -36,7 +40,16 @@ public:
 
     QString title() const;
 
+    DockArea *dockArea() const;
+    void setDockArea(DockArea *dockArea);
+
+    bool getIsDetached() const;
+
+    Dock::Areas allowedAreas() const;
+    DockWindow *dockWindow() const;
+
 public slots:
+    Q_DECL_DEPRECATED
     void detach();
     void close();
     void restoreSize();
@@ -53,15 +66,20 @@ public slots:
 
     void setTitle(QString title);
 
+    void setAllowedAreas(Dock::Areas allowedAreas);
+
 private slots:
     void header_moveStarted();
-    void header_moving(const QPointF &hotspot);
+    void header_moving(const QPointF &windowPos, const QPointF &cursorPos);
     void header_moveEnded();
 
 protected:
     bool childMouseEventFilter(QQuickItem *, QEvent *) override;
     void itemChange(ItemChange, const ItemChangeData &) override;
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
+    void hoverMoveEvent(QHoverEvent *event) override;
+    void hoverLeaveEvent(QHoverEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
 
 signals:
     void beginMove();
@@ -75,21 +93,9 @@ signals:
     void detachableChanged(bool detachable);
     void contentItemChanged(QQuickItem * contentItem);
     void titleChanged(QString title);
+    void allowedAreasChanged(Dock::Areas allowedAreas);
 
-private:
-    Dock::Area m_area;
-    QSizeF _originalSize;
-    bool isDetached;
-    DockWindow *dockWindow;
-
-    bool m_closable;
-    bool m_resizable;
-    bool m_movable;
-    bool m_showHeader;
-    bool m_detachable;
-
-    QQuickItem * m_contentItem;
-    QString m_title;
+    friend class DockWidgetHeader;
 };
 
 #endif // DOCKWIDGET_H

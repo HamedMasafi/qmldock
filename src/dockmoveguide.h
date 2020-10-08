@@ -9,6 +9,7 @@ class DockMoveGuide : public QQuickPaintedItem
     Q_OBJECT
     QPointF _mousePos;
     Dock::Area _area;
+    Dock::Areas _allowedAreas;
 
 public:
     DockMoveGuide(QQuickItem *parent = nullptr);
@@ -23,6 +24,9 @@ public:
     void setMousePos(const QPointF &mousePos);
 
     Dock::Area area() const;
+
+    Dock::Areas allowedAreas() const;
+    void setAllowedAreas(const Dock::Areas &allowedAreas);
 
 private:
     bool drawRect(QPainter *painter, const QRectF &rc);

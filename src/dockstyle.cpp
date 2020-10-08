@@ -234,6 +234,7 @@ void DockStyle::paintDockWidget(QPainter *p, DockWidget *item)
     pn.setWidth(widgetPadding() * 2);
     p->setPen(pn);
     p->drawRect(0, 0, item->width() - 1, item->height() - 1);
+    //    p->fillRect(item->clipRect(), mainColor());
 }
 
 void DockStyle::paintDockWidgetHeader(QPainter *p, DockWidgetHeader *item)

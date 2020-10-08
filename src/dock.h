@@ -2,19 +2,26 @@
 #define DOCK_H
 
 #include <QObject>
+#include <qobjectdefs.h>
 
 namespace Dock {
     Q_NAMESPACE
 
     enum Area {
-        Center,
-        Top,
-        Bottom,
-        Left,
-        Right,
-        Float
+        Center = 0,
+        Top = 1,
+        Bottom = 2,
+        Left = 4,
+        Right = 8,
+        Float = 16,
+        Detached = 32,
+        AllSides = Top | Left | Right | Bottom,
+        AllInsides = AllSides | Center | Float,
+        AllAreas = AllInsides | Detached
     };
     Q_ENUM_NS(Area)
+    Q_DECLARE_FLAGS(Areas, Area)
+    Q_FLAG_NS(Areas)
 
     enum ButtonStatus {
         Normal,

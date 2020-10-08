@@ -4,6 +4,7 @@
 #include "dockgroup.h"
 #include "dockgroupresizehandler.h"
 #include "dockstyle.h"
+#include "dockwindow.h"
 
 #include <QDebug>
 #include <QPainter>
@@ -90,6 +91,7 @@ void DockArea::addDockWidget(DockWidget *widget)
 {
     widget->setZ(widget->area() == Dock::Float ? Z_WIDGET_FLOAT : Z_WIDGET);
 
+    widget->setDockArea(this);
     _dockWidgets.append(widget);
     connect(widget,
             &DockWidget::beginMove,
@@ -252,11 +254,8 @@ void DockArea::dockWidget_beginMove()
         dw->dockGroup()->removeDockWidget(dw);
         dw->restoreSize();
     }
-    //        dw->setParentItem(this);
-    //        dw->setVisible(true);
-    //        dw->setPosition(QPointF(0, 0));
-    //        dw->setSize(QSizeF(200, 200));
 
+    _dockMoveGuide->setAllowedAreas(dw->allowedAreas());
     _dockMoveGuide->setSize(size());
     _dockMoveGuide->setVisible(true);
 }
@@ -270,8 +269,8 @@ void DockArea::dockWidget_moved()
 {
     _dockMoveGuide->setVisible(false);
 
-    auto d = qobject_cast<DockWidget *>(sender());
-    if (!d)
+    auto dw = qobject_cast<DockWidget *>(sender());
+    if (!dw)
         return;
 
     switch (_dockMoveGuide->area()) {
@@ -280,13 +279,18 @@ void DockArea::dockWidget_moved()
     case Dock::Top:
     case Dock::Bottom:
     case Dock::Center:
-        if (d->dockGroup() != _dockGroups[_dockMoveGuide->area()])
-            _dockGroups[_dockMoveGuide->area()]->addDockWidget(d);
-        d->setZ(Z_WIDGET);
+        if (dw->dockGroup() != _dockGroups[_dockMoveGuide->area()]) {
+            _dockGroups[_dockMoveGuide->area()]->addDockWidget(dw);
+        }
+        dw->setZ(Z_WIDGET);
         reorderDockGroups();
         break;
-
     case Dock::Float:
+    case Dock::Detached:
+        dw->setArea(_dockMoveGuide->area());
+        break;
+
+    default:
         break;
     }
 }
@@ -344,6 +348,7 @@ DockGroup *DockArea::createGroup(Dock::Area area, DockGroup *item)
     item->setPanelSize(200);
     item->setDisplayType(Dock::SplitView);
     connect(item, &DockGroup::panelSizeChanged, this, &DockArea::reorderDockGroups);
+    connect(item, &DockGroup::isOpenChanged, this, &DockArea::reorderDockGroups);
     _dockGroups.insert(area, item);
 
     return item;

@@ -27,7 +27,7 @@ public:
 
 signals:
     void moveStarted();
-    void moving(const QPointF &windowPos);
+    void moving(const QPointF &windowPos, const QPointF &cursorPos);
     void moveEnded();
 
     // QQuickPaintedItem interface
