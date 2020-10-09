@@ -10,6 +10,8 @@
 #include <QDebug>
 #include <QPainter>
 #include <QQuickWindow>
+#include <QApplication>
+#include <QScopeGuard>
 
 DockWidgetPrivate::DockWidgetPrivate(DockWidget *parent)
     : q_ptr(parent)
@@ -120,6 +122,43 @@ DockWidget::DockWidget(QQuickItem *parent)
 void DockWidget::detach()
 {
     setArea(Dock::Detached);
+}
+
+void DockWidget::beginDetach()
+{
+    Q_D(DockWidget);
+    // end the drag before re-parenting
+    QMouseEvent endDrag(QEvent::NonClientAreaMouseMove, QCursor::pos(), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+    const bool handledEndDrag = qApp->sendEvent(d->header, &endDrag);
+    qDebug()<<"handledEndDrag"<<handledEndDrag;
+
+    // set this attribute to avoid a hide()-event spoiling the drag-and-drop
+//        d->dockWindow->setFlag(Qt::WA_WState_Hidden, true);
+
+
+    setArea(Dock::Detached);
+    qApp->processEvents();
+    // ... do re-parenting
+
+//        d->dockWindow->setAttribute(Qt::WA_WState_Hidden, false);
+
+    qScopeGuard([this, d]{
+
+    // trigger start drag again
+        QMouseEvent* startDrag =
+                new QMouseEvent(QEvent::MouseButtonPress, mapFromGlobal(QCursor::pos()),
+                                Qt::LeftButton, Qt::LeftButton, QApplication::keyboardModifiers());
+        QApplication::postEvent(d->header, startDrag);
+
+        // fake this mouse move event to continue dragging
+        auto pos = QCursor::pos();
+        QMouseEvent *mouseMove = new QMouseEvent(QEvent::MouseMove, pos, pos, Qt::NoButton,
+                              QApplication::mouseButtons(), QApplication::keyboardModifiers());
+        const bool handledMouseMove = false;
+        QApplication::postEvent(d->header, mouseMove);
+        qDebug() << "handledMouseMove"<<handledMouseMove;
+        d->header->grabMouse();
+    });
 }
 
 void DockWidget::close()

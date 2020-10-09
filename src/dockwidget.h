@@ -51,6 +51,8 @@ public:
 public slots:
     Q_DECL_DEPRECATED
     void detach();
+
+    void beginDetach();
     void close();
     void restoreSize();
 

@@ -250,8 +250,9 @@ void DockArea::dockWidget_beginMove()
     dw->setZ(Z_WIDGET_FLOAT);
 
     if (dw->dockGroup()) {
-        dw->setArea(Dock::Float);
-        dw->dockGroup()->removeDockWidget(dw);
+        dw->beginDetach();
+//        dw->setArea(Dock::Float);
+//        dw->dockGroup()->removeDockWidget(dw);
         dw->restoreSize();
     }
 
