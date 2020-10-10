@@ -27,6 +27,7 @@ class DockWidget : public QQuickPaintedItem {
 
 public:
     DockWidget(QQuickItem *parent = nullptr);
+    virtual ~DockWidget();
 
     DockGroup *dockGroup() const;
     Dock::Area area() const;

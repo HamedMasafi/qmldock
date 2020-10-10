@@ -471,7 +471,6 @@ void DockGroup::geometryChanged(const QRectF &newGeometry,
     d->updateUsableArea();
 
     if (d->tabBar && d->displayType == Dock::TabbedView) {
-        qDebug() << d->tabBar->size() << d->displayType;
         switch (d->tabPosition) {
         case Qt::TopEdge:
             d->tabBar->setWidth(width());
@@ -714,7 +713,9 @@ void DockGroup::removeDockWidget(DockWidget *item)
     setIsOpen(d->dockWidgets.count());
     geometryChanged(QRect(), QRect());
     d->normalizeItemSizes();
-    d->reorderHandles();
+
+    if (d->displayType == Dock::SplitView)
+        d->reorderHandles();
     d->reorderItems();
 
     emit dockWidgetsChanged(d->dockWidgets);

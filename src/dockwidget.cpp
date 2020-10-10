@@ -117,6 +117,12 @@ DockWidget::DockWidget(QQuickItem *parent)
     setAcceptedMouseButtons(Qt::LeftButton);
 }
 
+DockWidget::~DockWidget()
+{
+    Q_D(DockWidget);
+    delete d;
+}
+
 void DockWidget::detach()
 {
     setArea(Dock::Detached);
@@ -271,7 +277,6 @@ void DockWidget::header_moving(const QPointF &windowPos, const QPointF &cursorPo
 {
     Q_D(DockWidget);
     if (d->isDetached) {
-        qDebug() << parentItem() << (d->dockArea->mapFromGlobal(cursorPos));
         emit moving(d->dockArea->mapFromGlobal(cursorPos));
         d->dockWindow->setPosition(windowPos.toPoint());
     } else {
@@ -411,7 +416,7 @@ void DockWidget::setDockArea(DockArea *dockArea)
 void DockWidget::hoverMoveEvent(QHoverEvent *event)
 {
     Q_D(DockWidget);
-    if (d->area != Dock::Float) {
+    if (d->area != Dock::Float && d->area != Dock::Detached) {
         setCursor(Qt::ArrowCursor);
         return;
     }
@@ -452,11 +457,9 @@ void DockWidget::mousePressEvent(QMouseEvent *event)
     }
 
     if (e) {
-        qDebug() << e;
         if (d->isDetached && d->dockWindow)
             d->dockWindow->startSystemResize((Qt::Edge) e);
     }
-    qDebug() << e << event->pos();
     event->accept();
 }
 
