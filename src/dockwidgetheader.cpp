@@ -102,7 +102,6 @@ void DockWidgetHeader::mousePressEvent(QMouseEvent *event)
 
 void DockWidgetHeader::mouseMoveEvent(QMouseEvent *event)
 {
-    qDebug() << "move";
     if (!_enableMove) {
         event->ignore();
         return;

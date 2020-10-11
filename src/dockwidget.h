@@ -36,6 +36,7 @@ public:
     Q_FLAG(DockWidgetFlags)
 
     DockWidget(QQuickItem *parent = nullptr);
+    virtual ~DockWidget();
 
     DockGroup *dockGroup() const;
     Dock::Area area() const;

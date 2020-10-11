@@ -177,7 +177,7 @@ void DockArea::reorderDockGroups()
     _dockGroups[Dock::Right]->setSize(QSizeF(width() - rc.right(), rightEnd - rightStart));
 
     _dockGroups[Dock::Bottom]->setPosition(QPointF(bottomStart, rc.bottom()));
-    _dockGroups[Dock::Bottom]->setSize(QSizeF(bottomEnd - bottomStart, height() - rc.height()));
+    _dockGroups[Dock::Bottom]->setSize(QSizeF(bottomEnd - bottomStart, height() - rc.bottom()));
 
     _dockGroups[Dock::Center]->setPosition(rc.topLeft());
     _dockGroups[Dock::Center]->setSize(rc.size());
@@ -186,21 +186,22 @@ void DockArea::reorderDockGroups()
 void DockArea::setTopLeftOwner(Qt::Edge topLeftOwner)
 {
     if (topLeftOwner != Qt::LeftEdge && topLeftOwner != Qt::TopEdge) {
-        qWarning() << "Invalid value for topLeftOwner";
+        qWarning() << "Invalid value for topLeftOwner: " << topLeftOwner;
         return;
     }
     if (m_topLeftOwner == topLeftOwner)
         return;
 
     m_topLeftOwner = topLeftOwner;
-    reorderDockGroups();
+    if (isComponentComplete())
+        reorderDockGroups();
     emit topLeftOwnerChanged(m_topLeftOwner);
 }
 
 void DockArea::setTopRightOwner(Qt::Edge topRightOwner)
 {
     if (topRightOwner != Qt::TopEdge && topRightOwner != Qt::RightEdge) {
-        qWarning() << "Invalid value for topRightOwner";
+        qWarning() << "Invalid value for topRightOwner: " << topRightOwner;
         return;
     }
 
@@ -208,14 +209,15 @@ void DockArea::setTopRightOwner(Qt::Edge topRightOwner)
         return;
 
     m_topRightOwner = topRightOwner;
-    reorderDockGroups();
+    if (isComponentComplete())
+        reorderDockGroups();
     emit topRightOwnerChanged(m_topRightOwner);
 }
 
 void DockArea::setBottomLeftOwner(Qt::Edge bottomLeftOwner)
 {
     if (bottomLeftOwner != Qt::BottomEdge && bottomLeftOwner != Qt::LeftEdge) {
-        qWarning() << "Invalid value for bottomLeftOwner";
+        qWarning() << "Invalid value for bottomLeftOwner: " << bottomLeftOwner;
         return;
     }
 
@@ -223,14 +225,15 @@ void DockArea::setBottomLeftOwner(Qt::Edge bottomLeftOwner)
         return;
 
     m_bottomLeftOwner = bottomLeftOwner;
-    reorderDockGroups();
+    if (isComponentComplete())
+        reorderDockGroups();
     emit bottomLeftOwnerChanged(m_bottomLeftOwner);
 }
 
 void DockArea::setBottomRightOwner(Qt::Edge bottomRightOwner)
 {
     if (bottomRightOwner != Qt::BottomEdge && bottomRightOwner != Qt::RightEdge) {
-        qWarning() << "Invalid value for bottomRightOwner";
+        qWarning() << "Invalid value for bottomRightOwner: " << bottomRightOwner;
         return;
     }
 
@@ -238,7 +241,8 @@ void DockArea::setBottomRightOwner(Qt::Edge bottomRightOwner)
         return;
 
     m_bottomRightOwner = bottomRightOwner;
-    reorderDockGroups();
+    if (isComponentComplete())
+        reorderDockGroups();
     emit bottomRightOwnerChanged(m_bottomRightOwner);
 }
 
@@ -324,9 +328,8 @@ void DockArea::dockWidget_visibleChanged()
 void DockArea::geometryChanged(const QRectF &newGeometry,
                                const QRectF &oldGeometry)
 {
-    if (_dockGroups.keys().length() == 5) {
+    if (isComponentComplete())
         reorderDockGroups();
-    }
     QQuickItem::geometryChanged(newGeometry, oldGeometry);
 }
 

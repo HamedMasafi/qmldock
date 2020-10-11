@@ -1,7 +1,4 @@
-QT += widgets quick quickcontrols2 quickcontrols2-private \
-quicktemplates2 quicktemplates2-private quick-private
-
-TEMPLATE = lib
+QT += quick
 
 CONFIG += c++11
 
@@ -16,6 +13,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+SOURCES += \
+        main.cpp
+
+RESOURCES += qml.qrc
+
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
 
@@ -27,4 +29,4 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-include($$PWD/src.pri)
+include($$PWD/../../src/src.pri)
