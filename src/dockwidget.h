@@ -24,8 +24,17 @@ class DockWidget : public QQuickPaintedItem {
     Q_PROPERTY(QQuickItem *contentItem READ contentItem WRITE setContentItem NOTIFY contentItemChanged FINAL)
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     Q_PROPERTY(Dock::Areas allowedAreas READ allowedAreas WRITE setAllowedAreas NOTIFY allowedAreasChanged)
+//    Q_PROPERTY(DockWidgetFlags flags READ flags WRITE setFlags NOTIFY flagsChanged)
 
 public:
+    enum DockWidgetFlag {
+        Movable,
+        Detachable,
+        Resizable
+    };
+    Q_DECLARE_FLAGS(DockWidgetFlags, DockWidgetFlag);
+    Q_FLAG(DockWidgetFlags)
+
     DockWidget(QQuickItem *parent = nullptr);
 
     DockGroup *dockGroup() const;

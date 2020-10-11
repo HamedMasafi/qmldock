@@ -96,7 +96,8 @@ void DockArea::addDockWidget(DockWidget *widget)
     connect(widget,
             &DockWidget::beginMove,
             this,
-            &DockArea::dockWidget_beginMove);
+            &DockArea::dockWidget_beginMove,
+            Qt::QueuedConnection);
 
     connect(widget, &DockWidget::moving, this, &DockArea::dockWidget_moving);
     connect(widget, &DockWidget::moved, this, &DockArea::dockWidget_moved);
@@ -112,9 +113,9 @@ void DockArea::addDockWidget(DockWidget *widget)
     case Dock::Bottom:
     case Dock::Center:
         _dockGroups[widget->area()]->addDockWidget(widget);
-
         break;
-    case Dock::Float:
+
+    default:
         break;
     }
 
@@ -250,9 +251,9 @@ void DockArea::dockWidget_beginMove()
     dw->setZ(Z_WIDGET_FLOAT);
 
     if (dw->dockGroup()) {
-        dw->beginDetach();
-//        dw->setArea(Dock::Float);
-//        dw->dockGroup()->removeDockWidget(dw);
+//        dw->beginDetach();
+        dw->setArea(Dock::Float);
+        dw->dockGroup()->removeDockWidget(dw);
         dw->restoreSize();
     }
 
