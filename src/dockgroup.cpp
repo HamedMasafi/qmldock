@@ -446,8 +446,7 @@ void DockGroup::mouseMoveEvent(QMouseEvent *event)
                      + (d->lastMousePos - event->windowPos().y()));
         break;
 
-    case Dock::Float:
-    case Dock::Center:
+    default:
         break;
     }
 }
@@ -505,6 +504,7 @@ void DockGroup::geometryChanged(const QRectF &newGeometry,
 
 void DockGroup::updatePolish()
 {
+    geometryChanged(QRectF(), QRectF());
     QQuickPaintedItem::updatePolish();
 }
 

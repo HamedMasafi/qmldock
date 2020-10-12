@@ -43,6 +43,14 @@ void DockArea::componentComplete()
     for (auto &dw : _initialWidgets)
         addDockWidget(dw);
 
+    _dockGroups[Dock::Left]->polish();
+    _dockGroups[Dock::Top]->polish();
+    _dockGroups[Dock::Right]->polish();
+    _dockGroups[Dock::Bottom]->polish();
+    _dockGroups[Dock::Center]->polish();
+    //    reorderDockGroups();
+    geometryChanged(QRectF(), QRectF());
+
     QQuickItem::componentComplete();
 }
 
@@ -92,7 +100,9 @@ void DockArea::addDockWidget(DockWidget *widget)
     widget->setZ(widget->area() == Dock::Float ? Z_WIDGET_FLOAT : Z_WIDGET);
 
     widget->setDockArea(this);
+//    widget->setParentItem(this);
     _dockWidgets.append(widget);
+
     connect(widget,
             &DockWidget::beginMove,
             this,
@@ -112,11 +122,22 @@ void DockArea::addDockWidget(DockWidget *widget)
     case Dock::Bottom:
     case Dock::Center:
         _dockGroups[widget->area()]->addDockWidget(widget);
-
+        _dockGroups[widget->area()]->polish();
         break;
-    case Dock::Float:
+
+        //TODO: remove this or keep!
+    case Dock::NoArea:
+        _dockGroups[Dock::Center]->addDockWidget(widget);
+        _dockGroups[Dock::Center]->polish();
+        break;
+    default:
+        qDebug() << "dock has no area " << widget->title();
         break;
     }
+
+    qDebug() << widget->title() << "added to" << widget->area();
+    if (isComponentComplete())
+        reorderDockGroups();
 
     emit dockWidgetsChanged(_dockWidgets);
 }
