@@ -258,7 +258,7 @@ void DockArea::dockWidget_beginMove()
         dw->dockGroup()->removeDockWidget(dw);
         dw->restoreSize();
     }
-
+    qDebug() << dw->allowedAreas() << (int)dw->allowedAreas();
     _dockMoveGuide->setAllowedAreas(dw->allowedAreas());
     _dockMoveGuide->setSize(size());
     _dockMoveGuide->setVisible(true);
