@@ -121,5 +121,6 @@ void DockGroupResizeHandler::hoverLeaveEvent(QHoverEvent *event)
 
 void DockGroupResizeHandler::drawCircle(QPainter *painter, const QPointF &center, bool hover)
 {
+    Q_UNUSED(hover)
     painter->drawEllipse(center, 2, 2);
 }

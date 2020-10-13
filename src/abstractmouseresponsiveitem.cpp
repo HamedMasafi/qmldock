@@ -13,6 +13,7 @@ AbstractMouseResponsiveItem::AbstractMouseResponsiveItem(QQuickItem *parent)
 
 void AbstractMouseResponsiveItem::mousePressEvent(QMouseEvent *event)
 {
+    Q_UNUSED(event)
     _status = Dock::Pressed;
     update();
 }
@@ -46,5 +47,5 @@ void AbstractMouseResponsiveItem::hoverLeaveEvent(QHoverEvent *event)
 
 void AbstractMouseResponsiveItem::paint(QPainter *painter)
 {
-
+    Q_UNUSED(painter)
 }

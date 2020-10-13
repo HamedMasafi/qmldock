@@ -15,6 +15,7 @@
 
 DockWidgetPrivate::DockWidgetPrivate(DockWidget *parent)
     : q_ptr(parent)
+//      , area{Dock::Float}
       , allowedAreas{Dock::AllAreas}
       , originalSize{200, 200}
       , closable{true}

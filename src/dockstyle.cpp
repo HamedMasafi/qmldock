@@ -22,6 +22,8 @@ DockStyle::DockStyle(QObject *parent) : QObject(parent)
 
 void DockStyle::paintDockArea(QPainter *p, DockArea *item)
 {
+    Q_UNUSED(p)
+    Q_UNUSED(item)
 //    p->fillRect(item->clipRect(), mainColor());
 }
 
@@ -117,7 +119,11 @@ QColor DockStyle::pressColor() const
 }
 
 
-void DockStyle::paintDropButton(QPainter *p, Dock::Area area) {}
+void DockStyle::paintDropButton(QPainter *p, Dock::Area area)
+{
+    Q_UNUSED(p)
+    Q_UNUSED(area)
+}
 
 void DockStyle::paintTabBar(QPainter *p, DockTabBar *item)
 {
@@ -218,6 +224,8 @@ void DockStyle::paintResizeHandler(QPainter *p, DockGroupResizeHandler *item, Do
 
 void DockStyle::paintGroup(QPainter *p, DockGroup *item)
 {
+    Q_UNUSED(p)
+    Q_UNUSED(item)
 //    if (item->displayType() == Dock::TabbedView && item->widgets().count() && item->showTabBar()) {
 //        p->setPen(borderColor());
 //        p->fillRect(0, 29, item->width() - 1, item->height() - 30, Qt::white);
@@ -257,6 +265,7 @@ void DockStyle::paintDockWidgetBackground(QPainter *p, DockWidgetBackground *ite
 
 void DockStyle::drawCircle(QPainter *painter, const QPointF &center, bool hover)
 {
+    Q_UNUSED(hover)
     painter->drawEllipse(center, 2, 2);
 }
 
@@ -271,6 +280,10 @@ void DockStyle::drawTab(QPainter *p,
                          const QString &title,
                          int status)
 {
+    Q_UNUSED(p)
+    Q_UNUSED(pos)
+    Q_UNUSED(title)
+    Q_UNUSED(status)
 //    p->setPen(Qt::black);
 //    p->setBrush(Qt::yellow);
 //    QRectF rc(*pos, 0, p->fontMetrics().horizontalAdvance(title) + 20, height());

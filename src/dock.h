@@ -8,13 +8,14 @@ namespace Dock {
     Q_NAMESPACE
 
     enum Area {
-        Center = 0,
+        NoArea = 0,
         Top = 1,
         Bottom = 2,
         Left = 4,
         Right = 8,
         Float = 16,
         Detached = 32,
+        Center = 64,
         AllSides = Top | Left | Right | Bottom,
         AllInsides = AllSides | Center | Float,
         AllAreas = AllInsides | Detached
@@ -38,6 +39,5 @@ namespace Dock {
         StackedView
     };
     Q_ENUM_NS(DockWidgetDisplayType)
-//    extern const qreal resizeHandleSize;
 }
 #endif // DOCK_H

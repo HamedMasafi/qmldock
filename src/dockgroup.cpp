@@ -92,8 +92,7 @@ bool DockGroupPrivate::acceptResizeEvent(const QPointF &point)
     case Dock::Top:
         return point.y() > q->height() - DockStyle::instance()->resizeHandleSize();
 
-    case Dock::Float:
-    case Dock::Center:
+    default:
         return false;
     }
 }
@@ -446,8 +445,7 @@ void DockGroup::mouseMoveEvent(QMouseEvent *event)
                      + (d->lastMousePos - event->windowPos().y()));
         break;
 
-    case Dock::Float:
-    case Dock::Center:
+    default:
         break;
     }
 }
@@ -505,6 +503,7 @@ void DockGroup::geometryChanged(const QRectF &newGeometry,
 
 void DockGroup::updatePolish()
 {
+    geometryChanged(QRectF(), QRectF());
     QQuickPaintedItem::updatePolish();
 }
 
