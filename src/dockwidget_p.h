@@ -36,6 +36,8 @@ public:
     DockGroup *dockGroup;
     DockWidgetHeader *header;
 
+    bool isClosed;
+
     Q_DECL_DEPRECATED
     bool detachable;
     Q_DECL_DEPRECATED

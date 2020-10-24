@@ -26,6 +26,7 @@ DockWidgetPrivate::DockWidgetPrivate(DockWidget *parent)
       , dockWindow{nullptr}
       , dockArea{nullptr}
       , dockGroup{nullptr}
+      , isClosed{false}
       , detachable{false}
       , isDetached{false}
 {
@@ -175,6 +176,8 @@ void DockWidget::close()
         d->dockWindow->setVisible(false);
     else
         setVisible(false);
+    d->isClosed = true;
+    emit closed();
 }
 
 void DockWidget::restoreSize()

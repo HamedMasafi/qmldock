@@ -97,6 +97,7 @@ signals:
     void beginMove();
     void moving(const QPointF &pt);
     void moved();
+    void closed();
     void areaChanged(Dock::Area area);
     void closableChanged(bool closable);
     void resizableChanged(bool resizable);
