@@ -81,6 +81,7 @@ protected:
     void updatePolish();
 
 private slots:
+    void dockWidget_closed();
     void tabBar_currentIndexChanged(int index);
     void handler_moving(qreal pos, bool *ok);
     void handler_moved();

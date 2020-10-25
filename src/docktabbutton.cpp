@@ -1,11 +1,28 @@
 #include "dockstyle.h"
+#include "docktabbar.h"
 #include "docktabbutton.h"
 
 #include <QDebug>
 #include <QFontMetrics>
 
-DockTabButton::DockTabButton(QString title, QQuickItem *parent)
-    : QQuickPaintedItem(parent), _title(title), _status(Dock::Normal)
+DockTabBar *DockTabButton::parentTabBar() const
+{
+    return _parentTabBar;
+}
+
+qreal DockTabButton::fitSize() const
+{
+    return _fitSize;
+}
+
+void DockTabButton::setFitSize(const qreal &fitSize)
+{
+    _fitSize = fitSize;
+}
+
+DockTabButton::DockTabButton(QString title, DockTabBar *parent)
+    : QQuickPaintedItem(parent), _parentTabBar{parent}, _title(title),
+      _status(Dock::Normal)
 {
     setAcceptedMouseButtons(Qt::LeftButton);
     setAcceptHoverEvents(true);

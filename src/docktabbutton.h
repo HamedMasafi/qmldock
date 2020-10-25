@@ -4,14 +4,17 @@
 #include <QQuickPaintedItem>
 #include "dock.h"
 
+class DockTabBar;
 class DockTabButton : public QQuickPaintedItem
 {
     Q_OBJECT
     QString _title;
     Dock::ButtonStatus _status;
+    DockTabBar *_parentTabBar;
+    qreal _fitSize;
 
 public:
-    DockTabButton(QString title, QQuickItem *parent = nullptr);
+    DockTabButton(QString title, DockTabBar *parent = nullptr);
     void paint(QPainter *painter);
 
 signals:
@@ -24,6 +27,11 @@ public:
     void setChecked(bool checked);
 
     // QQuickItem interface
+    DockTabBar *parentTabBar() const;
+
+    qreal fitSize() const;
+    void setFitSize(const qreal &fitSize);
+
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);

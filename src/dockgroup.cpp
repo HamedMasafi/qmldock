@@ -291,7 +291,7 @@ QRectF DockGroupPrivate::updateUsableArea()
     if (tabBar && displayType == Dock::TabbedView) {
         switch (tabPosition) {
         case Qt::TopEdge:
-            usableArea.setTop(usableArea.top() + DockStyle::instance()->tabBarHeight());
+            usableArea.setTop(usableArea.top() + DockStyle::instance()->tabBarHeight() + 10);
             break;
         case Qt::RightEdge:
             usableArea.setRight(usableArea.right() - DockStyle::instance()->tabBarHeight());
@@ -300,7 +300,7 @@ QRectF DockGroupPrivate::updateUsableArea()
             usableArea.setLeft(usableArea.left() + DockStyle::instance()->tabBarHeight());
             break;
         case Qt::BottomEdge:
-            usableArea.setBottom(usableArea.bottom() + DockStyle::instance()->tabBarHeight());
+            usableArea.setBottom(usableArea.bottom() - DockStyle::instance()->tabBarHeight());
             break;
         }
     }
@@ -507,6 +507,15 @@ void DockGroup::updatePolish()
     QQuickPaintedItem::updatePolish();
 }
 
+void DockGroup::dockWidget_closed()
+{
+    Q_D(DockGroup);
+    if (d->displayType == Dock::TabbedView
+        || d->displayType == Dock::StackedView) {
+        removeDockWidget(qobject_cast<DockWidget *>(sender()));
+    }
+}
+
 void DockGroup::tabBar_currentIndexChanged(int index)
 {
     Q_D(DockGroup);
@@ -676,6 +685,8 @@ void DockGroup::addDockWidget(DockWidget *item)
     if (d->displayType == Dock::SplitView)
         d->reorderHandles();
     d->reorderItems();
+
+    connect(item, &DockWidget::closed, this, &DockGroup::dockWidget_closed);
 
     setIsOpen(d->dockWidgets.count());
     emit dockWidgetsChanged(d->dockWidgets);

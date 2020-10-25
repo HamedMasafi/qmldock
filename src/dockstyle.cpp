@@ -34,12 +34,12 @@ QFont DockStyle::defaultFont() const
 
 qreal DockStyle::tabBarHeight() const
 {
-    return 30;
+    return 45;
 }
 
 qreal DockStyle::tabBarButtonHeight() const
 {
-    return 25;
+    return 40;
 }
 
 qreal DockStyle::tabBarButtonY() const
@@ -127,12 +127,19 @@ void DockStyle::paintDropButton(QPainter *p, Dock::Area area)
 
 void DockStyle::paintTabBar(QPainter *p, DockTabBar *item)
 {
-//    p->fillRect(item->clipRect(), Qt::magenta);
-
-//    qreal pos{0};
-//    for (auto t : item->tabs())
-//        drawTab(p, &pos, t, 0);
-    p->drawLine(0, 29, item->width() - 1, 29);
+    switch (item->edge()) {
+    case Qt::TopEdge:
+    case Qt::LeftEdge:
+    case Qt::RightEdge:
+        p->drawLine(0,
+                    tabBarHeight() - 2,
+                    item->width() - 1,
+                    tabBarHeight() - 2);
+        break;
+    case Qt::BottomEdge:
+        p->drawLine(0, 4, item->width() - 1, 4);
+        break;
+    }
 }
 
 void DockStyle::paintTabButton(QPainter *p,
@@ -146,26 +153,38 @@ void DockStyle::paintTabButton(QPainter *p,
 //    p->setTransform(t);
     switch (status) {
     case Dock::Normal:
-        p->setBrush(pressColor());
+//        p->setBrush(pressColor());
         rc = QRectF(1, 4, item->width() - 2, item->height() - 5);
-        p->drawRect(rc);
+//        p->drawRect(rc);
         break;
 
     case Dock::Hovered:
         p->setBrush(hoverColor());
         rc = QRectF(1, 4, item->width() - 2, item->height() - 5);
-        p->drawRect(rc);
+        p->fillRect(rc, hoverColor());
         break;
 
     case Dock::Checked:
     case Dock::Pressed:
         p->setPen(borderColor());
         p->setBrush(mainColor());
-        rc = QRectF(0, 0, item->width() - 1, item->height());
+        rc = QRectF(0, 0, item->width() - 1, item->height() - 1);
         p->fillRect(rc, Qt::white);
-        p->drawLine(rc.topLeft(), rc.topRight());
-        p->drawLine(rc.topLeft(), rc.bottomLeft());
-        p->drawLine(rc.topRight(), rc.bottomRight());
+
+        switch (item->parentTabBar()->edge()) {
+        case Qt::TopEdge:
+        case Qt::LeftEdge:
+        case Qt::RightEdge:
+            p->drawLine(rc.topLeft(), rc.topRight());
+            p->drawLine(rc.topLeft(), rc.bottomLeft());
+            p->drawLine(rc.topRight(), rc.bottomRight());
+            break;
+        case Qt::BottomEdge:
+            p->drawLine(rc.topLeft(), rc.bottomLeft());
+            p->drawLine(rc.topRight(), rc.bottomRight());
+            p->drawLine(rc.bottomLeft(), rc.bottomRight());
+            break;
+        }
         break;
     }
 

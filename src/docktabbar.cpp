@@ -53,9 +53,8 @@ DockTabBar::DockTabBar(QQuickItem *parent) : QQuickPaintedItem(parent)
 int DockTabBar::addTab(const QString &name)
 {
     auto t = new DockTabButton{name, this};
-    t->setWidth(QFontMetrics(DockStyle::instance()->defaultFont()).horizontalAdvance(name) + 15);
+    t->setFitSize(QFontMetrics(DockStyle::instance()->defaultFont()).horizontalAdvance(name) + 15);
     t->setY(DockStyle::instance()->tabBarButtonY());
-    t->setHeight(t->width());
     connect(t, &DockTabButton::clicked, this, &DockTabBar::tabButton_clicked);
     _tabs.append(t);
     reorderTabs();
@@ -85,23 +84,25 @@ void DockTabBar::paint(QPainter *painter)
 
 void DockTabBar::reorderTabs()
 {
-    qreal xx{0};
+    qreal xx = _edge == Qt::LeftEdge ? width() - 1 : 0;
     for (auto btn : _tabs) {
         switch (_edge) {
         case Qt::TopEdge:
         case Qt::BottomEdge:
+        case Qt::RightEdge:
             btn->setY(DockStyle::instance()->tabBarButtonY());
             btn->setHeight(DockStyle::instance()->tabBarButtonHeight());
             btn->setX(xx);
+            btn->setWidth(btn->fitSize());
             xx += btn->width();
             break;
 
         case Qt::LeftEdge:
-        case Qt::RightEdge:
-            btn->setX(0);
-            btn->setWidth(width());
-            btn->setY(xx);
-            xx += btn->height();
+            btn->setY(DockStyle::instance()->tabBarButtonY());
+            btn->setHeight(DockStyle::instance()->tabBarButtonHeight());
+            btn->setX(xx - btn->width());
+            btn->setWidth(btn->fitSize());
+            xx -= btn->width();
             break;
         }
     }
