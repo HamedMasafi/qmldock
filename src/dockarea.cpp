@@ -3,7 +3,7 @@
 #include "dockwidget.h"
 #include "dockgroup.h"
 #include "dockgroupresizehandler.h"
-#include "dockstyle.h"
+#include "style/abstractstyle.h"
 #include "dockwindow.h"
 
 #include <QDebug>
@@ -56,7 +56,7 @@ void DockArea::componentComplete()
 
 void DockArea::paint(QPainter *painter)
 {
-    DockStyle::instance()->paintDockArea(painter, this);
+    dockStyle->paintDockArea(painter, this);
 }
 
 QList<DockWidget *> DockArea::dockWidgets() const

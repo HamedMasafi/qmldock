@@ -3,15 +3,15 @@
 #include "dockarea.h"
 #include "dockwidget.h"
 #include "dockgroup.h"
-#include "dockstyle.h"
+#include "style/abstractstyle.h"
 
 #include <QQmlApplicationEngine>
 #include <QFontDatabase>
 
-QObject *createDockStyle(QQmlEngine *, QJSEngine *)
-{
-    return DockStyle::instance();
-}
+//QObject *createDockStyle(QQmlEngine *, QJSEngine *)
+//{
+//    return dockStyle;
+//}
 DockPlugin::DockPlugin(QObject *parent) : QObject(parent)
 {
 
@@ -29,7 +29,7 @@ void DockPlugin::registerDockPlugin()
                                      "Dock",
                                      "Error: only enums");
 
-    qmlRegisterSingletonType<DockStyle>("Kaj.Dock", 1, 0, "DockStyle", createDockStyle);
+//    qmlRegisterSingletonType<DockStyle>("Kaj.Dock", 1, 0, "DockStyle", createDockStyle);
 
     qRegisterMetaType<QList<DockWidget *>>();
 

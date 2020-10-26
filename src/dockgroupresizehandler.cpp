@@ -1,5 +1,5 @@
 #include "dockgroupresizehandler.h"
-#include "dockstyle.h"
+#include "style/abstractstyle.h"
 
 #include "dock.h"
 #include <QCursor>
@@ -17,12 +17,12 @@ DockGroupResizeHandler::DockGroupResizeHandler(Qt::Orientation orientation,
     switch (orientation) {
     case Qt::Horizontal:
         setCursor(Qt::SplitVCursor);
-        setHeight(DockStyle::instance()->resizeHandleSize());
+        setHeight(dockStyle->resizeHandleSize());
         break;
 
     case Qt::Vertical:
         setCursor(Qt::SplitHCursor);
-        setWidth(DockStyle::instance()->resizeHandleSize());
+        setWidth(dockStyle->resizeHandleSize());
         break;
     }
 
@@ -55,7 +55,7 @@ void DockGroupResizeHandler::setPos(const qreal &pos)
 
 void DockGroupResizeHandler::paint(QPainter *painter)
 {
-    DockStyle::instance()->paintResizeHandler(painter,
+    dockStyle->paintResizeHandler(painter,
                                               this,
                                               _hasHover ? Dock::Hovered
                                                         : Dock::Normal);

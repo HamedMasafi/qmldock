@@ -14,6 +14,12 @@ Window {
         id: dockArea
         anchors.fill: parent
 
+        DockGroup {
+            id: centerDockGroup
+            area: Dock.Center
+            displayType: Dock.TabbedView
+        }
+
         DockWidget {
             area: Dock.Left
             title: "Left dock"
@@ -73,19 +79,26 @@ Window {
                 text: qsTr("I am a dock on center")
             }
         }
-        DockWidget {
-            area: Dock.Center
-            title: "Center 2"
-            contentItem: Label {
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
-                text: qsTr("I am a dock on center")
-            }
-        }
+//        DockWidget {
+//            area: Dock.Center
+//            title: "Center 2"
+//            contentItem: Label {
+//                verticalAlignment: Text.AlignVCenter
+//                horizontalAlignment: Text.AlignHCenter
+//                text: qsTr("I am a dock on center")
+//            }
+//        }
         DockWidget {
             area: Dock.Center
             title: "Settings"
             contentItem: CornerOwnerSettings { dockArea: dockArea }
+        }
+        DockWidget {
+            area: Dock.Center
+            title: "Tab potision"
+            contentItem: TabPosition {
+                dockGroup: centerDockGroup
+            }
         }
 
 

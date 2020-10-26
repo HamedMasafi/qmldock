@@ -1,4 +1,4 @@
-#include "dockstyle.h"
+#include "style/abstractstyle.h"
 #include "dockwidgetheaderbutton.h"
 
 #include <QPainter>
@@ -23,7 +23,7 @@ DockWidgetHeaderButton::DockWidgetHeaderButton(QQuickItem *parent)
 
 void DockWidgetHeaderButton::paint(QPainter *painter)
 {
-    DockStyle::instance()->paintWidgetButton(painter, this, _status);
+    dockStyle->paintWidgetButton(painter, this, _status);
 }
 
 void DockWidgetHeaderButton::hoverEnterEvent(QHoverEvent *event)

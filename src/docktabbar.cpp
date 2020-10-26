@@ -1,4 +1,4 @@
-#include "dockstyle.h"
+#include "style/abstractstyle.h"
 #include "docktabbar.h"
 #include "docktabbutton.h"
 
@@ -53,8 +53,8 @@ DockTabBar::DockTabBar(QQuickItem *parent) : QQuickPaintedItem(parent)
 int DockTabBar::addTab(const QString &name)
 {
     auto t = new DockTabButton{name, this};
-    t->setFitSize(QFontMetrics(DockStyle::instance()->defaultFont()).horizontalAdvance(name) + 15);
-    t->setY(DockStyle::instance()->tabBarButtonY());
+    t->setFitSize(QFontMetrics(dockStyle->font()).horizontalAdvance(name) + 15);
+    t->setY(0);
     connect(t, &DockTabButton::clicked, this, &DockTabBar::tabButton_clicked);
     _tabs.append(t);
     reorderTabs();
@@ -79,31 +79,22 @@ void DockTabBar::removeTab(int index)
 
 void DockTabBar::paint(QPainter *painter)
 {
-    DockStyle::instance()->paintTabBar(painter, this);
+    dockStyle->paintTabBar(painter, this);
 }
 
 void DockTabBar::reorderTabs()
 {
     qreal xx = _edge == Qt::LeftEdge ? width() - 1 : 0;
     for (auto btn : _tabs) {
-        switch (_edge) {
-        case Qt::TopEdge:
-        case Qt::BottomEdge:
-        case Qt::RightEdge:
-            btn->setY(DockStyle::instance()->tabBarButtonY());
-            btn->setHeight(DockStyle::instance()->tabBarButtonHeight());
-            btn->setX(xx);
-            btn->setWidth(btn->fitSize());
-            xx += btn->width();
-            break;
-
-        case Qt::LeftEdge:
-            btn->setY(DockStyle::instance()->tabBarButtonY());
-            btn->setHeight(DockStyle::instance()->tabBarButtonHeight());
+        btn->setY(0);
+        btn->setHeight(height());
+        btn->setWidth(btn->fitSize());
+        if (_edge == Qt::LeftEdge) {
             btn->setX(xx - btn->width());
-            btn->setWidth(btn->fitSize());
             xx -= btn->width();
-            break;
+        } else {
+            btn->setX(xx);
+            xx += btn->width();
         }
     }
 }
@@ -136,4 +127,5 @@ void DockTabBar::setEdge(const Qt::Edge &edge)
 {
     _edge = edge;
     reorderTabs();
+    update();
 }

@@ -4,7 +4,7 @@
 #include "debugrect.h"
 #include "dockwidgetbackground.h"
 #include "dockwindow.h"
-#include "dockstyle.h"
+#include "style/abstractstyle.h"
 #include "dockarea.h"
 
 #include <QDebug>
@@ -83,7 +83,7 @@ bool DockWidget::detachable() const
 
 void DockWidget::paint(QPainter *painter)
 {
-    DockStyle::instance()->paintDockWidget(painter, this);
+    dockStyle->paintDockWidget(painter, this);
 //    QQuickPaintedItem::paint(painter);
 }
 
@@ -92,7 +92,7 @@ DockWidget::DockWidget(QQuickItem *parent)
 {
     Q_D(DockWidget);
     d->header = new DockWidgetHeader(this);
-    d->header->setPosition(QPointF(DockStyle::instance()->widgetPadding(), DockStyle::instance()->widgetPadding()));
+    d->header->setPosition(QPointF(dockStyle->widgetPadding(), dockStyle->widgetPadding()));
     d->header->setSize(QSizeF(width(), 30));
     d->header->setVisible(true);
     d->header->setZ(999);
@@ -279,9 +279,9 @@ void DockWidget::setContentItem(QQuickItem *contentItem)
 
     d->contentItem->setParentItem(this);
     d->contentItem->setPosition(QPointF(
-                                   DockStyle::instance()->widgetPadding(),
+                                   dockStyle->widgetPadding(),
                                    (d->showHeader ? d->header->height() : 0)
-                                    +DockStyle::instance()->widgetPadding()
+                                    +dockStyle->widgetPadding()
                                    ));
     geometryChanged(QRectF(), QRectF());
     emit contentItemChanged(d->contentItem);

@@ -1,4 +1,4 @@
-#include "dockstyle.h"
+#include "style/abstractstyle.h"
 #include "dockwidgetbackground.h"
 
 #include <QPainter>
@@ -11,5 +11,5 @@ DockWidgetBackground::DockWidgetBackground(QQuickItem *parent)
 
 void DockWidgetBackground::paint(QPainter *painter)
 {
-    DockStyle::instance()->paintDockWidgetBackground(painter, this);
+    dockStyle->paintDockWidgetBackground(painter, this);
 }

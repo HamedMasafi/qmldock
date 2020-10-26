@@ -26,14 +26,15 @@ SOURCES += \
     $$PWD/dockgroupresizehandler.cpp \
     $$PWD/dockmoveguide.cpp \
     $$PWD/dockplugin.cpp \
-    $$PWD/dockstyle.cpp \
     $$PWD/docktabbar.cpp \
     $$PWD/docktabbutton.cpp \
     $$PWD/dockwidget.cpp \
     $$PWD/dockwidgetbackground.cpp \
     $$PWD/dockwidgetheader.cpp \
     $$PWD/dockwidgetheaderbutton.cpp \
-    $$PWD/dockwindow.cpp
+    $$PWD/dockwindow.cpp \
+    $$PWD/style/abstractstyle.cpp \
+    $$PWD/style/defaultstyle.cpp
 
 RESOURCES += $$PWD/dock.qrc
 
@@ -48,7 +49,6 @@ HEADERS += \
     $$PWD/dockgroupresizehandler.h \
     $$PWD/dockmoveguide.h \
     $$PWD/dockplugin.h \
-    $$PWD/dockstyle.h \
     $$PWD/docktabbar.h \
     $$PWD/docktabbutton.h \
     $$PWD/dockwidget.h \
@@ -56,4 +56,6 @@ HEADERS += \
     $$PWD/dockwidgetbackground.h \
     $$PWD/dockwidgetheader.h \
     $$PWD/dockwidgetheaderbutton.h \
-    $$PWD/dockwindow.h
+    $$PWD/dockwindow.h \
+    $$PWD/style/abstractstyle.h \
+    $$PWD/style/defaultstyle.h

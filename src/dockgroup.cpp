@@ -3,7 +3,7 @@
 #include "debugrect.h"
 #include "dockgroup_p.h"
 #include "dockgroupresizehandler.h"
-#include "dockstyle.h"
+#include "style/abstractstyle.h"
 #include "docktabbar.h"
 #include "dockwidget.h"
 
@@ -79,18 +79,18 @@ bool DockGroupPrivate::acceptResizeEvent(const QPointF &point)
 
     switch (area) {
     case Dock::Right:
-        return point.x() < DockStyle::instance()->resizeHandleSize();
+        return point.x() < dockStyle->resizeHandleSize();
         break;
 
     case Dock::Left:
-        return point.x() > q->width() - DockStyle::instance()->resizeHandleSize();
+        return point.x() > q->width() - dockStyle->resizeHandleSize();
         break;
 
     case Dock::Bottom:
-        return point.y() < DockStyle::instance()->resizeHandleSize();
+        return point.y() < dockStyle->resizeHandleSize();
 
     case Dock::Top:
-        return point.y() > q->height() - DockStyle::instance()->resizeHandleSize();
+        return point.y() > q->height() - dockStyle->resizeHandleSize();
 
     default:
         return false;
@@ -103,36 +103,36 @@ void DockGroupPrivate::fitItem(QQuickItem *item)
 
     switch (area) {
     case Dock::Right:
-        item->setX(q->x() + (enableResizing ? DockStyle::instance()->resizeHandleSize() : 1.));
+        item->setX(q->x() + (enableResizing ? dockStyle->resizeHandleSize() : 1.));
         item->setWidth(q->width() - 2
-                       - (enableResizing ? DockStyle::instance()->resizeHandleSize() : 0.));
+                       - (enableResizing ? dockStyle->resizeHandleSize() : 0.));
         break;
 
     case Dock::Left:
         item->setX(q->x() + 1);
         item->setWidth(q->width() - 2
-                       - (enableResizing ? DockStyle::instance()->resizeHandleSize() : 0.) - 2);
+                       - (enableResizing ? dockStyle->resizeHandleSize() : 0.) - 2);
         break;
 
     case Dock::Top:
         item->setY(q->y() + 1);
         item->setHeight(q->height() - 2
-                        - (enableResizing ? DockStyle::instance()->resizeHandleSize() : 0.));
+                        - (enableResizing ? dockStyle->resizeHandleSize() : 0.));
         break;
     case Dock::Bottom:
-        item->setY(q->y() + (enableResizing ? DockStyle::instance()->resizeHandleSize() : 1.));
+        item->setY(q->y() + (enableResizing ? dockStyle->resizeHandleSize() : 1.));
         item->setHeight(q->height() - 2
-                        - (enableResizing ? DockStyle::instance()->resizeHandleSize() : 0.));
+                        - (enableResizing ? dockStyle->resizeHandleSize() : 0.));
         break;
 
     case Dock::Center:
-        item->setPosition(usableArea.topLeft());// QPointF(q->x() + DockStyle::instance()->tabMargin(),
-//                                  q->y() + DockStyle::instance()->tabMargin()
-//                                      + DockStyle::instance()->tabBarHeight()));
+        item->setPosition(usableArea.topLeft());// QPointF(q->x() + dockStyle->tabMargin(),
+//                                  q->y() + dockStyle->tabMargin()
+//                                      + dockStyle->tabBarHeight()));
         item->setSize(usableArea.size());
-//            QSizeF(q->width() - 2 * +DockStyle::instance()->tabMargin(),
-//                   q->height() - (2 * +DockStyle::instance()->tabMargin())
-//                       - DockStyle::instance()->tabBarHeight()));
+//            QSizeF(q->width() - 2 * +dockStyle->tabMargin(),
+//                   q->height() - (2 * +dockStyle->tabMargin())
+//                       - dockStyle->tabBarHeight()));
         break;
 
     case Dock::Float:
@@ -158,13 +158,13 @@ void DockGroupPrivate::reorderItems()
     if (isVertical()) {
         ss = q->y();
         freeSize = (q->height()
-                    - (DockStyle::instance()->resizeHandleSize() * (dockWidgets.count() - 1)));
+                    - (dockStyle->resizeHandleSize() * (dockWidgets.count() - 1)));
     }
 
     if (isHorizontal()) {
         ss = q->x();
         freeSize = (q->width()
-                    - (DockStyle::instance()->resizeHandleSize() * (dockWidgets.count() - 1)));
+                    - (dockStyle->resizeHandleSize() * (dockWidgets.count() - 1)));
     }
     QList<qreal> sl;
     for (int i = 0; i < dockWidgets.count(); i++) {
@@ -177,7 +177,7 @@ void DockGroupPrivate::reorderItems()
                 dw->setY(ss);
                 dw->setX(q->x() + usableArea.x());
                 dw->setWidth(usableArea.width());
-                ss += dw->height() + DockStyle::instance()->resizeHandleSize();
+                ss += dw->height() + dockStyle->resizeHandleSize();
                 sl.append(dw->height());
             }
             if (isHorizontal()) {
@@ -185,15 +185,15 @@ void DockGroupPrivate::reorderItems()
                 dw->setX(ss);
                 dw->setY(q->y() + usableArea.y());
                 dw->setHeight(usableArea.height());
-                ss += dw->width() + DockStyle::instance()->resizeHandleSize();
+                ss += dw->width() + dockStyle->resizeHandleSize();
                 sl.append(dw->width());
             }
             if (i < dockWidgets.count() - 1) {
                 if (isVertical())
-                    handlers.at(i)->setY(ss - q->y() - DockStyle::instance()->resizeHandleSize());
+                    handlers.at(i)->setY(ss - q->y() - dockStyle->resizeHandleSize());
 
                 if (isHorizontal())
-                    handlers.at(i)->setX(ss - q->x() - DockStyle::instance()->resizeHandleSize());
+                    handlers.at(i)->setX(ss - q->x() - dockStyle->resizeHandleSize());
             }
             break;;
 
@@ -268,20 +268,20 @@ QRectF DockGroupPrivate::updateUsableArea()
     if (enableResizing)
         switch (area) {
         case Dock::Right:
-            usableArea.setLeft(DockStyle::instance()->resizeHandleSize() + 1);
+            usableArea.setLeft(dockStyle->resizeHandleSize() + 1);
             break;
 
         case Dock::Left:
             usableArea.setRight(usableArea.right()
-                                - DockStyle::instance()->resizeHandleSize());
+                                - dockStyle->resizeHandleSize());
             break;
 
         case Dock::Top:
             usableArea.setBottom(usableArea.bottom()
-                                - DockStyle::instance()->resizeHandleSize());
+                                - dockStyle->resizeHandleSize());
             break;
         case Dock::Bottom:
-            usableArea.setTop(DockStyle::instance()->resizeHandleSize() + 1);
+            usableArea.setTop(dockStyle->resizeHandleSize() + 1);
             break;
 
         case Dock::Center:
@@ -291,18 +291,20 @@ QRectF DockGroupPrivate::updateUsableArea()
     if (tabBar && displayType == Dock::TabbedView) {
         switch (tabPosition) {
         case Qt::TopEdge:
-            usableArea.setTop(usableArea.top() + DockStyle::instance()->tabBarHeight() + 10);
+            usableArea.setTop(usableArea.top() + dockStyle->tabBarSize());
             break;
         case Qt::RightEdge:
-            usableArea.setRight(usableArea.right() - DockStyle::instance()->tabBarHeight());
+            usableArea.setRight(usableArea.right() - dockStyle->tabBarSize());
             break;
         case Qt::LeftEdge:
-            usableArea.setLeft(usableArea.left() + DockStyle::instance()->tabBarHeight());
+            usableArea.setLeft(usableArea.left() + dockStyle->tabBarSize());
             break;
         case Qt::BottomEdge:
-            usableArea.setBottom(usableArea.bottom() - DockStyle::instance()->tabBarHeight());
+            usableArea.setBottom(usableArea.bottom() - dockStyle->tabBarSize());
             break;
         }
+        auto a = dockStyle->widgetTabPadding();
+        usableArea.adjust(a, a, -a, -a);
     }
     return usableArea;
 }
@@ -471,24 +473,28 @@ void DockGroup::geometryChanged(const QRectF &newGeometry,
     if (d->tabBar && d->displayType == Dock::TabbedView) {
         switch (d->tabPosition) {
         case Qt::TopEdge:
+            d->tabBar->setX(0);
+            d->tabBar->setY(0);
             d->tabBar->setWidth(width());
-            d->tabBar->setHeight(DockStyle::instance()->tabBarHeight());
+            d->tabBar->setHeight(dockStyle->tabBarSize());
             break;
         case Qt::LeftEdge:
             d->tabBar->setX(0);
             d->tabBar->setY(height());
             d->tabBar->setWidth(height());
-            d->tabBar->setHeight(DockStyle::instance()->tabBarHeight());
+            d->tabBar->setHeight(dockStyle->tabBarSize());
             break;
         case Qt::RightEdge:
+            d->tabBar->setY(0);
             d->tabBar->setX(width());
             d->tabBar->setWidth(height());
-            d->tabBar->setHeight(dockStyle->tabBarHeight());
+            d->tabBar->setHeight(dockStyle->tabBarSize());
             break;
         case Qt::BottomEdge:
-            d->tabBar->setWidth(width());
-            d->tabBar->setHeight(DockStyle::instance()->tabBarHeight());
+            d->tabBar->setX(0);
             d->tabBar->setY(height() - d->tabBar->height());
+            d->tabBar->setWidth(width());
+            d->tabBar->setHeight(dockStyle->tabBarSize());
             break;
         }
     }
@@ -536,26 +542,26 @@ void DockGroup::handler_moving(qreal pos, bool *ok)
         return;
 
     auto ps = handler->index() ? pos - d->handlers.at(handler->index() - 1)->pos()
-                               - DockStyle::instance()->resizeHandleSize()
+                               - dockStyle->resizeHandleSize()
                          : pos;
 
     auto ns = handler->index() == d->handlers.count() - 1
                   ? (d->isVertical() ? height() : width()) - pos
-                        - DockStyle::instance()->resizeHandleSize()
+                        - dockStyle->resizeHandleSize()
                   : d->handlers.at(handler->index() + 1)->pos() - pos
-                        - DockStyle::instance()->resizeHandleSize();
+                        - dockStyle->resizeHandleSize();
 
     auto prevDockWidget = d->dockWidgets.at(handler->index());
     auto nextDockWidget = d->dockWidgets.at(handler->index() + 1);
 
     if (ns > 30 && ps > 30) {
         if (d->isVertical()) {
-            nextDockWidget->setY(pos + DockStyle::instance()->resizeHandleSize());
+            nextDockWidget->setY(y() + pos + dockStyle->resizeHandleSize());
             nextDockWidget->setHeight(ns);
             prevDockWidget->setHeight(ps);
         }
         if (d->isHorizontal()) {
-            nextDockWidget->setX(pos + DockStyle::instance()->resizeHandleSize());
+            nextDockWidget->setX(x() + pos + dockStyle->resizeHandleSize());
             nextDockWidget->setWidth(ns);
             prevDockWidget->setWidth(ps);
         }
@@ -573,14 +579,14 @@ void DockGroup::handler_moved()
         foreach (auto dw, d->dockWidgets)
             totalSpace += dw->height();
         freeSize = (height()
-                    - (DockStyle::instance()->resizeHandleSize() * (d->dockWidgets.count() - 1)));
+                    - (dockStyle->resizeHandleSize() * (d->dockWidgets.count() - 1)));
     }
 
     if (d->isHorizontal()) {
         foreach (auto dw, d->dockWidgets)
             totalSpace += dw->width();
         freeSize = (width()
-                    - (DockStyle::instance()->resizeHandleSize() * (d->dockWidgets.count() - 1)));
+                    - (dockStyle->resizeHandleSize() * (d->dockWidgets.count() - 1)));
     }
 
     int index{0};
@@ -815,8 +821,12 @@ void DockGroup::setTabPosition(Qt::Edge tabPosition)
 
     if (d->tabPosition == tabPosition)
         return;
-
     switch (tabPosition) {
+    case Qt::TopEdge:
+    case Qt::BottomEdge:
+        d->tabBar->setRotation(0);
+        break;
+
     case Qt::LeftEdge:
         d->tabBar->setRotation(-90);
         break;
@@ -826,8 +836,10 @@ void DockGroup::setTabPosition(Qt::Edge tabPosition)
         break;
     }
     d->tabPosition = tabPosition;
-    d->updateUsableArea();
+//    d->updateUsableArea();
     d->tabBar->setEdge(tabPosition);
+    geometryChanged(QRectF(), QRectF());
+    update();
     emit tabPositionChanged(d->tabPosition);
 }
 void DockGroup::setCurrentIndex(int currentIndex)
@@ -842,5 +854,5 @@ void DockGroup::setCurrentIndex(int currentIndex)
 
 void DockGroup::paint(QPainter *painter)
 {
-    DockStyle::instance()->paintGroup(painter, this);
+    dockStyle->paintDockGroup(painter, this);
 }

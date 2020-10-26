@@ -1,4 +1,4 @@
-#include "dockstyle.h"
+#include "style/abstractstyle.h"
 #include "dockwidget.h"
 #include "dockwidgetheader.h"
 #include "dockwidgetheaderbutton.h"
@@ -80,7 +80,7 @@ DockWidgetHeader::DockWidgetHeader(DockWidget *parent)
 
 void DockWidgetHeader::paint(QPainter *painter)
 {
-    DockStyle::instance()->paintDockWidgetHeader(painter, this);
+    dockStyle->paintDockWidgetHeader(painter, this);
 }
 
 void DockWidgetHeader::mousePressEvent(QMouseEvent *event)

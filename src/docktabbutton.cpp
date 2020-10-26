@@ -1,4 +1,4 @@
-#include "dockstyle.h"
+#include "style/abstractstyle.h"
 #include "docktabbar.h"
 #include "docktabbutton.h"
 
@@ -26,12 +26,11 @@ DockTabButton::DockTabButton(QString title, DockTabBar *parent)
 {
     setAcceptedMouseButtons(Qt::LeftButton);
     setAcceptHoverEvents(true);
-    setHeight(DockStyle::instance()->tabBarButtonHeight());
 }
 
 void DockTabButton::paint(QPainter *painter)
 {
-    DockStyle::instance()->paintTabButton(painter, this, _status);
+    dockStyle->paintTabButton(painter, this, _status);
 }
 
 QString DockTabButton::title() const

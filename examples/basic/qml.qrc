@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>CornerOwnerSettings.qml</file>
+        <file>TabPosition.qml</file>
     </qresource>
 </RCC>
