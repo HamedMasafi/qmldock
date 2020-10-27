@@ -225,6 +225,8 @@ void DockGroupPrivate::reorderHandles()
             h->setY(0);
             h->setHeight(q->height());
         }
+        if (displayType != Dock::SplitView)
+            h->setVisible(false);
     }
 }
 

@@ -20,6 +20,14 @@ Window {
             displayType: Dock.TabbedView
         }
 
+        DockGroup {
+            id: leftDockGroup
+            area: Dock.Left
+            displayType: Dock.TabbedView
+            tabPosition: Qt.LeftEdge
+            panelSize: 200
+        }
+
         DockWidget {
             area: Dock.Left
             title: "Left dock"

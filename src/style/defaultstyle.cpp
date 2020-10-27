@@ -144,10 +144,10 @@ void DefaultStyle::drawLineOnEdge(QPainter *p,
         p->drawLine(0, 0, item->width() - 1, 0);
         break;
     case Qt::RightEdge:
-        p->drawLine(0, 0, 0, item->height() - 1);
+        p->drawLine(item->width() - 1, 0, item->width() - 1, item->height() - 1);
         break;
     case Qt::LeftEdge:
-        p->drawLine(item->width() - 1, 0, item->width() - 1, item->height() - 1);
+        p->drawLine(0, 0, 0, item->height() - 1);
         break;
     case Qt::BottomEdge:
         p->drawLine(0, item->height() - 1, item->width() - 1, item->height() - 1);
@@ -192,29 +192,28 @@ void DefaultStyle::paintTabButton(QPainter *p,
                                   Dock::ButtonStatus status)
 {
     QRectF rc(0, 0, item->width() - 1, item->height() - 1);
-
     p->setPen(m_borderColor);
 
     switch (status) {
     case Dock::Normal:
         p->setPen(m_borderColor);
         rc.setBottom(rc.bottom() - 1);
+        p->fillRect(rc, m_backgroundColor);
         if (item->parentTabBar()->edge() == Qt::BottomEdge)
             drawLineOnEdge(p, item, Qt::TopEdge);
         else
             drawLineOnEdge(p, item, Qt::BottomEdge);
-        p->fillRect(rc, m_backgroundColor);
         break;
 
     case Dock::Hovered:
         p->setPen(m_borderColor);
         rc.setBottom(rc.bottom() - 1);
+        p->setBrush(hoverColor());
+        p->fillRect(rc, hoverColor());
         if (item->parentTabBar()->edge() == Qt::BottomEdge)
             drawLineOnEdge(p, item, Qt::TopEdge);
         else
             drawLineOnEdge(p, item, Qt::BottomEdge);
-        p->setBrush(hoverColor());
-        p->fillRect(rc, hoverColor());
         break;
 
     case Dock::Checked:
@@ -225,20 +224,22 @@ void DefaultStyle::paintTabButton(QPainter *p,
         case Qt::TopEdge:
         case Qt::LeftEdge:
         case Qt::RightEdge:
+            p->setPen(m_tabAreaColor);
+            drawLineOnEdge(p, item, Qt::BottomEdge);
+
+            p->setPen(m_borderColor);
             drawLineOnEdge(p, item, Qt::TopEdge);
             drawLineOnEdge(p, item, Qt::LeftEdge);
             drawLineOnEdge(p, item, Qt::RightEdge);
-
-            p->setPen(m_tabAreaColor);
-            drawLineOnEdge(p, item, Qt::BottomEdge);
             break;
         case Qt::BottomEdge:
+            p->setPen(m_tabAreaColor);
+            drawLineOnEdge(p, item, Qt::TopEdge);
+
+            p->setPen(m_borderColor);
             drawLineOnEdge(p, item, Qt::LeftEdge);
             drawLineOnEdge(p, item, Qt::RightEdge);
             drawLineOnEdge(p, item, Qt::BottomEdge);
-
-            p->setPen(m_tabAreaColor);
-            drawLineOnEdge(p, item, Qt::TopEdge);
             break;
         }
         break;
@@ -333,15 +334,21 @@ void DefaultStyle::paintDockWidget(QPainter *p, DockWidget *item)
     p->setPen(pn);
     p->drawRect(0, 0, item->width() - 1, item->height() - 1);*/
     p->fillRect(item->clipRect(), mainColor());
+    qreal a;
     if (item->area() == Dock::Float || item->area() == Dock::Detached)
-        p->fillRect(item->clipRect().adjusted(10, 10, -10, -10), Qt::white);
+        a = 10;
     else
-        p->fillRect(item->clipRect().adjusted(3, 3, -3, -3), Qt::white);
+        a = 1;
+    p->fillRect(item->clipRect().adjusted(a, a, -a, -a), Qt::white);
 }
 
 void DefaultStyle::paintDockWidgetHeader(QPainter *p, DockWidgetHeader *item)
 {
-    p->fillRect(item->clipRect(), mainColor());
+    //    p->fillRect(item->clipRect(), mainColor());
+    QBrush b(m_mainColor);
+    b.setStyle(Qt::Dense6Pattern);
+    auto tw = QFontMetrics(font()).horizontalAdvance(item->title());
+    p->fillRect(10 + tw, 10, item->width() - 30 - tw, item->height() - 20, b);
     p->setPen(m_textColor);
     p->drawText(8,
                 0,

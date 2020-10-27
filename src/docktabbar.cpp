@@ -84,7 +84,7 @@ void DockTabBar::paint(QPainter *painter)
 
 void DockTabBar::reorderTabs()
 {
-    qreal xx = _edge == Qt::LeftEdge ? width() - 1 : 0;
+    qreal xx = _edge == Qt::LeftEdge ? width() : 0;
     for (auto btn : _tabs) {
         btn->setY(0);
         btn->setHeight(height());
@@ -96,6 +96,7 @@ void DockTabBar::reorderTabs()
             btn->setX(xx);
             xx += btn->width();
         }
+        btn->update();
     }
 }
 
