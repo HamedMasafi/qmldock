@@ -28,14 +28,7 @@ Window {
             panelSize: 200
         }
 
-        DockWidget {
-            area: Dock.Left
-            title: "Left dock"
-            contentItem: Label {
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
-                text: qsTr("I am a dock on left")
-            }
+        CusomTitleBar {
         }
 
         DockWidget {

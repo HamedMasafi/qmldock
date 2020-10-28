@@ -35,6 +35,8 @@ public:
     virtual qreal widgetPadding() const = 0;
     virtual qreal widgetResizePadding() const = 0;
     virtual qreal widgetTabPadding() const = 0;
+    virtual qreal dropButtonSize() const = 0;
+    virtual qreal dropButtonSpace() const = 0;
 
     //colors
     /*virtual QColor areaColor() const = 0;
@@ -45,7 +47,7 @@ public:
     //draw methods
     virtual void paintDockGroup(QPainter *p, DockGroup *item) = 0;
     virtual void paintDockArea(QPainter *p, DockArea *item) = 0;
-    virtual void paintDropButton(QPainter *p, Dock::Area area) = 0;
+    virtual void paintDropButton(QPainter *p, Dock::Area area, const QRectF &rc, bool hover) = 0;
     virtual void paintTabBar(QPainter *p, DockTabBar *item) = 0;
     virtual void paintTabButton(QPainter *p, DockTabButton *item, Dock::ButtonStatus status) = 0;
     virtual void paintWidgetButton(QPainter *p,

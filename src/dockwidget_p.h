@@ -31,10 +31,11 @@ public:
     QString title;
 
     QQuickItem * contentItem;
+    QQuickItem * titleBarItem;
+    DockWidgetHeader *titleBar;
     DockWindow *dockWindow;
     DockArea *dockArea;
     DockGroup *dockGroup;
-    DockWidgetHeader *header;
 
     bool isClosed;
 

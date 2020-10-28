@@ -40,7 +40,7 @@ public:
 
 
     void paintDockArea(QPainter *p, DockArea *item) override;
-    void paintDropButton(QPainter *p, Dock::Area area) override;
+    void paintDropButton(QPainter *p, Dock::Area area, const QRectF &rc, bool hover) override;
     void paintTabBar(QPainter *p, DockTabBar *item) override;
     void paintTabButton(QPainter *p, DockTabButton *item, Dock::ButtonStatus status) override;
     void paintWidgetButton(QPainter *p,
@@ -59,6 +59,8 @@ public:
     qreal widgetResizePadding() const override;
     qreal widgetTabPadding() const override;
     qreal tabBarSize() const override;
+    qreal dropButtonSize() const override;
+    qreal dropButtonSpace() const override;
 
     QColor mainColor() const;
     QColor borderColor() const;

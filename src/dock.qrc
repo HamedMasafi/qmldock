@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>icons.ttf</file>
+        <file>icons/dock_font_default.ttf</file>
     </qresource>
 </RCC>

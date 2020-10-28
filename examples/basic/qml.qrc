@@ -3,5 +3,6 @@
         <file>main.qml</file>
         <file>CornerOwnerSettings.qml</file>
         <file>TabPosition.qml</file>
+        <file>CusomTitleBar.qml</file>
     </qresource>
 </RCC>

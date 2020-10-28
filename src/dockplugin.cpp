@@ -34,4 +34,5 @@ void DockPlugin::registerDockPlugin()
     qRegisterMetaType<QList<DockWidget *>>();
 
     QFontDatabase::addApplicationFont(":/icons.ttf");
+    QFontDatabase::addApplicationFont(":/icons/dock_font_default.ttf");
 }

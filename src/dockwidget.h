@@ -22,6 +22,7 @@ class DockWidget : public QQuickPaintedItem {
     Q_PROPERTY(bool showHeader READ showHeader WRITE setShowHeader NOTIFY showHeaderChanged)
     Q_PROPERTY(bool detachable READ detachable WRITE setDetachable NOTIFY detachableChanged)
     Q_PROPERTY(QQuickItem *contentItem READ contentItem WRITE setContentItem NOTIFY contentItemChanged FINAL)
+    Q_PROPERTY(QQuickItem *titleBar READ titleBar WRITE setTitleBar NOTIFY titleBarChanged)
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     Q_PROPERTY(Dock::Areas allowedAreas READ allowedAreas WRITE setAllowedAreas NOTIFY allowedAreasChanged)
 //    Q_PROPERTY(DockWidgetFlags flags READ flags WRITE setFlags NOTIFY flagsChanged)
@@ -58,6 +59,9 @@ public:
     Dock::Areas allowedAreas() const;
     DockWindow *dockWindow() const;
 
+    QQuickItem * titleBar() const;
+    void componentComplete() override;
+
 public slots:
     Q_DECL_DEPRECATED
     void detach();
@@ -79,6 +83,8 @@ public slots:
     void setTitle(QString title);
 
     void setAllowedAreas(Dock::Areas allowedAreas);
+
+    void setTitleBar(QQuickItem * titleBar);
 
 private slots:
     void header_moveStarted();
@@ -109,6 +115,8 @@ signals:
     void allowedAreasChanged(Dock::Areas allowedAreas);
 
     friend class DockWidgetHeader;
+    void titleBarChanged(QQuickItem * titleBar);
+
 };
 
 #endif // DOCKWIDGET_H

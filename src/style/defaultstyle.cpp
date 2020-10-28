@@ -12,6 +12,12 @@
 
 #include <QPainter>
 
+#ifdef Q_OS_WIN
+#   define STR(x) QString::fromUtf16(u ## x)
+#else
+#   define STR(x) QString::fromUtf8(x)
+#endif
+
 DefaultStyle::DefaultStyle(QObject *parent)
     : QObject(parent), AbstractStyle(), m_backgroundColor("#e4e4e4"),
       m_mainColor("#4fc1e9"), m_borderColor(30, 30, 30),
@@ -35,6 +41,16 @@ QFont DefaultStyle::font() const
 qreal DefaultStyle::tabBarSize() const
 {
     return 29;
+}
+
+qreal DefaultStyle::dropButtonSize() const
+{
+    return 30;
+}
+
+qreal DefaultStyle::dropButtonSpace() const
+{
+    return 15;
 }
 
 qreal DefaultStyle::resizeHandleSize() const
@@ -175,10 +191,37 @@ QColor DefaultStyle::pressColor() const
     return m_pressColor;
 }
 
-void DefaultStyle::paintDropButton(QPainter *p, Dock::Area area)
+void DefaultStyle::paintDropButton(QPainter *p, Dock::Area area, const QRectF &rc, bool hover)
 {
-    Q_UNUSED(p)
-    Q_UNUSED(area)
+    p->setFont(QFont("dock_font_default", 24));
+    if (hover) {
+        p->setPen(Qt::blue);
+    } else {
+        p->setPen(Qt::black);
+        p->setOpacity(.2);
+        p->fillRect(rc, Qt::blue);
+    }
+
+    switch (area) {
+    case Dock::Left:
+        p->drawText(rc, Qt::AlignCenter, "l");
+        break;
+    case Dock::Right:
+        p->drawText(rc, Qt::AlignCenter, "r");
+        break;
+    case Dock::Top:
+        p->drawText(rc, Qt::AlignCenter, "u");
+        break;
+    case Dock::Bottom:
+        p->drawText(rc, Qt::AlignCenter, "d");
+        break;
+    case Dock::Center:
+        p->drawText(rc, Qt::AlignCenter, "C");
+        break;
+    default:
+        break;
+    }
+    p->setOpacity(1);
 }
 
 void DefaultStyle::paintTabBar(QPainter *p, DockTabBar *item)
@@ -315,6 +358,22 @@ void DefaultStyle::paintDockGroup(QPainter *p, DockGroup *item)
             item->height()
             - (item->tabPosition() == Qt::BottomEdge ? tabBarSize() : 1));
 
+        switch (item->area()) {
+        case Dock::Left:
+            rc.setRight(rc.right() - resizeHandleSize());
+            break;
+        case Dock::Top:
+            rc.setBottom(rc.bottom() - resizeHandleSize());
+            break;
+        case Dock::Right:
+            rc.setX(rc.x() - resizeHandleSize());
+            break;
+        case Dock::Bottom:
+            rc.setY(rc.y() - resizeHandleSize());
+            break;
+        default:
+            break;
+        }
         p->fillRect(rc, m_tabAreaColor);
         p->setPen(m_borderColor);
         p->drawRect(rc);

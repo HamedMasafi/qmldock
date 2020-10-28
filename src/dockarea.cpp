@@ -39,9 +39,13 @@ void DockArea::componentComplete()
     createGroup(Dock::Top);
     createGroup(Dock::Bottom);
 
-
     for (auto &dw : _initialWidgets)
         addDockWidget(dw);
+
+    for (auto &dg: _dockGroups.values()) {
+        connect(dg, &DockGroup::panelSizeChanged, this, &DockArea::reorderDockGroups);
+        connect(dg, &DockGroup::isOpenChanged, this, &DockArea::reorderDockGroups);
+    }
 
     _dockGroups[Dock::Left]->polish();
     _dockGroups[Dock::Top]->polish();
@@ -373,8 +377,8 @@ DockGroup *DockArea::createGroup(Dock::Area area, DockGroup *item)
     item->setZ(Z_GROUP);
     item->setPanelSize(200);
     item->setDisplayType(Dock::SplitView);
-    connect(item, &DockGroup::panelSizeChanged, this, &DockArea::reorderDockGroups);
-    connect(item, &DockGroup::isOpenChanged, this, &DockArea::reorderDockGroups);
+//    connect(item, &DockGroup::panelSizeChanged, this, &DockArea::reorderDockGroups);
+//    connect(item, &DockGroup::isOpenChanged, this, &DockArea::reorderDockGroups);
     _dockGroups.insert(area, item);
 
     return item;

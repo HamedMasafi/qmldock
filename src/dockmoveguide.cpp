@@ -1,6 +1,7 @@
 #include "dockmoveguide.h"
 
 #include <QPainter>
+#include "style/abstractstyle.h"
 
 Dock::Area DockMoveGuide::area() const
 {
@@ -45,34 +46,33 @@ void DockMoveGuide::paint(QPainter *painter)
     if (_allowedAreas & Dock::Float && clipRect().contains(_mousePos))
         _area = Dock::Float;
 
-    QRectF rc(0, 0, 30, 30);
-    bool b;
+    QRectF rc(0, 0, dockStyle->dropButtonSize(), dockStyle->dropButtonSize());
 
     painter->setOpacity(.6);
 
     rc.moveCenter(clipRect().center());
     if (_allowedAreas & Dock::Center) {
-        b = drawRect(painter, rc);
-        if (b)
+        auto b = rc.contains(_mousePos);
+        dockStyle->paintDropButton(painter, Dock::Center, rc, b);
+        if (b) {
             _area = Dock::Center;
+        }
     }
 
     if (_allowedAreas & Dock::Right) {
         rc.moveLeft(width() / 2 + 30);
-        b = drawRect(painter, rc);
+        auto b = rc.contains(_mousePos);
+        dockStyle->paintDropButton(painter, Dock::Right, rc, b);
         if (b) {
-            painter->setOpacity(0.2);
-            painter->fillRect(width() - 300, 0, 300, height(), Qt::green);
             _area = Dock::Right;
         }
     }
 
     if (_allowedAreas & Dock::Left) {
         rc.moveRight(width() / 2 - 30);
-        b = drawRect(painter, rc);
+        auto b = rc.contains(_mousePos);
+        dockStyle->paintDropButton(painter, Dock::Left, rc, b);
         if (b) {
-            painter->setOpacity(0.2);
-            painter->fillRect(0, 0, 300, height(), Qt::green);
             _area = Dock::Left;
         }
     }
@@ -80,20 +80,18 @@ void DockMoveGuide::paint(QPainter *painter)
     if (_allowedAreas & Dock::Bottom) {
         rc.moveCenter(clipRect().center());
         rc.moveTop(height() / 2 + 30);
-        b = drawRect(painter, rc);
+        auto b = rc.contains(_mousePos);
+        dockStyle->paintDropButton(painter, Dock::Bottom, rc, b);
         if (b) {
-            painter->setOpacity(0.2);
-            painter->fillRect(0, height() - 300, width(), 300, Qt::green);
             _area = Dock::Bottom;
         }
     }
 
     if (_allowedAreas & Dock::Top) {
         rc.moveBottom(height() / 2 - 30);
-        b = drawRect(painter, rc);
+        auto b = rc.contains(_mousePos);
+        dockStyle->paintDropButton(painter, Dock::Top, rc, b);
         if (b) {
-            painter->setOpacity(0.2);
-            painter->fillRect(0, 0, width(), 300, Qt::green);
             _area = Dock::Top;
         }
     }
