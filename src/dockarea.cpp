@@ -21,11 +21,11 @@ DockArea::DockArea(QQuickItem *parent) : QQuickPaintedItem(parent)
 {
 
     _dockMoveGuide = new DockMoveGuide(this);
-    _dockMoveGuide->setVisible(false);
-    _dockMoveGuide->setPosition(QPointF(0, 0));
-    _dockMoveGuide->setSize(QSizeF(30, 30));
-    _dockMoveGuide->setZ(Z_GUIDE);
-    _dockMoveGuide->update();
+//    _dockMoveGuide->setVisible(false);
+//    _dockMoveGuide->setPosition(QPointF(0, 0));
+//    _dockMoveGuide->setSize(QSizeF(30, 30));
+//    _dockMoveGuide->setZ(Z_GUIDE);
+//    _dockMoveGuide->update();
 }
 
 void DockArea::componentComplete()
@@ -285,10 +285,12 @@ void DockArea::dockWidget_beginMove()
         dw->dockGroup()->removeDockWidget(dw);
         dw->restoreSize();
     }
-    qDebug() << dw->allowedAreas() << (int)dw->allowedAreas();
-    _dockMoveGuide->setAllowedAreas(dw->allowedAreas());
-    _dockMoveGuide->setSize(size());
-    _dockMoveGuide->setVisible(true);
+
+    _dockMoveGuide->begin(mapToGlobal(QPoint(0, 0)),
+                size());
+//    _dockMoveGuide->setAllowedAreas(dw->allowedAreas());
+//    _dockMoveGuide->setSize(size());
+//    _dockMoveGuide->setVisible(true);
 }
 
 void DockArea::dockWidget_moving(const QPointF &pt)
@@ -298,7 +300,7 @@ void DockArea::dockWidget_moving(const QPointF &pt)
 
 void DockArea::dockWidget_moved()
 {
-    _dockMoveGuide->setVisible(false);
+    _dockMoveGuide->end();
 
     auto dw = qobject_cast<DockWidget *>(sender());
     if (!dw)

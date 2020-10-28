@@ -3,6 +3,7 @@
 
 #include "dock.h"
 
+#include <QRectF>
 #include <QSizeF>
 
 class DockWidget;
@@ -38,6 +39,9 @@ public:
     DockGroup *dockGroup;
 
     bool isClosed;
+    int resizeEdge;
+    QRectF rectBeforeResize;
+    QPointF resizeMousePos;
 
     Q_DECL_DEPRECATED
     bool detachable;

@@ -404,7 +404,6 @@ void DockWidget::geometryChanged(const QRectF &newGeometry,
         d->contentItem->setWidth(rc.width());
         d->contentItem->setHeight(
             rc.height() - (d->showHeader ? d->titleBarItem->height() : 0));
-        d->contentItem->setVisible(false);
     }
 }
 
@@ -502,26 +501,61 @@ void DockWidget::hoverMoveEvent(QHoverEvent *event)
 void DockWidget::mousePressEvent(QMouseEvent *event)
 {
     Q_D(DockWidget);
-    int e{0};
+    d->resizeEdge = 0;
     auto b = 10;
     if (event->pos().x() < b) {
-        e |= Qt::LeftEdge;
+        d->resizeEdge |= Qt::LeftEdge;
     }
     if (event->pos().x() >= width() - b) {
-        e |= Qt::RightEdge;
+        d->resizeEdge |= Qt::RightEdge;
     }
     if (event->pos().y() < b) {
-        e |= Qt::TopEdge;
+        d->resizeEdge |= Qt::TopEdge;
     }
     if (event->pos().y() >= height() - b) {
-        e |= Qt::BottomEdge;
+        d->resizeEdge |= Qt::BottomEdge;
     }
 
-    if (e) {
-        if (d->isDetached && d->dockWindow)
-            d->dockWindow->startSystemResize((Qt::Edge) e);
+    if (d->resizeEdge) {
+        if (d->isDetached && d->dockWindow) {
+            d->dockWindow->startSystemResize((Qt::Edge) d->resizeEdge);
+            event->ignore();
+        } else {
+            event->accept();
+        }
+        d->rectBeforeResize = QRectF(position(), size());
+        d->resizeMousePos = event->windowPos();
+    } else {
+        event->ignore();
     }
-    event->accept();
+}
+
+void DockWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    Q_D(DockWidget);
+    QRectF rc(position(), size());
+    if (d->resizeEdge & Qt::LeftEdge)
+        rc.setLeft(d->rectBeforeResize.left()
+                                    + event->windowPos().x()
+                                    - d->resizeMousePos.x());
+
+    if (d->resizeEdge & Qt::TopEdge)
+        rc.setTop(d->rectBeforeResize.top()
+                                   + event->windowPos().y()
+                                   - d->resizeMousePos.y());
+
+    if (d->resizeEdge & Qt::RightEdge)
+        rc.setRight(d->rectBeforeResize.right()
+                                     + event->windowPos().x()
+                                     - d->resizeMousePos.x());
+
+    if (d->resizeEdge & Qt::BottomEdge)
+        rc.setBottom(d->rectBeforeResize.bottom()
+                                      + event->windowPos().y()
+                                      - d->resizeMousePos.y());
+
+    setPosition(rc.topLeft());
+    setSize(rc.size());
 }
 
 void DockWidget::hoverLeaveEvent(QHoverEvent *event)

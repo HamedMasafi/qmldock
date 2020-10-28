@@ -34,10 +34,15 @@ Window {
         DockWidget {
             area: Dock.Right
             title: "Right dock 1"
-            contentItem: Label {
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
-                text: qsTr("I am a dock on right")
+            contentItem: ListView {
+                id: listView60
+                model: 60
+                clip: true
+                delegate: Text {
+                    width: listView60.width
+                    text: modelData
+                    color: 'white'
+                }
             }
         }
         DockWidget {
@@ -80,15 +85,15 @@ Window {
                 text: qsTr("I am a dock on center")
             }
         }
-//        DockWidget {
-//            area: Dock.Center
-//            title: "Center 2"
-//            contentItem: Label {
-//                verticalAlignment: Text.AlignVCenter
-//                horizontalAlignment: Text.AlignHCenter
-//                text: qsTr("I am a dock on center")
-//            }
-//        }
+        //        DockWidget {
+        //            area: Dock.Center
+        //            title: "Center 2"
+        //            contentItem: Label {
+        //                verticalAlignment: Text.AlignVCenter
+        //                horizontalAlignment: Text.AlignHCenter
+        //                text: qsTr("I am a dock on center")
+        //            }
+        //        }
         DockWidget {
             area: Dock.Center
             title: "Settings"

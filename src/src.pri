@@ -34,7 +34,8 @@ SOURCES += \
     $$PWD/dockwidgetheaderbutton.cpp \
     $$PWD/dockwindow.cpp \
     $$PWD/style/abstractstyle.cpp \
-    $$PWD/style/defaultstyle.cpp
+    $$PWD/style/defaultstyle.cpp \
+    $$PWD/style/vsdarkstyle.cpp
 
 RESOURCES += $$PWD/dock.qrc
 
@@ -58,4 +59,5 @@ HEADERS += \
     $$PWD/dockwidgetheaderbutton.h \
     $$PWD/dockwindow.h \
     $$PWD/style/abstractstyle.h \
-    $$PWD/style/defaultstyle.h
+    $$PWD/style/defaultstyle.h \
+    $$PWD/style/vsdarkstyle.h

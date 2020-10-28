@@ -12,11 +12,13 @@ class DefaultStyle : public QObject, public AbstractStyle
     Q_OBJECT
 
     Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
+    Q_PROPERTY(QColor widgetColor READ widgetColor WRITE setWidgetColor NOTIFY widgetColorChanged)
     Q_PROPERTY(QColor mainColor READ mainColor WRITE setMainColor NOTIFY mainColorChanged)
     Q_PROPERTY(QColor borderColor READ borderColor WRITE setBorderColor NOTIFY borderColorChanged)
     Q_PROPERTY(QColor hoverColor READ hoverColor WRITE setHoverColor NOTIFY hoverColorChanged)
     Q_PROPERTY(QColor pressColor READ pressColor WRITE setPressColor NOTIFY pressColorChanged)
     Q_PROPERTY(QColor tabAreaColor READ tabAreaColor WRITE setTabAreaColor NOTIFY tabAreaColorChanged)
+    Q_PROPERTY(QColor activeTextColor READ activeTextColor WRITE setActiveTextColor NOTIFY activeTextColorChanged)
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
 
     void drawCircle(QPainter *painter,
@@ -70,6 +72,10 @@ public:
     QColor textColor() const;
     QColor backgroundColor() const;
 
+    QColor widgetColor() const;
+
+    QColor activeTextColor() const;
+
 signals:
     void mainColorChanged(QColor mainColor);
     void borderColorChanged(QColor borderColor);
@@ -78,6 +84,10 @@ signals:
     void tabAreaColorChanged(QColor tabAreaColor);
     void textColorChanged(QColor textColor);
     void backgroundColorChanged(QColor backgroundColor);
+
+    void widgetColorChanged(QColor widgetColor);
+
+    void activeTextColorChanged(QColor activeTextColor);
 
 public slots:
     void setMainColor(QColor mainColor);
@@ -88,8 +98,14 @@ public slots:
     void setTextColor(QColor textColor);
     void setBackgroundColor(QColor backgroundColor);
 
+    void setWidgetColor(QColor widgetColor);
+
+    void setActiveTextColor(QColor activeTextColor);
+
 private:
     void drawLineOnEdge(QPainter *p, QQuickItem *item, Qt::Edge edge) const;
+    QColor m_widgetColor;
+    QColor m_activeTextColor;
 };
 
 #endif // DefaultStyle_H

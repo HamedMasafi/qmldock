@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <dockplugin.h>
+#include "style/vsdarkstyle.h"
 
 int main(int argc, char *argv[])
 {
@@ -9,6 +10,7 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     DockPlugin::registerDockPlugin();
+    AbstractStyle::setStyle(new VSDarkStyle);
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));

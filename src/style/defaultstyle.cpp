@@ -20,9 +20,10 @@
 
 DefaultStyle::DefaultStyle(QObject *parent)
     : QObject(parent), AbstractStyle(), m_backgroundColor("#e4e4e4"),
-      m_mainColor("#4fc1e9"), m_borderColor(30, 30, 30),
+      m_mainColor("#4fc1e9"), m_borderColor("#4fc1e9"),
       m_hoverColor(220, 220, 220), m_pressColor(200, 200, 200),
       m_tabAreaColor(Qt::white), m_textColor(Qt::black)
+      , m_activeTextColor(Qt::black)
 {
 }
 
@@ -50,7 +51,7 @@ qreal DefaultStyle::dropButtonSize() const
 
 qreal DefaultStyle::dropButtonSpace() const
 {
-    return 15;
+    return 25;
 }
 
 qreal DefaultStyle::resizeHandleSize() const
@@ -124,6 +125,16 @@ QColor DefaultStyle::backgroundColor() const
     return m_backgroundColor;
 }
 
+QColor DefaultStyle::widgetColor() const
+{
+    return m_widgetColor;
+}
+
+QColor DefaultStyle::activeTextColor() const
+{
+    return m_activeTextColor;
+}
+
 void DefaultStyle::setTabAreaColor(QColor tabAreaColor)
 {
     if (m_tabAreaColor == tabAreaColor)
@@ -149,6 +160,24 @@ void DefaultStyle::setBackgroundColor(QColor backgroundColor)
 
     m_backgroundColor = backgroundColor;
     emit backgroundColorChanged(m_backgroundColor);
+}
+
+void DefaultStyle::setWidgetColor(QColor widgetColor)
+{
+    if (m_widgetColor == widgetColor)
+        return;
+
+    m_widgetColor = widgetColor;
+    emit widgetColorChanged(m_widgetColor);
+}
+
+void DefaultStyle::setActiveTextColor(QColor activeTextColor)
+{
+    if (m_activeTextColor == activeTextColor)
+        return;
+
+    m_activeTextColor = activeTextColor;
+    emit activeTextColorChanged(m_activeTextColor);
 }
 
 void DefaultStyle::drawLineOnEdge(QPainter *p,
@@ -195,12 +224,12 @@ void DefaultStyle::paintDropButton(QPainter *p, Dock::Area area, const QRectF &r
 {
     p->setFont(QFont("dock_font_default", 24));
     if (hover) {
-        p->setPen(Qt::blue);
+        p->setPen(m_activeTextColor);
     } else {
-        p->setPen(Qt::black);
-        p->setOpacity(.2);
-        p->fillRect(rc, Qt::blue);
+        p->setPen(QColor(110, 110, 250));
+        p->setOpacity(.8);
     }
+    p->fillRect(rc, Qt::lightGray);
 
     switch (area) {
     case Dock::Left:
@@ -246,6 +275,7 @@ void DefaultStyle::paintTabButton(QPainter *p,
             drawLineOnEdge(p, item, Qt::TopEdge);
         else
             drawLineOnEdge(p, item, Qt::BottomEdge);
+        p->setPen(m_textColor);
         break;
 
     case Dock::Hovered:
@@ -257,6 +287,7 @@ void DefaultStyle::paintTabButton(QPainter *p,
             drawLineOnEdge(p, item, Qt::TopEdge);
         else
             drawLineOnEdge(p, item, Qt::BottomEdge);
+        p->setPen(m_textColor);
         break;
 
     case Dock::Checked:
@@ -285,10 +316,10 @@ void DefaultStyle::paintTabButton(QPainter *p,
             drawLineOnEdge(p, item, Qt::BottomEdge);
             break;
         }
+        p->setPen(m_activeTextColor);
         break;
     }
 
-    p->setPen(m_textColor);
     p->drawText(rc, Qt::AlignCenter, item->title());
 }
 
@@ -301,16 +332,17 @@ void DefaultStyle::paintWidgetButton(QPainter *p,
         break;
 
     case Dock::Hovered:
-        p->setBrush(QColor(220, 220, 220));
+        p->setBrush(m_hoverColor);
         p->drawEllipse(0, 0, 15, 15);
         break;
 
     case Dock::Pressed:
     case Dock::Checked:
-        p->setBrush(QColor(200, 200, 200));
+        p->setBrush(m_pressColor);
         p->drawEllipse(0, 0, 15, 15);
         break;
     }
+    p->setPen(m_textColor);
     p->setFont(QFont("icons"));
     p->drawText(item->clipRect(), Qt::AlignCenter, item->icon());
 }
@@ -387,18 +419,13 @@ void DefaultStyle::paintDockGroup(QPainter *p, DockGroup *item)
 
 void DefaultStyle::paintDockWidget(QPainter *p, DockWidget *item)
 {
-    p->setBrush(Qt::white);
-    /*QPen pn(mainColor());
-    pn.setWidth(widgetPadding() * 2);
-    p->setPen(pn);
-    p->drawRect(0, 0, item->width() - 1, item->height() - 1);*/
-    p->fillRect(item->clipRect(), mainColor());
+    p->fillRect(item->clipRect(), m_borderColor);
     qreal a;
     if (item->area() == Dock::Float || item->area() == Dock::Detached)
         a = 10;
     else
         a = 1;
-    p->fillRect(item->clipRect().adjusted(a, a, -a, -a), Qt::white);
+    p->fillRect(item->clipRect().adjusted(a, a, -a, -a), m_widgetColor);
 }
 
 void DefaultStyle::paintDockWidgetHeader(QPainter *p, DockWidgetHeader *item)
