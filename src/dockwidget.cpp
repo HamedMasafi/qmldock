@@ -163,10 +163,11 @@ void DockWidget::setArea(Dock::Area area)
 
     if (d->area == Dock::Detached) {
         setParentItem(d->dockArea);
+        setVisible(true);
         d->isDetached = false;
-        d->dockWindow->deleteLater();
         d->dockWindow->hide();
-        d->dockWindow = nullptr;
+//        d->dockWindow->deleteLater();
+//        d->dockWindow = nullptr;
     }
     d->area = area;
     emit areaChanged(d->area);

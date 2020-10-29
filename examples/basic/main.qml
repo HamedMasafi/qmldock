@@ -13,6 +13,7 @@ Window {
     DockArea {
         id: dockArea
         anchors.fill: parent
+        enableStateStoring: true
 
         DockGroup {
             id: centerDockGroup

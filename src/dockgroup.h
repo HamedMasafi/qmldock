@@ -29,10 +29,10 @@ class DockGroup : public QQuickPaintedItem {
                    currentIndexChanged)
     Q_PROPERTY(Qt::Edge tabPosition READ tabPosition WRITE setTabPosition NOTIFY
                    tabPositionChanged)
+    Q_PROPERTY(QQuickItem *tabBar READ tabBar WRITE setTabBar NOTIFY tabBarChanged)
 
     Q_DECLARE_PRIVATE(DockGroup);
     DockGroupPrivate *d_ptr;
-    QList<DockWidget *> m_name;
 
 public:
     DockGroup(QQuickItem *parent = nullptr);
@@ -49,6 +49,9 @@ public:
     QList<DockWidget *> dockWidgets() const;
     int currentIndex() const;
     Qt::Edge tabPosition() const;
+    void componentComplete();
+
+    QQuickItem * tabBar() const;
 
 public slots:
     void addDockWidget(DockWidget *item);
@@ -63,6 +66,8 @@ public slots:
     void setTabPosition(Qt::Edge tabPosition);
     void setCurrentIndex(int currentIndex);
 
+    void setTabBar(QQuickItem * tabBar);
+
 signals:
     void requestResize(const QRectF &rect, bool *ok);
     void isOpenChanged(bool isOpen);
@@ -75,6 +80,8 @@ signals:
     void dockWidgetsChanged(QList<DockWidget *> name);
     void currentIndexChanged(int currentIndex);
     void tabPositionChanged(Qt::Edge tabPosition);
+
+    void tabBarChanged(QQuickItem * tabBar);
 
 protected:
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
@@ -93,8 +100,6 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
 
-    // QQuickItem interface
-protected:
 };
 
 #endif // DOCKGROUP_H

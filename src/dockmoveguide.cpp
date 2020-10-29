@@ -3,8 +3,11 @@
 #include <QPainter>
 #include <QQuickWindow>
 #include "style/abstractstyle.h"
+#include "dockarea.h"
+#include "movedropguide.h"
 
-DockMoveGuide::DockMoveGuide(QQuickItem *parent) : QQuickPaintedItem(parent)
+DockMoveGuide::DockMoveGuide(DockArea *parent) : QQuickPaintedItem(parent)
+      ,_parentDockArea(parent)
 {
     _window = new QQuickWindow;
     setParentItem(_window->contentItem());
@@ -12,6 +15,11 @@ DockMoveGuide::DockMoveGuide(QQuickItem *parent) : QQuickPaintedItem(parent)
     _window->setFlags(Qt::FramelessWindowHint | Qt::Tool
                       | Qt::WindowStaysOnTopHint);
     setPosition(QPointF(0, 0));
+
+    _dropArea = new MoveDropGuide(parent);
+    _dropArea->setParentItem(parent);
+    _dropArea->setVisible(false);
+    _dropArea->setZ(999);
 }
 
 void DockMoveGuide::begin(const QPointF &pos, const QSizeF &size)
@@ -89,6 +97,7 @@ void DockMoveGuide::begin(const QPointF &pos, const QSizeF &size)
 void DockMoveGuide::end()
 {
     _window->hide();
+    _dropArea->setVisible(false);
 }
 
 Dock::Area DockMoveGuide::area() const
@@ -130,59 +139,13 @@ void DockMoveGuide::paint(QPainter *painter)
         dockStyle->paintDropButton(painter, i.key(), i.value(), contains);
         if (contains) {
             _area = i.key();
-        }
-    }
-    return;
-
-    QRectF rc(0, 0, dockStyle->dropButtonSize(), dockStyle->dropButtonSize());
-
-    painter->setOpacity(.6);
-
-    rc.moveCenter(clipRect().center());
-    if (_allowedAreas & Dock::Center) {
-        auto b = rc.contains(_mousePos);
-        dockStyle->paintDropButton(painter, Dock::Center, rc, b);
-        if (b) {
-            _area = Dock::Center;
+            auto rc = _parentDockArea->panelRect(_area);
+            _dropArea->setPosition(rc.topLeft());
+            _dropArea->setSize(rc.size());
+            _dropArea->setVisible(true);
         }
     }
 
-    if (_allowedAreas & Dock::Right) {
-        rc.moveLeft(width() / 2 + 30);
-        auto b = rc.contains(_mousePos);
-        dockStyle->paintDropButton(painter, Dock::Right, rc, b);
-        if (b) {
-            _area = Dock::Right;
-        }
-    }
-
-    if (_allowedAreas & Dock::Left) {
-        rc.moveRight(width() / 2 - 30);
-        auto b = rc.contains(_mousePos);
-        dockStyle->paintDropButton(painter, Dock::Left, rc, b);
-        if (b) {
-            _area = Dock::Left;
-        }
-    }
-
-    if (_allowedAreas & Dock::Bottom) {
-        rc.moveCenter(clipRect().center());
-        rc.moveTop(height() / 2 + 30);
-        auto b = rc.contains(_mousePos);
-        dockStyle->paintDropButton(painter, Dock::Bottom, rc, b);
-        if (b) {
-            _area = Dock::Bottom;
-        }
-    }
-
-    if (_allowedAreas & Dock::Top) {
-        rc.moveBottom(height() / 2 - 30);
-        auto b = rc.contains(_mousePos);
-        dockStyle->paintDropButton(painter, Dock::Top, rc, b);
-        if (b) {
-            _area = Dock::Top;
-        }
-    }
-
-    painter->setOpacity(1);
+    if (_area == Dock::Detached || _area == Dock::Float)
+        _dropArea->setVisible(false);
 }

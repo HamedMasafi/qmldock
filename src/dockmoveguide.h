@@ -5,17 +5,21 @@
 #include "dock.h"
 
 class QQuickWindow;
+class DockArea;
+class MoveDropGuide;
 class DockMoveGuide : public QQuickPaintedItem
 {
     Q_OBJECT
     QPointF _mousePos;
+    DockArea *_parentDockArea;
     Dock::Area _area;
     Dock::Areas _allowedAreas;
     QQuickWindow *_window;
     QMultiMap<Dock::Area, QRectF> _areas;
+    MoveDropGuide *_dropArea;
 
 public:
-    DockMoveGuide(QQuickItem *parent = nullptr);
+    DockMoveGuide(DockArea *parent = nullptr);
 
 public:
     void begin(const QPointF &pos, const QSizeF &size);

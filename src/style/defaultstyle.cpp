@@ -21,6 +21,7 @@
 DefaultStyle::DefaultStyle(QObject *parent)
     : QObject(parent), AbstractStyle(), m_backgroundColor("#e4e4e4"),
       m_mainColor("#4fc1e9"), m_borderColor("#4fc1e9"),
+      m_widgetColor(Qt::white),
       m_hoverColor(220, 220, 220), m_pressColor(200, 200, 200),
       m_tabAreaColor(Qt::white), m_textColor(Qt::black)
       , m_activeTextColor(Qt::black)
@@ -459,21 +460,4 @@ void DefaultStyle::drawCircle(QPainter *painter,
 {
     Q_UNUSED(hover)
     painter->drawEllipse(center, 2, 2);
-}
-
-void DefaultStyle::drawTab(QPainter *p,
-                           qreal *pos,
-                           const QString &title,
-                           int status)
-{
-    Q_UNUSED(p)
-    Q_UNUSED(pos)
-    Q_UNUSED(title)
-    Q_UNUSED(status)
-    //    p->setPen(Qt::black);
-    //    p->setBrush(Qt::yellow);
-    //    QRectF rc(*pos, 0, p->fontMetrics().horizontalAdvance(title) + 20, height());
-    //    p->drawRoundedRect(rc, 5, 5);
-    //    p->drawText(rc, Qt::AlignCenter, title);
-    //    *pos += rc.width() + 2;
 }

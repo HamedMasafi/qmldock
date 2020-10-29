@@ -8,6 +8,7 @@
 
 #include <QDebug>
 #include <QPainter>
+#include <QSettings>
 #define Z_GROUP 100
 #define Z_WIDGET 200
 #define Z_WIDGET_FLOAT 300
@@ -21,11 +22,12 @@ DockArea::DockArea(QQuickItem *parent) : QQuickPaintedItem(parent)
 {
 
     _dockMoveGuide = new DockMoveGuide(this);
-//    _dockMoveGuide->setVisible(false);
-//    _dockMoveGuide->setPosition(QPointF(0, 0));
-//    _dockMoveGuide->setSize(QSizeF(30, 30));
-//    _dockMoveGuide->setZ(Z_GUIDE);
-//    _dockMoveGuide->update();
+}
+
+DockArea::~DockArea()
+{
+    if (m_enableStateStoring)
+        storeSettings();
 }
 
 void DockArea::componentComplete()
@@ -56,6 +58,29 @@ void DockArea::componentComplete()
     geometryChanged(QRectF(), QRectF());
 
     QQuickItem::componentComplete();
+}
+
+void DockArea::storeSettings()
+{
+    QSettings set;
+    QMetaEnum e = QMetaEnum::fromType<Dock::Area>();
+
+    for (auto &dw : _dockWidgets) {
+        set.beginGroup(dw->title());
+        set.setValue("area", e.valueToKey(dw->area()));
+        set.setValue("position", QStringLiteral("%1,%2").arg(dw->x()).arg(dw->y()));
+        set.setValue("size", QStringLiteral("%1,%2").arg(dw->width()).arg(dw->height()));
+        set.setValue("visible", dw->isVisible());
+        set.endGroup();
+    }
+
+    set.sync();
+    qDebug() << set.fileName();
+}
+
+void DockArea::restoreSettings()
+{
+
 }
 
 void DockArea::paint(QPainter *painter)
@@ -120,6 +145,17 @@ void DockArea::addDockWidget(DockWidget *widget)
             this,
             &DockArea::dockWidget_visibleChanged);
 
+    if (m_enableStateStoring) {
+        QSettings set;
+        QMetaEnum e = QMetaEnum::fromType<Dock::Area>();
+        set.beginGroup(widget->title());
+        if (set.contains("area"))
+            widget->setArea(
+                (Dock::Area) e.keyToValue(set.value("area", widget->area())
+                                              .toString()
+                                              .toLocal8Bit()
+                                              .data()));
+    }
     switch (widget->area()) {
     case Dock::Left:
     case Dock::Right:
@@ -271,6 +307,15 @@ void DockArea::setBottomRightOwner(Qt::Edge bottomRightOwner)
     emit bottomRightOwnerChanged(m_bottomRightOwner);
 }
 
+void DockArea::setEnableStateStoring(bool enableStateStoring)
+{
+    if (m_enableStateStoring == enableStateStoring)
+        return;
+
+    m_enableStateStoring = enableStateStoring;
+    emit enableStateStoringChanged(m_enableStateStoring);
+}
+
 void DockArea::dockWidget_beginMove()
 {
     auto dw = qobject_cast<DockWidget *>(sender());
@@ -280,7 +325,7 @@ void DockArea::dockWidget_beginMove()
     dw->setZ(Z_WIDGET_FLOAT);
 
     if (dw->dockGroup()) {
-//        dw->beginDetach();
+        //        dw->beginDetach();
         dw->setArea(Dock::Float);
         dw->dockGroup()->removeDockWidget(dw);
         dw->restoreSize();
@@ -379,11 +424,37 @@ DockGroup *DockArea::createGroup(Dock::Area area, DockGroup *item)
     item->setZ(Z_GROUP);
     item->setPanelSize(200);
     item->setDisplayType(Dock::SplitView);
-//    connect(item, &DockGroup::panelSizeChanged, this, &DockArea::reorderDockGroups);
-//    connect(item, &DockGroup::isOpenChanged, this, &DockArea::reorderDockGroups);
+
     _dockGroups.insert(area, item);
 
     return item;
+}
+
+QRectF DockArea::panelRect(Dock::Area area) const
+{
+    auto d = _dockGroups.value(area);
+
+    if (d->isOpen())
+        return QRectF(d->position(), d->size());
+
+    constexpr qreal s{50};
+
+    switch (area) {
+    case Dock::Left:
+        return QRectF(0, 0, s, height() - 1);
+
+    case Dock::Top:
+        return QRectF(0, 0, width() - 1, s);
+
+    case Dock::Right:
+        return QRectF(width() - s, 0, s, height() - 1);
+
+    case Dock::Bottom:
+        return QRectF(0, height() - s, width() - 1, s);
+
+    default:
+        return QRectF();
+    }
 }
 
 Qt::Edge DockArea::topLeftOwner() const
@@ -404,4 +475,9 @@ Qt::Edge DockArea::bottomLeftOwner() const
 Qt::Edge DockArea::bottomRightOwner() const
 {
     return m_bottomRightOwner;
+}
+
+bool DockArea::enableStateStoring() const
+{
+    return m_enableStateStoring;
 }

@@ -12,9 +12,9 @@
 #include <QPainter>
 
 DockGroupPrivate::DockGroupPrivate(DockGroup *parent)
-    : q_ptr(parent), mousepRessed{false},
-      area(Dock::Float), enableResizing{true}
-      , tabBar{nullptr}, displayType{Dock::SplitView}
+    : q_ptr(parent), mousepRessed{false}, currentIndex{-1},
+      area(Dock::Float), enableResizing{true}, tabBar{nullptr},
+      tabBarItem{nullptr}, displayType{Dock::SplitView}
       , minimumSize(80), maximumSize(400)
       , tabPosition{Qt::TopEdge}
 {
@@ -225,8 +225,6 @@ void DockGroupPrivate::reorderHandles()
             h->setY(0);
             h->setHeight(q->height());
         }
-        if (displayType != Dock::SplitView)
-            h->setVisible(false);
     }
 }
 
@@ -286,23 +284,22 @@ QRectF DockGroupPrivate::updateUsableArea()
             usableArea.setTop(dockStyle->resizeHandleSize() + 1);
             break;
 
-        case Dock::Center:
-        case Dock::Float:
+        default:
             break;
         }
-    if (tabBar && displayType == Dock::TabbedView) {
+    if (tabBarItem && displayType == Dock::TabbedView) {
         switch (tabPosition) {
         case Qt::TopEdge:
-            usableArea.setTop(usableArea.top() + dockStyle->tabBarSize());
+            usableArea.setTop(usableArea.top() + tabBarItem->height());
             break;
         case Qt::RightEdge:
-            usableArea.setRight(usableArea.right() - dockStyle->tabBarSize());
+            usableArea.setRight(usableArea.right() - tabBarItem->height());
             break;
         case Qt::LeftEdge:
-            usableArea.setLeft(usableArea.left() + dockStyle->tabBarSize());
+            usableArea.setLeft(usableArea.left() + tabBarItem->height());
             break;
         case Qt::BottomEdge:
-            usableArea.setBottom(usableArea.bottom() - dockStyle->tabBarSize());
+            usableArea.setBottom(usableArea.bottom() - tabBarItem->height());
             break;
         }
         auto a = dockStyle->widgetTabPadding();
@@ -319,15 +316,6 @@ DockGroup::DockGroup(QQuickItem *parent)
     setClip(true);
     setAcceptHoverEvents(true);
     setAcceptedMouseButtons(Qt::LeftButton);
-
-    d->tabBar = new DockTabBar(this);
-    d->tabBar->setVisible(false);
-    d->tabBar->setZ(10000);
-    d->tabBar->setTransformOrigin(QQuickItem::TopLeft);
-    connect(d->tabBar,
-            &DockTabBar::currentIndexChanged,
-            this,
-            &DockGroup::tabBar_currentIndexChanged);
 }
 
 void DockGroup::hoverMoveEvent(QHoverEvent *event)
@@ -472,31 +460,31 @@ void DockGroup::geometryChanged(const QRectF &newGeometry,
 
     d->updateUsableArea();
 
-    if (d->tabBar && d->displayType == Dock::TabbedView) {
+    if (d->tabBarItem && d->displayType == Dock::TabbedView) {
         switch (d->tabPosition) {
         case Qt::TopEdge:
-            d->tabBar->setX(0);
-            d->tabBar->setY(0);
-            d->tabBar->setWidth(width());
-            d->tabBar->setHeight(dockStyle->tabBarSize());
+            d->tabBarItem->setX(0);
+            d->tabBarItem->setY(0);
+            d->tabBarItem->setWidth(width());
+//            d->tabBarItem->setHeight(dockStyle->tabBarSize());
             break;
         case Qt::LeftEdge:
-            d->tabBar->setX(0);
-            d->tabBar->setY(height());
-            d->tabBar->setWidth(height());
-            d->tabBar->setHeight(dockStyle->tabBarSize());
+            d->tabBarItem->setX(0);
+            d->tabBarItem->setY(height());
+            d->tabBarItem->setWidth(height());
+//            d->tabBarItem->setHeight(dockStyle->tabBarSize());
             break;
         case Qt::RightEdge:
-            d->tabBar->setY(0);
-            d->tabBar->setX(width());
-            d->tabBar->setWidth(height());
-            d->tabBar->setHeight(dockStyle->tabBarSize());
+            d->tabBarItem->setY(0);
+            d->tabBarItem->setX(width());
+            d->tabBarItem->setWidth(height());
+//            d->tabBarItem->setHeight(dockStyle->tabBarSize());
             break;
         case Qt::BottomEdge:
-            d->tabBar->setX(0);
-            d->tabBar->setY(height() - d->tabBar->height());
-            d->tabBar->setWidth(width());
-            d->tabBar->setHeight(dockStyle->tabBarSize());
+            d->tabBarItem->setX(0);
+            d->tabBarItem->setY(height() - d->tabBarItem->height());
+            d->tabBarItem->setWidth(width());
+//            d->tabBarItem->setHeight(dockStyle->tabBarSize());
             break;
         }
     }
@@ -505,6 +493,11 @@ void DockGroup::geometryChanged(const QRectF &newGeometry,
 
     if (d->displayType == Dock::SplitView)
         d->reorderHandles();
+    else
+        for (auto h : d->handlers)
+            if (h)
+                h->setVisible(false);
+
     d->reorderItems();
     QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);
 }
@@ -663,10 +656,36 @@ Qt::Edge DockGroup::tabPosition() const
     return d->tabPosition;
 }
 
+void DockGroup::componentComplete()
+{
+    Q_D(DockGroup);
+    if (!d->tabBarItem) {
+        d->tabBar = new DockTabBar(this);
+        d->tabBar->setVisible(false);
+        d->tabBar->setZ(10000);
+        d->tabBar->setTransformOrigin(QQuickItem::TopLeft);
+        d->tabBar->setHeight(dockStyle->tabBarSize());
+        d->tabBarItem = d->tabBar;
+        connect(d->tabBar,
+                &DockTabBar::currentIndexChanged,
+                this,
+                &DockGroup::tabBar_currentIndexChanged);
+    }
+
+    d->tabBarItem->setVisible(d->displayType == Dock::TabbedView);
+    QQuickPaintedItem::componentComplete();
+}
+
+QQuickItem *DockGroup::tabBar() const
+{
+    Q_D(const DockGroup);
+    return d->tabBarItem;
+}
+
 int DockGroup::currentIndex() const
 {
     Q_D(const DockGroup);
-    return d->tabBar->currentIndex();
+    return d->currentIndex;
 }
 
 void DockGroup::addDockWidget(DockWidget *item)
@@ -786,7 +805,8 @@ void DockGroup::setDisplayType(Dock::DockWidgetDisplayType displayType)
     if (d->displayType == displayType)
         return;
 
-    d->tabBar->setVisible(displayType == Dock::TabbedView);
+    if (d->tabBarItem)
+        d->tabBarItem->setVisible(displayType == Dock::TabbedView);
     d->displayType = displayType;
     emit displayTypeChanged(displayType);
 }
@@ -826,20 +846,22 @@ void DockGroup::setTabPosition(Qt::Edge tabPosition)
     switch (tabPosition) {
     case Qt::TopEdge:
     case Qt::BottomEdge:
-        d->tabBar->setRotation(0);
+        d->tabBarItem->setRotation(0);
         break;
 
     case Qt::LeftEdge:
-        d->tabBar->setRotation(-90);
+        d->tabBarItem->setRotation(-90);
         break;
 
     case Qt::RightEdge:
-        d->tabBar->setRotation(90);
+        d->tabBarItem->setRotation(90);
         break;
     }
     d->tabPosition = tabPosition;
 //    d->updateUsableArea();
-    d->tabBar->setEdge(tabPosition);
+
+    if (d->tabBar)
+        d->tabBar->setEdge(tabPosition);
     geometryChanged(QRectF(), QRectF());
     update();
     emit tabPositionChanged(d->tabPosition);
@@ -847,11 +869,26 @@ void DockGroup::setTabPosition(Qt::Edge tabPosition)
 void DockGroup::setCurrentIndex(int currentIndex)
 {
     Q_D(DockGroup);
-    if (d->tabBar->currentIndex() == currentIndex)
+    if (d->currentIndex == currentIndex)
         return;
 
-    d->tabBar->setCurrentIndex(currentIndex);
+    d->currentIndex = qBound(0, currentIndex, d->dockWidgets.count() - 1);
+    if (d->tabBar)
+        d->tabBar->setCurrentIndex(currentIndex);
     emit currentIndexChanged(currentIndex);
+}
+
+void DockGroup::setTabBar(QQuickItem *tabBar)
+{
+    Q_D(DockGroup);
+
+    if (d->tabBarItem == tabBar)
+        return;
+
+    tabBar->setParentItem(this);
+    d->tabBarItem = tabBar;
+    updatePolish();
+    emit tabBarChanged(tabBar);
 }
 
 void DockGroup::paint(QPainter *painter)

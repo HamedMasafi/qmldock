@@ -21,23 +21,8 @@ class DefaultStyle : public QObject, public AbstractStyle
     Q_PROPERTY(QColor activeTextColor READ activeTextColor WRITE setActiveTextColor NOTIFY activeTextColorChanged)
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
 
-    void drawCircle(QPainter *painter,
-                    const QPointF &center,
-                    bool hover = false);
-
-    void drawTab(QPainter *p, qreal *pos, const QString &title, int status);
-
-    QColor m_backgroundColor;
-    QColor m_mainColor;
-    QColor m_borderColor;
-    QColor m_hoverColor;
-    QColor m_pressColor;
-    QColor m_tabAreaColor;
-    QColor m_textColor;
 
 public:
-    enum ButtonStatus { Normal, Hovered, Pressed };
-
     explicit DefaultStyle(QObject *parent = nullptr);
 
 
@@ -104,6 +89,18 @@ public slots:
 
 private:
     void drawLineOnEdge(QPainter *p, QQuickItem *item, Qt::Edge edge) const;
+    void drawCircle(QPainter *painter,
+                    const QPointF &center,
+                    bool hover = false);
+
+
+    QColor m_backgroundColor;
+    QColor m_mainColor;
+    QColor m_borderColor;
+    QColor m_hoverColor;
+    QColor m_pressColor;
+    QColor m_tabAreaColor;
+    QColor m_textColor;
     QColor m_widgetColor;
     QColor m_activeTextColor;
 };

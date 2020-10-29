@@ -24,6 +24,7 @@ public:
     QList<DockGroupResizeHandler *> handlers;
     QList<qreal> itemSizes;
 
+    int currentIndex;
     bool isOpen;
     qreal lastGroupSize;
     qreal lastMousePos;
@@ -31,6 +32,7 @@ public:
     Dock::Area area;
     bool enableResizing;
     DockTabBar *tabBar;
+    QQuickItem *tabBarItem;
     QRectF usableArea;
     Dock::DockWidgetDisplayType displayType;
 
