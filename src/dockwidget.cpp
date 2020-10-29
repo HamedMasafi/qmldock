@@ -111,19 +111,9 @@ void DockWidget::detach()
 void DockWidget::beginDetach()
 {
     Q_D(DockWidget);
-    // end the drag before re-parenting
-    QMouseEvent endDrag(QEvent::NonClientAreaMouseMove, QCursor::pos(), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-    const bool handledEndDrag = qApp->sendEvent(d->titleBar, &endDrag);
-    qDebug()<<"handledEndDrag"<<handledEndDrag;
-
-    // set this attribute to avoid a hide()-event spoiling the drag-and-drop
-//        d->dockWindow->setFlag(Qt::WA_WState_Hidden, true);
-
-
     setArea(Dock::Detached);
-    qApp->processEvents();
-    // ... do re-parenting
 
+//    d->titleBar->grabMouse();
 }
 
 void DockWidget::close()
@@ -293,6 +283,7 @@ void DockWidget::header_moveStarted()
     //    if (isDetached)
     //        d->dockWindow->startSystemMove();
 
+//    beginDetach();
     emit beginMove();
 }
 
@@ -387,12 +378,12 @@ void DockWidget::geometryChanged(const QRectF &newGeometry,
 
     QRectF rc(QPointF(0, 0), size());
 
-    if (d->isDetached) {
-        rc.adjust(10, 10, -10, -10);
-    } else {
-        rc.adjust(dockStyle->widgetPadding(), dockStyle->widgetPadding(),
-                  -dockStyle->widgetPadding(), -dockStyle->widgetPadding());
-    }
+//    if (d->isDetached) {
+//        rc.adjust(10, 10, -10, -10);
+//    } else {
+//    }
+    rc.adjust(dockStyle->widgetPadding(), dockStyle->widgetPadding(),
+              -dockStyle->widgetPadding(), -dockStyle->widgetPadding());
 
     d->titleBarItem->setWidth(rc.width());
     d->titleBarItem->setPosition(rc.topLeft());

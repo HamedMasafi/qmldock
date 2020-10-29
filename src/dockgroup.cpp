@@ -20,6 +20,46 @@ DockGroupPrivate::DockGroupPrivate(DockGroup *parent)
 {
 }
 
+void DockGroupPrivate::rearrange()
+{
+    updateUsableArea();
+    arrangeTabBar();
+    reorderHandles();
+
+    reorderItems();
+}
+
+void DockGroupPrivate::arrangeTabBar()
+{
+    Q_Q(DockGroup);
+
+    if (!tabBarItem || displayType != Dock::TabbedView)
+        return;
+
+    switch (tabPosition) {
+    case Qt::TopEdge:
+        tabBarItem->setX(0);
+        tabBarItem->setY(0);
+        tabBarItem->setWidth(q->width());
+        break;
+    case Qt::LeftEdge:
+        tabBarItem->setX(0);
+        tabBarItem->setY(q->height());
+        tabBarItem->setWidth(q->height());
+        break;
+    case Qt::RightEdge:
+        tabBarItem->setY(0);
+        tabBarItem->setX(q->width());
+        tabBarItem->setWidth(q->height());
+        break;
+    case Qt::BottomEdge:
+        tabBarItem->setX(0);
+        tabBarItem->setY(q->height() - tabBarItem->height());
+        tabBarItem->setWidth(q->width());
+        break;
+    }
+}
+
 DockGroupResizeHandler *DockGroupPrivate::createHandlers()
 {
     Q_Q(DockGroup);
@@ -40,8 +80,7 @@ DockGroupResizeHandler *DockGroupPrivate::createHandlers()
         h->setHeight(q->height());
         break;
 
-    case Dock::Float:
-    case Dock::Center:
+    default:
         return nullptr;
     }
     if (!h)
@@ -216,6 +255,7 @@ void DockGroupPrivate::reorderHandles()
 
     int index{0};
     for (auto h : handlers) {
+        if (displayType == Dock::SplitView) {
         h->setIndex(index++);
         if (isVertical()) {
             h->setX(0);
@@ -224,6 +264,9 @@ void DockGroupPrivate::reorderHandles()
         if (isHorizontal()) {
             h->setY(0);
             h->setHeight(q->height());
+        }
+        } else {
+            h->setVisible(false);
         }
     }
 }
@@ -455,56 +498,18 @@ void DockGroup::geometryChanged(const QRectF &newGeometry,
 {
     Q_D(DockGroup);
 
-    if (!d->dockWidgets.count())
+    if (!d->dockWidgets.count() || !isComponentComplete())
         return;
 
-    d->updateUsableArea();
-
-    if (d->tabBarItem && d->displayType == Dock::TabbedView) {
-        switch (d->tabPosition) {
-        case Qt::TopEdge:
-            d->tabBarItem->setX(0);
-            d->tabBarItem->setY(0);
-            d->tabBarItem->setWidth(width());
-//            d->tabBarItem->setHeight(dockStyle->tabBarSize());
-            break;
-        case Qt::LeftEdge:
-            d->tabBarItem->setX(0);
-            d->tabBarItem->setY(height());
-            d->tabBarItem->setWidth(height());
-//            d->tabBarItem->setHeight(dockStyle->tabBarSize());
-            break;
-        case Qt::RightEdge:
-            d->tabBarItem->setY(0);
-            d->tabBarItem->setX(width());
-            d->tabBarItem->setWidth(height());
-//            d->tabBarItem->setHeight(dockStyle->tabBarSize());
-            break;
-        case Qt::BottomEdge:
-            d->tabBarItem->setX(0);
-            d->tabBarItem->setY(height() - d->tabBarItem->height());
-            d->tabBarItem->setWidth(width());
-//            d->tabBarItem->setHeight(dockStyle->tabBarSize());
-            break;
-        }
-    }
-    for (auto dw : d->dockWidgets)
-        d->fitItem(dw);
-
-    if (d->displayType == Dock::SplitView)
-        d->reorderHandles();
-    else
-        for (auto h : d->handlers)
-            if (h)
-                h->setVisible(false);
-
-    d->reorderItems();
+    d->rearrange();
+    d->arrangeTabBar();
     QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);
 }
 
 void DockGroup::updatePolish()
 {
     geometryChanged(QRectF(), QRectF());
+    qDebug() << "update polish";
     QQuickPaintedItem::updatePolish();
 }
 
@@ -697,21 +702,19 @@ void DockGroup::addDockWidget(DockWidget *item)
     d->dockWidgets.append(item);
     d->normalizeItemSizes();
 
-    if (d->dockWidgets.count() > 1)
-        d->handlers.append(d->createHandlers());
+    if (d->dockWidgets.count() > 1) {
+        auto h = d->createHandlers();
+        if (h)
+            d->handlers.append(h);
+    }
 
     if (d->tabBar) {
         d->tabBar->addTab(item->title());
         d->tabBar->setCurrentIndex(d->dockWidgets.count() - 1);
     }
 
-//    if (isComponentComplete())
-//        geometryChanged(QRectF(), QRectF());
-    d->fitItem(item);
-
-    if (d->displayType == Dock::SplitView)
-        d->reorderHandles();
-    d->reorderItems();
+    if (isComponentComplete())
+        d->rearrange();
 
     connect(item, &DockWidget::closed, this, &DockGroup::dockWidget_closed);
 
@@ -841,6 +844,9 @@ void DockGroup::setTabPosition(Qt::Edge tabPosition)
 {
     Q_D(DockGroup);
 
+    if (!isComponentComplete())
+        return;
+
     if (d->tabPosition == tabPosition)
         return;
     switch (tabPosition) {
@@ -887,7 +893,7 @@ void DockGroup::setTabBar(QQuickItem *tabBar)
 
     tabBar->setParentItem(this);
     d->tabBarItem = tabBar;
-    updatePolish();
+    polish();
     emit tabBarChanged(tabBar);
 }
 

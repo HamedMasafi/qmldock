@@ -36,7 +36,7 @@ void DockMoveGuide::begin(const QPointF &pos, const QSizeF &size)
              dockStyle->dropButtonSize() + 10,
              dockStyle->dropButtonSize() + 10);
 
-    { //center
+    if (_allowedAreas & Dock::Center) {
         rc.moveCenter(QPoint(size.width() / 2, size.height() / 2));
         region = region.united(rc);
         _areas.insert(Dock::Center, rc);
@@ -44,7 +44,7 @@ void DockMoveGuide::begin(const QPointF &pos, const QSizeF &size)
 
     rc.setSize(QSize(dockStyle->dropButtonSize(), dockStyle->dropButtonSize()));
     rc.moveCenter(QPoint(size.width() / 2, size.height() / 2));
-    { //left
+    if (_allowedAreas & Dock::Left) {
         rc.moveLeft(size.width() / 2 - dockStyle->dropButtonSize()
                     - dockStyle->dropButtonSpace());
         region = region.united(rc);
@@ -55,7 +55,7 @@ void DockMoveGuide::begin(const QPointF &pos, const QSizeF &size)
         _areas.insert(Dock::Left, rc);
     }
 
-    { //right
+    if (_allowedAreas & Dock::Right) {
         rc.moveRight(size.width() / 2 + dockStyle->dropButtonSize()
                      + dockStyle->dropButtonSpace());
         region = region.united(rc);
@@ -69,7 +69,7 @@ void DockMoveGuide::begin(const QPointF &pos, const QSizeF &size)
     //back to center
     rc.moveCenter(QPoint(size.width() / 2, size.height() / 2));
 
-    { //top
+    if (_allowedAreas & Dock::Top) {
         rc.moveTop(size.height() / 2 - dockStyle->dropButtonSize()
                    - dockStyle->dropButtonSpace());
         region = region.united(rc);
@@ -80,7 +80,7 @@ void DockMoveGuide::begin(const QPointF &pos, const QSizeF &size)
         _areas.insert(Dock::Top, rc);
     }
 
-    { //bottom
+    if (_allowedAreas & Dock::Bottom) {
         rc.moveBottom(size.height() / 2 + dockStyle->dropButtonSize()
                       + dockStyle->dropButtonSpace());
         region = region.united(rc);

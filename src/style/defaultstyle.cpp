@@ -410,11 +410,6 @@ void DefaultStyle::paintDockGroup(QPainter *p, DockGroup *item)
         p->fillRect(rc, m_tabAreaColor);
         p->setPen(m_borderColor);
         p->drawRect(rc);
-        //        p->setPen(borderColor());
-        //        p->fillRect(0, 29, item->width() - 1, item->height() - 30, Qt::white);
-        //        p->drawLine(0, 29, 0, item->height() - 1);
-        //        p->drawLine(item->width() - 1, 29, item->width() - 1, item->height() - 1);
-        //        p->drawLine(0, item->height() - 1, item->width() - 1, item->height() - 1);
     }
 }
 
@@ -422,9 +417,9 @@ void DefaultStyle::paintDockWidget(QPainter *p, DockWidget *item)
 {
     p->fillRect(item->clipRect(), m_borderColor);
     qreal a;
-    if (item->area() == Dock::Float || item->area() == Dock::Detached)
-        a = 10;
-    else
+//    if (item->area() == Dock::Float || item->area() == Dock::Detached)
+//        a = 10;
+//    else
         a = 1;
     p->fillRect(item->clipRect().adjusted(a, a, -a, -a), m_widgetColor);
 }

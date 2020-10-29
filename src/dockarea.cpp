@@ -331,9 +331,9 @@ void DockArea::dockWidget_beginMove()
         dw->restoreSize();
     }
 
+    _dockMoveGuide->setAllowedAreas(dw->allowedAreas());
     _dockMoveGuide->begin(mapToGlobal(QPoint(0, 0)),
                 size());
-//    _dockMoveGuide->setAllowedAreas(dw->allowedAreas());
 //    _dockMoveGuide->setSize(size());
 //    _dockMoveGuide->setVisible(true);
 }
@@ -422,7 +422,7 @@ DockGroup *DockArea::createGroup(Dock::Area area, DockGroup *item)
     item->setArea(area);
     item->setVisible(true);
     item->setZ(Z_GROUP);
-    item->setPanelSize(200);
+    item->setPanelSize(120);
     item->setDisplayType(Dock::SplitView);
 
     _dockGroups.insert(area, item);

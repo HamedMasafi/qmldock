@@ -97,7 +97,7 @@ void DockWidgetHeader::mousePressEvent(QMouseEvent *event)
         _lastMousePos = event->windowPos();
         _lastParentPos = parentDock->position();
     }
-    setKeepMouseGrab(true);
+    grabMouse();
 }
 
 void DockWidgetHeader::mouseMoveEvent(QMouseEvent *event)
@@ -132,8 +132,7 @@ void DockWidgetHeader::mouseReleaseEvent(QMouseEvent *event)
         emit moveEnded();
 
     _moveEmitted = false;
-    setKeepMouseGrab(false);
-    //    QQuickPaintedItem::mouseReleaseEvent(event);
+    ungrabMouse();
 }
 
 void DockWidgetHeader::hoverMoveEvent(QHoverEvent *event)

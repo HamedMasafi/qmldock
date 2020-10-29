@@ -73,6 +73,7 @@ void DockGroupResizeHandler::mousePressEvent(QMouseEvent *event)
         _lastMousePos = event->windowPos().x();
         _lastHandlerPos = x();
     }
+    grabMouse();
 }
 
 void DockGroupResizeHandler::mouseMoveEvent(QMouseEvent *event)
@@ -102,6 +103,7 @@ void DockGroupResizeHandler::mouseMoveEvent(QMouseEvent *event)
 void DockGroupResizeHandler::mouseReleaseEvent(QMouseEvent *event)
 {
     emit moved();
+    ungrabMouse();
     QQuickPaintedItem::mouseReleaseEvent(event);
 }
 

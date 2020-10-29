@@ -36,6 +36,8 @@ public:
     QRectF usableArea;
     Dock::DockWidgetDisplayType displayType;
 
+    void rearrange();
+    void arrangeTabBar();
     bool isHorizontal() const;
     bool isVertical() const;
     bool acceptResizeEvent(const QPointF &point);
