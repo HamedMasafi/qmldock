@@ -69,11 +69,12 @@ Window {
         DockWidget {
             title: "Top dock"
             area: Dock.Top
+            titleBar: null
             contentItem: Label {
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.WordWrap
-                text: qsTr("I am a dock on top. Move me outside of window!")
+                text: qsTr("I have no titlebar!")
             }
         }
 

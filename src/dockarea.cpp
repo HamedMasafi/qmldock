@@ -5,6 +5,7 @@
 #include "dockgroupresizehandler.h"
 #include "style/abstractstyle.h"
 #include "dockwindow.h"
+#include "dockgroup.h"
 
 #include <QDebug>
 #include <QPainter>
@@ -36,6 +37,12 @@ void DockArea::componentComplete()
         createGroup(Dock::Center);
         _dockGroups[Dock::Center]->setDisplayType(Dock::TabbedView);
     }
+    connect(window(), &QQuickWindow::activeFocusItemChanged, [this]() {
+        auto dockWidget = Dock::findInParents<DockWidget>(
+            window()->activeFocusItem());
+        if (dockWidget)
+            qDebug() << "Dock=" << dockWidget->title();
+    });
     createGroup(Dock::Left);
     createGroup(Dock::Right);
     createGroup(Dock::Top);

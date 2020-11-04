@@ -29,6 +29,7 @@ DockWidgetPrivate::DockWidgetPrivate(DockWidget *parent)
       , dockArea{nullptr}
       , dockGroup{nullptr}
       , isClosed{false}
+      , autoCreateHeader{true}
       , detachable{false}
       , isDetached{false}
 {
@@ -264,6 +265,8 @@ void DockWidget::setAllowedAreas(Dock::Areas allowedAreas)
 void DockWidget::setTitleBar(QQuickItem *titleBar)
 {
     Q_D(DockWidget);
+
+    d->autoCreateHeader = false;
     if (d->titleBarItem == titleBar)
         return;
 
@@ -382,20 +385,25 @@ void DockWidget::geometryChanged(const QRectF &newGeometry,
 //        rc.adjust(10, 10, -10, -10);
 //    } else {
 //    }
-    rc.adjust(dockStyle->widgetPadding(), dockStyle->widgetPadding(),
-              -dockStyle->widgetPadding(), -dockStyle->widgetPadding());
+    rc.adjust(dockStyle->widgetPadding(),
+              dockStyle->widgetPadding(),
+              -dockStyle->widgetPadding(),
+              -dockStyle->widgetPadding());
 
-    d->titleBarItem->setWidth(rc.width());
-    d->titleBarItem->setPosition(rc.topLeft());
+    qreal titlebarHeight{0};
+
+    if (d->titleBarItem) {
+        d->titleBarItem->setWidth(rc.width());
+        d->titleBarItem->setPosition(rc.topLeft());
+        titlebarHeight = d->showHeader ? d->titleBarItem->height() : 0;
+    }
 
     if (d->contentItem) {
         d->contentItem->setPosition(
-            QPointF(rc.left(),
-                    rc.top() + (d->showHeader ? d->titleBarItem->height() : 0)));
+            QPointF(rc.left(), rc.top() + titlebarHeight));
 
         d->contentItem->setWidth(rc.width());
-        d->contentItem->setHeight(
-            rc.height() - (d->showHeader ? d->titleBarItem->height() : 0));
+        d->contentItem->setHeight(rc.height() - titlebarHeight);
     }
 }
 
@@ -426,7 +434,7 @@ QQuickItem *DockWidget::titleBar() const
 void DockWidget::componentComplete()
 {
     Q_D(DockWidget);
-    if (!d->titleBarItem) {
+    if (!d->titleBarItem && d->autoCreateHeader) {
         d->titleBar = new DockWidgetHeader(this);
         d->titleBarItem = d->titleBar;
         d->titleBar->setPosition(

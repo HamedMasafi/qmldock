@@ -43,6 +43,8 @@ public:
     QRectF rectBeforeResize;
     QPointF resizeMousePos;
 
+    bool autoCreateHeader;
+
     Q_DECL_DEPRECATED
     bool detachable;
     Q_DECL_DEPRECATED

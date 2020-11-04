@@ -2,6 +2,7 @@
 #define DOCK_H
 
 #include <QObject>
+#include <QQuickItem>
 #include <qobjectdefs.h>
 
 namespace Dock {
@@ -39,5 +40,20 @@ namespace Dock {
         StackedView
     };
     Q_ENUM_NS(DockWidgetDisplayType)
+
+
+    template<class T>
+    T* findInParents(QQuickItem *item)
+    {
+        auto i = item;
+
+        while (i) {
+            auto p = qobject_cast<T *>(i);
+            if (p)
+                return p;
+            i = i->parentItem();
+            return nullptr;
+        }
+    }
 }
 #endif // DOCK_H
