@@ -18,6 +18,7 @@ class DockWidgetBackground;
 class DockGroupResizeHandler;
 class DockWidgetHeaderButton;
 class DockGroupResizeHandler;
+class DockTabBarArrorButton;
 class AbstractStyle
 {
     static AbstractStyle *_style;
@@ -57,7 +58,10 @@ public:
     virtual void paintDockWidget(QPainter *p, DockWidget *item) = 0;
     virtual void paintDockWidgetHeader(QPainter *p, DockWidgetHeader *item) = 0;
     virtual void paintDockWidgetBackground(QPainter *p, DockWidgetBackground *item) = 0;
-
+    virtual void paintDockTabBarArrowButton(QPainter *p,
+                                            DockTabBarArrorButton *item,
+                                            Dock::ButtonStatus status)
+        = 0;
 };
 
 #endif // ABSTRACTSTYLE_H

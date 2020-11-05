@@ -40,7 +40,7 @@ void DockGroupPrivate::arrangeTabBar()
     case Qt::TopEdge:
         tabBarItem->setX(0);
         tabBarItem->setY(0);
-        tabBarItem->setWidth(q->width());
+        tabBarItem->setWidth(q->width() - dockStyle->resizeHandleSize());
         break;
     case Qt::LeftEdge:
         tabBarItem->setX(0);

@@ -5,6 +5,7 @@
 #include "dock.h"
 
 class DockTabBar;
+class DockWidgetHeaderButton;
 class DockTabButton : public QQuickPaintedItem
 {
     Q_OBJECT
@@ -12,6 +13,8 @@ class DockTabButton : public QQuickPaintedItem
     Dock::ButtonStatus _status;
     DockTabBar *_parentTabBar;
     qreal _fitSize;
+    bool _showCloseButton;
+    DockWidgetHeaderButton *_closeButton;
 
 public:
     DockTabButton(QString title, DockTabBar *parent = nullptr);
@@ -19,6 +22,7 @@ public:
 
 signals:
     void clicked();
+    void closeButtonClicked();
 
     // QQuickPaintedItem interface
 public:
@@ -32,11 +36,18 @@ public:
     qreal fitSize() const;
     void setFitSize(const qreal &fitSize);
 
+    bool showCloseButton() const;
+    void setShowCloseButton(bool showCloseButton);
+
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void hoverEnterEvent(QHoverEvent *event);
     void hoverLeaveEvent(QHoverEvent *event);
+
+    // QQuickItem interface
+protected:
+    void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
 };
 
 #endif // DOCKTABBUTTON_H

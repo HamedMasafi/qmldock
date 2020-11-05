@@ -11,6 +11,7 @@
 #include "dockwidgetheaderbutton.h"
 
 #include <QPainter>
+#include <docktabbararrorbutton.h>
 
 #ifdef Q_OS_WIN
 #   define STR(x) QString::fromUtf16(u ## x)
@@ -181,6 +182,39 @@ void DefaultStyle::setActiveTextColor(QColor activeTextColor)
     emit activeTextColorChanged(m_activeTextColor);
 }
 
+QString DefaultStyle::iconToStr(Dock::Icon icon) const
+{
+    switch (icon) {
+    case Dock::CloseIcon:
+        return "c";
+    case Dock::PinIcon:
+        return "p";
+    case Dock::PopoutIcon:
+        return "o";
+
+    case Dock::CenterDropIcon:
+        return "C";
+    case Dock::LeftDropIcon:
+        return "l";
+    case Dock::RightDropIcon:
+        return "r";
+    case Dock::UpDropIcon:
+        return "u";
+    case Dock::DownDropIcon:
+        return "d";
+
+    case Dock::LeftArrowIcon:
+        return "L";
+    case Dock::RightArrowIcon:
+        return "R";
+    case Dock::UpArrowIcon:
+        return "U";
+    case Dock::DownArrowIcon:
+        return "D";
+    };
+    return QString();
+}
+
 void DefaultStyle::drawLineOnEdge(QPainter *p,
                                   QQuickItem *item,
                                   Qt::Edge edge) const
@@ -321,6 +355,9 @@ void DefaultStyle::paintTabButton(QPainter *p,
         break;
     }
 
+    if (item->showCloseButton())
+        rc.setWidth(rc.width() - 20);
+
     p->drawText(rc, Qt::AlignCenter, item->title());
 }
 
@@ -344,8 +381,8 @@ void DefaultStyle::paintWidgetButton(QPainter *p,
         break;
     }
     p->setPen(m_textColor);
-    p->setFont(QFont("icons"));
-    p->drawText(item->clipRect(), Qt::AlignCenter, item->icon());
+    p->setFont(QFont("dock_font_default"));
+    p->drawText(item->clipRect(), Qt::AlignCenter, iconToStr(item->icon()));
 }
 
 void DefaultStyle::paintResizeHandler(QPainter *p,
@@ -447,6 +484,32 @@ void DefaultStyle::paintDockWidgetBackground(QPainter *p,
     p->setPen(Qt::gray);
     p->setBrush(Qt::white);
     p->drawRect(0, 0, item->width() - 1, item->height() - 1);
+}
+
+void DefaultStyle::paintDockTabBarArrowButton(QPainter *p,
+                                              DockTabBarArrorButton *item, Dock::ButtonStatus status)
+{
+    p->setFont(QFont("dock_font_default"));
+
+    switch (status) {
+    case Dock::Normal:
+        p->fillRect(item->clipRect(), m_backgroundColor);
+        break;
+
+    case Dock::Hovered:
+        p->setBrush(m_hoverColor);
+        p->fillRect(item->clipRect(), m_hoverColor);
+        break;
+
+    case Dock::Pressed:
+    case Dock::Checked:
+        p->setBrush(m_pressColor);
+        p->fillRect(item->clipRect(), m_pressColor);
+        break;
+    }
+    p->setPen(m_textColor);
+    p->setFont(QFont("dock_font_default"));
+    p->drawText(item->clipRect(), Qt::AlignCenter, iconToStr(item->icon()));
 }
 
 void DefaultStyle::drawCircle(QPainter *painter,

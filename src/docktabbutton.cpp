@@ -1,6 +1,7 @@
 #include "style/abstractstyle.h"
 #include "docktabbar.h"
 #include "docktabbutton.h"
+#include "dockwidgetheaderbutton.h"
 
 #include <QDebug>
 #include <QFontMetrics>
@@ -12,7 +13,10 @@ DockTabBar *DockTabButton::parentTabBar() const
 
 qreal DockTabButton::fitSize() const
 {
-    return _fitSize;
+    if (_showCloseButton)
+        return _fitSize + _closeButton->width() + 6;
+    else
+        return _fitSize;
 }
 
 void DockTabButton::setFitSize(const qreal &fitSize)
@@ -20,12 +24,31 @@ void DockTabButton::setFitSize(const qreal &fitSize)
     _fitSize = fitSize;
 }
 
+bool DockTabButton::showCloseButton() const
+{
+    return _showCloseButton;
+}
+
+void DockTabButton::setShowCloseButton(bool showCloseButton)
+{
+    _closeButton->setVisible(showCloseButton);
+    _showCloseButton = showCloseButton;
+}
+
 DockTabButton::DockTabButton(QString title, DockTabBar *parent)
     : QQuickPaintedItem(parent), _parentTabBar{parent}, _title(title),
-      _status(Dock::Normal)
+      _status(Dock::Normal), _showCloseButton{true}
 {
     setAcceptedMouseButtons(Qt::LeftButton);
     setAcceptHoverEvents(true);
+    _closeButton = new DockWidgetHeaderButton(this);
+    _closeButton->setParentItem(this);
+    _closeButton->setIcon(Dock::CloseIcon);
+    _closeButton->setY(6);
+    connect(_closeButton,
+            &DockWidgetHeaderButton::clicked,
+            this,
+            &DockTabButton::closeButtonClicked);
 }
 
 void DockTabButton::paint(QPainter *painter)
@@ -97,4 +120,13 @@ void DockTabButton::hoverLeaveEvent(QHoverEvent *event)
         _status = Dock::Normal;
         update();
     }
+}
+
+void DockTabButton::geometryChanged(const QRectF &newGeometry,
+                                    const QRectF &oldGeometry)
+{
+    if (_showCloseButton) {
+        _closeButton->setX(width() - 20);
+    }
+    QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);
 }

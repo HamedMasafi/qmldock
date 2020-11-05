@@ -4,6 +4,7 @@
 #include <QQuickPaintedItem>
 
 class DockTabButton;
+class DockTabBarArrorButton;
 class DockTabBar : public QQuickPaintedItem
 {
     Q_OBJECT
@@ -11,6 +12,10 @@ class DockTabBar : public QQuickPaintedItem
 
     QList<DockTabButton *> _tabs;
     Qt::Edge _edge;
+    DockTabBarArrorButton *_prevButton;
+    DockTabBarArrorButton *_nextButton;
+    qreal _tabsStartPos;
+    qreal _tabsSize;
 
 public:
     DockTabBar(QQuickItem *parent = nullptr);
@@ -23,6 +28,10 @@ public:
 
     Qt::Edge edge() const;
     void setEdge(const Qt::Edge &edge);
+private slots:
+    void prevButton_clicked();
+    void nextButton_clicked();
+    void tabButton_clicked();
 
 public slots:
     int addTab(const QString &name);
@@ -36,16 +45,13 @@ signals:
 
 private:
     void reorderTabs();
-
+    void calculateTabsSize();
     int m_currentIndex;
 
-private slots:
-    void tabButton_clicked();
-protected:
-
-    // QQuickItem interface
 protected:
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
+    void updatePolish();
+
 };
 
 #endif // DOCKTABBAR_H

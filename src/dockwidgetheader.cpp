@@ -60,11 +60,11 @@ DockWidgetHeader::DockWidgetHeader(DockWidget *parent)
     setClip(true);
     setAcceptHoverEvents(true);
 
-    pinButton->setIcon("A");
+    pinButton->setIcon(Dock::PinIcon);
     pinButton->setY(5);
     pinButton->setVisible(false);
 
-    closeButton->setIcon("B");
+    closeButton->setIcon(Dock::CloseIcon);
     closeButton->setY(5);
 
     connect(closeButton,

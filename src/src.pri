@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 INCLUDEPATH += $$PWD
 
 SOURCES += \
+    $$PWD/abstractbutton.cpp \
     $$PWD/abstractmouseresponsiveitem.cpp \
     $$PWD/debugrect.cpp \
     $$PWD/dock.cpp \
@@ -27,6 +28,7 @@ SOURCES += \
     $$PWD/dockmoveguide.cpp \
     $$PWD/dockplugin.cpp \
     $$PWD/docktabbar.cpp \
+    $$PWD/docktabbararrorbutton.cpp \
     $$PWD/docktabbutton.cpp \
     $$PWD/dockwidget.cpp \
     $$PWD/dockwidgetbackground.cpp \
@@ -42,6 +44,7 @@ SOURCES += \
 RESOURCES += $$PWD/dock.qrc
 
 HEADERS += \
+    $$PWD/abstractbutton.h \
     $$PWD/abstractmouseresponsiveitem.h \
     $$PWD/debugrect.h \
     $$PWD/dock.h \
@@ -53,6 +56,7 @@ HEADERS += \
     $$PWD/dockmoveguide.h \
     $$PWD/dockplugin.h \
     $$PWD/docktabbar.h \
+    $$PWD/docktabbararrorbutton.h \
     $$PWD/docktabbutton.h \
     $$PWD/dockwidget.h \
     $$PWD/dockwidget_p.h \

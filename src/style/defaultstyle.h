@@ -38,6 +38,7 @@ public:
     void paintDockWidget(QPainter *p, DockWidget *item) override;
     void paintDockWidgetHeader(QPainter *p, DockWidgetHeader *item) override;
     void paintDockWidgetBackground(QPainter *p, DockWidgetBackground *item) override;
+    void paintDockTabBarArrowButton(QPainter *p, DockTabBarArrorButton *item, Dock::ButtonStatus status) override;
 
     QFont font() const override;
 
@@ -88,6 +89,7 @@ public slots:
     void setActiveTextColor(QColor activeTextColor);
 
 private:
+    QString iconToStr(Dock::Icon icon) const;
     void drawLineOnEdge(QPainter *p, QQuickItem *item, Qt::Edge edge) const;
     void drawCircle(QPainter *painter,
                     const QPointF &center,
@@ -103,6 +105,7 @@ private:
     QColor m_textColor;
     QColor m_widgetColor;
     QColor m_activeTextColor;
+
 };
 
 #endif // DefaultStyle_H
