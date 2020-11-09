@@ -1,5 +1,5 @@
-#ifndef DOCKGROUP_P_H
-#define DOCKGROUP_P_H
+#ifndef DOCKAREA_P_H
+#define DOCKAREA_P_H
 
 #include <QColor>
 #include <QMap>
@@ -9,19 +9,19 @@
 
 class QQuickItem;
 class DockWidget;
-class DockGroup;
-class DockGroupResizeHandler;
+class DockArea;
+class DockAreaResizeHandler;
 class DockTabBar;
-class DockGroupPrivate {
-    DockGroup *q_ptr;
-    Q_DECLARE_PUBLIC(DockGroup);
+class DockAreaPrivate {
+    DockArea *q_ptr;
+    Q_DECLARE_PUBLIC(DockArea);
 
 public:
-    DockGroupPrivate(DockGroup *parent);
+    DockAreaPrivate(DockArea *parent);
 
     qreal panelSize;
     QList<DockWidget *> dockWidgets;
-    QList<DockGroupResizeHandler *> handlers;
+    QList<DockAreaResizeHandler *> handlers;
     QList<qreal> itemSizes;
 
     int currentIndex;
@@ -46,11 +46,11 @@ public:
     void reorderHandles();
     void normalizeItemSizes();
     QRectF updateUsableArea();
-    DockGroupResizeHandler *createHandlers();
+    DockAreaResizeHandler *createHandlers();
 
     qreal minimumSize;
     qreal maximumSize;
     Qt::Edge tabPosition;
 };
 
-#endif // DOCKGROUP_P_H
+#endif // DOCKAREA_P_H

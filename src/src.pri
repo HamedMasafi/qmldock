@@ -23,7 +23,7 @@ SOURCES += \
     $$PWD/debugrect.cpp \
     $$PWD/dock.cpp \
     $$PWD/dockarea.cpp \
-    $$PWD/dockgroup.cpp \
+    $$PWD/dockcontainer.cpp \
     $$PWD/dockgroupresizehandler.cpp \
     $$PWD/dockmoveguide.cpp \
     $$PWD/dockplugin.cpp \
@@ -50,8 +50,8 @@ HEADERS += \
     $$PWD/dock.h \
     $$PWD/dock_p.h \
     $$PWD/dockarea.h \
-    $$PWD/dockgroup.h \
-    $$PWD/dockgroup_p.h \
+    $$PWD/dockarea_p.h \
+    $$PWD/dockcontainer.h \
     $$PWD/dockgroupresizehandler.h \
     $$PWD/dockmoveguide.h \
     $$PWD/dockplugin.h \

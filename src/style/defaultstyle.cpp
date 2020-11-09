@@ -1,7 +1,7 @@
 #include "defaultstyle.h"
 
+#include "dockcontainer.h"
 #include "dockarea.h"
-#include "dockgroup.h"
 #include "dockgroupresizehandler.h"
 #include "docktabbar.h"
 #include "docktabbutton.h"
@@ -29,7 +29,7 @@ DefaultStyle::DefaultStyle(QObject *parent)
 {
 }
 
-void DefaultStyle::paintDockArea(QPainter *p, DockArea *item)
+void DefaultStyle::paintDockContainer(QPainter *p, DockContainer *item)
 {
     Q_UNUSED(p)
     Q_UNUSED(item)
@@ -386,7 +386,7 @@ void DefaultStyle::paintWidgetButton(QPainter *p,
 }
 
 void DefaultStyle::paintResizeHandler(QPainter *p,
-                                      DockGroupResizeHandler *item,
+                                      DockAreaResizeHandler *item,
                                       Dock::ButtonStatus status)
 {
     //    p->fillRect(item->clipRect(), Qt::darkYellow);
@@ -414,7 +414,7 @@ void DefaultStyle::paintResizeHandler(QPainter *p,
     }
 }
 
-void DefaultStyle::paintDockGroup(QPainter *p, DockGroup *item)
+void DefaultStyle::paintDockArea(QPainter *p, DockArea *item)
 {
     Q_UNUSED(p)
     Q_UNUSED(item)

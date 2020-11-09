@@ -5,12 +5,12 @@
 #include <QCursor>
 #include <qpainter.h>
 
-Qt::Orientation DockGroupResizeHandler::orientation() const
+Qt::Orientation DockAreaResizeHandler::orientation() const
 {
     return _orientation;
 }
 
-DockGroupResizeHandler::DockGroupResizeHandler(Qt::Orientation orientation,
+DockAreaResizeHandler::DockAreaResizeHandler(Qt::Orientation orientation,
                                                QQuickItem *parent)
     : QQuickPaintedItem(parent), _orientation(orientation), _hasHover{false}
 {
@@ -29,17 +29,17 @@ DockGroupResizeHandler::DockGroupResizeHandler(Qt::Orientation orientation,
     setAcceptedMouseButtons(Qt::LeftButton);
     setAcceptHoverEvents(true);
 }
-int DockGroupResizeHandler::index() const
+int DockAreaResizeHandler::index() const
 {
     return _index;
 }
 
-void DockGroupResizeHandler::setIndex(int index)
+void DockAreaResizeHandler::setIndex(int index)
 {
     _index = index;
 }
 
-qreal DockGroupResizeHandler::pos() const
+qreal DockAreaResizeHandler::pos() const
 {
     if (_orientation)
         return y();
@@ -47,13 +47,13 @@ qreal DockGroupResizeHandler::pos() const
     return x();
 }
 
-void DockGroupResizeHandler::setPos(const qreal &pos)
+void DockAreaResizeHandler::setPos(const qreal &pos)
 {
     _pos = pos;
 }
 
 
-void DockGroupResizeHandler::paint(QPainter *painter)
+void DockAreaResizeHandler::paint(QPainter *painter)
 {
     dockStyle->paintResizeHandler(painter,
                                               this,
@@ -61,7 +61,7 @@ void DockGroupResizeHandler::paint(QPainter *painter)
                                                         : Dock::Normal);
 }
 
-void DockGroupResizeHandler::mousePressEvent(QMouseEvent *event)
+void DockAreaResizeHandler::mousePressEvent(QMouseEvent *event)
 {
     QQuickPaintedItem::mousePressEvent(event);
     event->accept();
@@ -76,7 +76,7 @@ void DockGroupResizeHandler::mousePressEvent(QMouseEvent *event)
     grabMouse();
 }
 
-void DockGroupResizeHandler::mouseMoveEvent(QMouseEvent *event)
+void DockAreaResizeHandler::mouseMoveEvent(QMouseEvent *event)
 {
     QQuickPaintedItem::mouseMoveEvent(event);
 
@@ -100,28 +100,28 @@ void DockGroupResizeHandler::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
-void DockGroupResizeHandler::mouseReleaseEvent(QMouseEvent *event)
+void DockAreaResizeHandler::mouseReleaseEvent(QMouseEvent *event)
 {
     emit moved();
     ungrabMouse();
     QQuickPaintedItem::mouseReleaseEvent(event);
 }
 
-void DockGroupResizeHandler::hoverEnterEvent(QHoverEvent *event)
+void DockAreaResizeHandler::hoverEnterEvent(QHoverEvent *event)
 {
     QQuickPaintedItem::hoverEnterEvent(event);
     _hasHover = true;
     update();
 }
 
-void DockGroupResizeHandler::hoverLeaveEvent(QHoverEvent *event)
+void DockAreaResizeHandler::hoverLeaveEvent(QHoverEvent *event)
 {
     QQuickPaintedItem::hoverLeaveEvent(event);
     _hasHover = false;
     update();
 }
 
-void DockGroupResizeHandler::drawCircle(QPainter *painter, const QPointF &center, bool hover)
+void DockAreaResizeHandler::drawCircle(QPainter *painter, const QPointF &center, bool hover)
 {
     Q_UNUSED(hover)
     painter->drawEllipse(center, 2, 2);

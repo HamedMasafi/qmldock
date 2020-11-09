@@ -8,16 +8,16 @@
 
 class QPainter;
 
-class DockArea;
+class DockContainer;
 class DockTabBar;
 class DockTabButton;
-class DockGroup;
+class DockArea;
 class DockWidget;
 class DockWidgetHeader;
 class DockWidgetBackground;
-class DockGroupResizeHandler;
+class DockAreaResizeHandler;
 class DockWidgetHeaderButton;
-class DockGroupResizeHandler;
+class DockAreaResizeHandler;
 class DockTabBarArrorButton;
 class AbstractStyle
 {
@@ -46,15 +46,15 @@ public:
     virtual QColor tabAreaColor() const = 0;*/
 
     //draw methods
-    virtual void paintDockGroup(QPainter *p, DockGroup *item) = 0;
     virtual void paintDockArea(QPainter *p, DockArea *item) = 0;
+    virtual void paintDockContainer(QPainter *p, DockContainer *item) = 0;
     virtual void paintDropButton(QPainter *p, Dock::Area area, const QRectF &rc, bool hover) = 0;
     virtual void paintTabBar(QPainter *p, DockTabBar *item) = 0;
     virtual void paintTabButton(QPainter *p, DockTabButton *item, Dock::ButtonStatus status) = 0;
     virtual void paintWidgetButton(QPainter *p,
                            DockWidgetHeaderButton *item,
                            Dock::ButtonStatus status) = 0;
-    virtual void paintResizeHandler(QPainter *p, DockGroupResizeHandler *item, Dock::ButtonStatus status) = 0;
+    virtual void paintResizeHandler(QPainter *p, DockAreaResizeHandler *item, Dock::ButtonStatus status) = 0;
     virtual void paintDockWidget(QPainter *p, DockWidget *item) = 0;
     virtual void paintDockWidgetHeader(QPainter *p, DockWidgetHeader *item) = 0;
     virtual void paintDockWidgetBackground(QPainter *p, DockWidgetBackground *item) = 0;

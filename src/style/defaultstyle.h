@@ -26,15 +26,15 @@ public:
     explicit DefaultStyle(QObject *parent = nullptr);
 
 
-    void paintDockArea(QPainter *p, DockArea *item) override;
+    void paintDockContainer(QPainter *p, DockContainer *item) override;
     void paintDropButton(QPainter *p, Dock::Area area, const QRectF &rc, bool hover) override;
     void paintTabBar(QPainter *p, DockTabBar *item) override;
     void paintTabButton(QPainter *p, DockTabButton *item, Dock::ButtonStatus status) override;
     void paintWidgetButton(QPainter *p,
                            DockWidgetHeaderButton *item,
                            Dock::ButtonStatus status) override;
-    void paintResizeHandler(QPainter *p, DockGroupResizeHandler *item, Dock::ButtonStatus status) override;
-    void paintDockGroup(QPainter *p, DockGroup *item) override;
+    void paintResizeHandler(QPainter *p, DockAreaResizeHandler *item, Dock::ButtonStatus status) override;
+    void paintDockArea(QPainter *p, DockArea *item) override;
     void paintDockWidget(QPainter *p, DockWidget *item) override;
     void paintDockWidgetHeader(QPainter *p, DockWidgetHeader *item) override;
     void paintDockWidgetBackground(QPainter *p, DockWidgetBackground *item) override;

@@ -5,7 +5,7 @@
 #include "dockwidgetbackground.h"
 #include "dockwindow.h"
 #include "style/abstractstyle.h"
-#include "dockarea.h"
+#include "dockcontainer.h"
 
 #include <QDebug>
 #include <QPainter>
@@ -26,8 +26,8 @@ DockWidgetPrivate::DockWidgetPrivate(DockWidget *parent)
       , titleBarItem{nullptr}
       , titleBar{nullptr}
       , dockWindow{nullptr}
+      , dockContainer{nullptr}
       , dockArea{nullptr}
-      , dockGroup{nullptr}
       , isClosed{false}
       , autoCreateHeader{true}
       , detachable{false}
@@ -36,16 +36,16 @@ DockWidgetPrivate::DockWidgetPrivate(DockWidget *parent)
 
 }
 
-DockGroup *DockWidget::dockGroup() const
+DockArea *DockWidget::dockArea() const
 {
     Q_D(const DockWidget);
-    return d->dockGroup;
+    return d->dockArea;
 }
 
-void DockWidget::setDockGroup(DockGroup *dockGroup)
+void DockWidget::setDockArea(DockArea *dockArea)
 {
     Q_D(DockWidget);
-    d->dockGroup = dockGroup;
+    d->dockArea = dockArea;
 }
 
 Dock::Area DockWidget::area() const
@@ -153,7 +153,7 @@ void DockWidget::setArea(Dock::Area area)
     }
 
     if (d->area == Dock::Detached) {
-        setParentItem(d->dockArea);
+        setParentItem(d->dockContainer);
         setVisible(true);
         d->isDetached = false;
         d->dockWindow->hide();
@@ -294,7 +294,7 @@ void DockWidget::header_moving(const QPointF &windowPos, const QPointF &cursorPo
 {
     Q_D(DockWidget);
     if (d->isDetached) {
-        emit moving(d->dockArea->mapFromGlobal(cursorPos));
+        emit moving(d->dockContainer->mapFromGlobal(cursorPos));
         d->dockWindow->setPosition(windowPos.toPoint());
     } else {
         setPosition(windowPos);
@@ -461,16 +461,16 @@ void DockWidget::componentComplete()
     QQuickPaintedItem::componentComplete();
 }
 
-DockArea *DockWidget::dockArea() const
+DockContainer *DockWidget::dockContainer() const
 {
     Q_D(const DockWidget);
-    return d->dockArea;
+    return d->dockContainer;
 }
 
-void DockWidget::setDockArea(DockArea *dockArea)
+void DockWidget::setDockContainer(DockContainer *dockContainer)
 {
     Q_D(DockWidget);
-    d->dockArea = dockArea;
+    d->dockContainer = dockContainer;
 }
 
 void DockWidget::hoverMoveEvent(QHoverEvent *event)

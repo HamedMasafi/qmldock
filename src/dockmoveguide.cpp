@@ -3,11 +3,11 @@
 #include <QPainter>
 #include <QQuickWindow>
 #include "style/abstractstyle.h"
-#include "dockarea.h"
+#include "dockcontainer.h"
 #include "movedropguide.h"
 
-DockMoveGuide::DockMoveGuide(DockArea *parent) : QQuickPaintedItem(parent)
-      ,_parentDockArea(parent)
+DockMoveGuide::DockMoveGuide(DockContainer *parent) : QQuickPaintedItem(parent)
+      ,_parentDockContainer(parent)
 {
     _window = new QQuickWindow;
     setParentItem(_window->contentItem());
@@ -139,7 +139,7 @@ void DockMoveGuide::paint(QPainter *painter)
         dockStyle->paintDropButton(painter, i.key(), i.value(), contains);
         if (contains) {
             _area = i.key();
-            auto rc = _parentDockArea->panelRect(_area);
+            auto rc = _parentDockContainer->panelRect(_area);
             _dropArea->setPosition(rc.topLeft());
             _dropArea->setSize(rc.size());
             _dropArea->setVisible(true);

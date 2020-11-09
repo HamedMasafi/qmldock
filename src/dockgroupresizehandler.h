@@ -3,7 +3,7 @@
 
 #include <QQuickPaintedItem>
 
-class DockGroupResizeHandler : public QQuickPaintedItem
+class DockAreaResizeHandler : public QQuickPaintedItem
 {
     Q_OBJECT
     Qt::Orientation _orientation;
@@ -13,7 +13,7 @@ class DockGroupResizeHandler : public QQuickPaintedItem
     int _index;
     qreal _pos;
 public:
-    DockGroupResizeHandler(Qt::Orientation orientation, QQuickItem *parent = nullptr);
+    DockAreaResizeHandler(Qt::Orientation orientation, QQuickItem *parent = nullptr);
 
 signals:
     void moving(qreal pos, bool *ok);

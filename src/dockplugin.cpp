@@ -1,8 +1,8 @@
 #include "dockplugin.h"
 
-#include "dockarea.h"
+#include "dockcontainer.h"
 #include "dockwidget.h"
-#include "dockgroup.h"
+#include "dockarea.h"
 #include "style/abstractstyle.h"
 
 #include <QQmlApplicationEngine>
@@ -19,9 +19,9 @@ DockPlugin::DockPlugin(QObject *parent) : QObject(parent)
 
 void DockPlugin::registerDockPlugin()
 {
-    qmlRegisterType<DockArea>("Kaj.Dock", 1, 0, "DockArea");
+    qmlRegisterType<DockContainer>("Kaj.Dock", 1, 0, "DockContainer");
     qmlRegisterType<DockWidget>("Kaj.Dock", 1, 0, "DockWidget");
-    qmlRegisterType<DockGroup>("Kaj.Dock", 1, 0, "DockGroup");
+    qmlRegisterType<DockArea>("Kaj.Dock", 1, 0, "DockArea");
     qmlRegisterUncreatableMetaObject(Dock::staticMetaObject,
                                      "Kaj.Dock",
                                      1,

@@ -5,13 +5,13 @@
 #include "dock.h"
 
 class QQuickWindow;
-class DockArea;
+class DockContainer;
 class MoveDropGuide;
 class DockMoveGuide : public QQuickPaintedItem
 {
     Q_OBJECT
     QPointF _mousePos;
-    DockArea *_parentDockArea;
+    DockContainer *_parentDockContainer;
     Dock::Area _area;
     Dock::Areas _allowedAreas;
     QQuickWindow *_window;
@@ -19,7 +19,7 @@ class DockMoveGuide : public QQuickPaintedItem
     MoveDropGuide *_dropArea;
 
 public:
-    DockMoveGuide(DockArea *parent = nullptr);
+    DockMoveGuide(DockContainer *parent = nullptr);
 
 public:
     void begin(const QPointF &pos, const QSizeF &size);

@@ -9,8 +9,8 @@
 class DockWidget;
 class DockWindow;
 class QQuickItem;
+class DockContainer;
 class DockArea;
-class DockGroup;
 class DockWidgetHeader;
 class DockWidgetPrivate {
     DockWidget *q_ptr;
@@ -35,8 +35,8 @@ public:
     QQuickItem * titleBarItem;
     DockWidgetHeader *titleBar;
     DockWindow *dockWindow;
+    DockContainer *dockContainer;
     DockArea *dockArea;
-    DockGroup *dockGroup;
 
     bool isClosed;
     int resizeEdge;

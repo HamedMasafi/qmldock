@@ -4,10 +4,10 @@
 #include <QQuickPaintedItem>
 #include "dock.h"
 
-class DockGroup;
+class DockArea;
 class DockWidgetHeader;
 class DockWindow;
-class DockArea;
+class DockContainer;
 class DockWidgetPrivate;
 class DockWidget : public QQuickPaintedItem {
     Q_OBJECT
@@ -39,7 +39,7 @@ public:
     DockWidget(QQuickItem *parent = nullptr);
     virtual ~DockWidget();
 
-    DockGroup *dockGroup() const;
+    DockArea *dockArea() const;
     Dock::Area area() const;
     bool closable() const;
     bool resizable() const;
@@ -51,8 +51,8 @@ public:
 
     QString title() const;
 
-    DockArea *dockArea() const;
-    void setDockArea(DockArea *dockArea);
+    DockContainer *dockContainer() const;
+    void setDockContainer(DockContainer *dockContainer);
 
     bool getIsDetached() const;
 
@@ -70,7 +70,7 @@ public slots:
     void close();
     void restoreSize();
 
-    void setDockGroup(DockGroup *dockGroup);
+    void setDockArea(DockArea *dockArea);
     void setArea(Dock::Area area);
     void setClosable(bool closable);
     void setResizable(bool resizable);

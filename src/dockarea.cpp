@@ -1,490 +1,903 @@
 #include "dockarea.h"
-#include "dockmoveguide.h"
-#include "dockwidget.h"
-#include "dockgroup.h"
+
+#include "debugrect.h"
+#include "dockarea_p.h"
 #include "dockgroupresizehandler.h"
 #include "style/abstractstyle.h"
-#include "dockwindow.h"
-#include "dockgroup.h"
+#include "docktabbar.h"
+#include "dockwidget.h"
 
+#include <QCursor>
 #include <QDebug>
 #include <QPainter>
-#include <QSettings>
-#define Z_GROUP 100
-#define Z_WIDGET 200
-#define Z_WIDGET_FLOAT 300
-#define Z_RESIZER 400
-#define Z_GUIDE 500
-DockArea::DockArea(QQuickItem *parent) : QQuickPaintedItem(parent)
-        , m_topLeftOwner(Qt::LeftEdge)
-        , m_topRightOwner(Qt::RightEdge)
-        , m_bottomLeftOwner(Qt::LeftEdge)
-        , m_bottomRightOwner(Qt::RightEdge)
-{
 
-    _dockMoveGuide = new DockMoveGuide(this);
+DockAreaPrivate::DockAreaPrivate(DockArea *parent)
+    : q_ptr(parent), mousepRessed{false}, currentIndex{-1},
+      area(Dock::Float), enableResizing{true}, tabBar{nullptr},
+      tabBarItem{nullptr}, displayType{Dock::SplitView}
+      , minimumSize(80), maximumSize(400)
+      , tabPosition{Qt::TopEdge}
+{
 }
 
-DockArea::~DockArea()
+void DockAreaPrivate::rearrange()
 {
-    if (m_enableStateStoring)
-        storeSettings();
+    updateUsableArea();
+    arrangeTabBar();
+    reorderHandles();
+
+    reorderItems();
+}
+
+void DockAreaPrivate::arrangeTabBar()
+{
+    Q_Q(DockArea);
+
+    if (!tabBarItem || displayType != Dock::TabbedView)
+        return;
+
+    switch (tabPosition) {
+    case Qt::TopEdge:
+        tabBarItem->setX(0);
+        tabBarItem->setY(0);
+        tabBarItem->setWidth(q->width() - dockStyle->resizeHandleSize());
+        break;
+    case Qt::LeftEdge:
+        tabBarItem->setX(0);
+        tabBarItem->setY(q->height());
+        tabBarItem->setWidth(q->height());
+        break;
+    case Qt::RightEdge:
+        tabBarItem->setY(0);
+        tabBarItem->setX(q->width());
+        tabBarItem->setWidth(q->height());
+        break;
+    case Qt::BottomEdge:
+        tabBarItem->setX(0);
+        tabBarItem->setY(q->height() - tabBarItem->height());
+        tabBarItem->setWidth(q->width());
+        break;
+    }
+}
+
+DockAreaResizeHandler *DockAreaPrivate::createHandlers()
+{
+    Q_Q(DockArea);
+
+    DockAreaResizeHandler *h{nullptr};
+    switch (area) {
+    case Dock::Left:
+    case Dock::Right:
+        h = new DockAreaResizeHandler(Qt::Horizontal, q);
+        h->setX(0);
+        h->setWidth(q->width());
+        break;
+
+    case Dock::Top:
+    case Dock::Bottom:
+        h = new DockAreaResizeHandler(Qt::Vertical, q);
+        h->setY(0);
+        h->setHeight(q->height());
+        break;
+
+    default:
+        return nullptr;
+    }
+    if (!h)
+        return nullptr;
+
+    h->setIndex(handlers.count());
+    QObject::connect(h,
+                     &DockAreaResizeHandler::moving,
+                     q,
+                     &DockArea::handler_moving);
+
+    QObject::connect(h,
+                     &DockAreaResizeHandler::moved,
+                     q,
+                     &DockArea::handler_moved);
+    return h;
+}
+
+bool DockAreaPrivate::isHorizontal() const
+{
+    return area == Dock::Top || area == Dock::Bottom;
+}
+
+bool DockAreaPrivate::isVertical() const
+{
+    return area == Dock::Right || area == Dock::Left;
+}
+
+bool DockAreaPrivate::acceptResizeEvent(const QPointF &point)
+{
+    Q_Q(DockArea);
+
+    if (!enableResizing)
+        return false;
+
+    switch (area) {
+    case Dock::Right:
+        return point.x() < dockStyle->resizeHandleSize();
+        break;
+
+    case Dock::Left:
+        return point.x() > q->width() - dockStyle->resizeHandleSize();
+        break;
+
+    case Dock::Bottom:
+        return point.y() < dockStyle->resizeHandleSize();
+
+    case Dock::Top:
+        return point.y() > q->height() - dockStyle->resizeHandleSize();
+
+    default:
+        return false;
+    }
+}
+
+void DockAreaPrivate::fitItem(QQuickItem *item)
+{
+    Q_Q(DockArea);
+
+    switch (area) {
+    case Dock::Right:
+        item->setX(q->x() + (enableResizing ? dockStyle->resizeHandleSize() : 1.));
+        item->setWidth(q->width() - 2
+                       - (enableResizing ? dockStyle->resizeHandleSize() : 0.));
+        break;
+
+    case Dock::Left:
+        item->setX(q->x() + 1);
+        item->setWidth(q->width() - 2
+                       - (enableResizing ? dockStyle->resizeHandleSize() : 0.) - 2);
+        break;
+
+    case Dock::Top:
+        item->setY(q->y() + 1);
+        item->setHeight(q->height() - 2
+                        - (enableResizing ? dockStyle->resizeHandleSize() : 0.));
+        break;
+    case Dock::Bottom:
+        item->setY(q->y() + (enableResizing ? dockStyle->resizeHandleSize() : 1.));
+        item->setHeight(q->height() - 2
+                        - (enableResizing ? dockStyle->resizeHandleSize() : 0.));
+        break;
+
+    case Dock::Center:
+        item->setPosition(usableArea.topLeft());// QPointF(q->x() + dockStyle->tabMargin(),
+//                                  q->y() + dockStyle->tabMargin()
+//                                      + dockStyle->tabBarHeight()));
+        item->setSize(usableArea.size());
+//            QSizeF(q->width() - 2 * +dockStyle->tabMargin(),
+//                   q->height() - (2 * +dockStyle->tabMargin())
+//                       - dockStyle->tabBarHeight()));
+        break;
+
+    case Dock::Float:
+        break;
+    }
+}
+
+void DockAreaPrivate::reorderItems()
+{
+    Q_Q(DockArea);
+    int ss;
+
+    //    for (auto h : _handlers) {
+    //        _dockWidgets.at(h->index())->setY(y() + ss);
+    //        _dockWidgets.at(h->index())->setHeight(h->y() - ss);
+    //        ss += h->y() + h->height();
+    //    }
+    //    _dockWidgets.last()->setY(y() + ss);
+    //    _dockWidgets.last()->setHeight(height() - ss);
+
+    qreal freeSize;
+
+    if (isVertical()) {
+        ss = q->y();
+        freeSize = (q->height()
+                    - (dockStyle->resizeHandleSize() * (dockWidgets.count() - 1)));
+    }
+
+    if (isHorizontal()) {
+        ss = q->x();
+        freeSize = (q->width()
+                    - (dockStyle->resizeHandleSize() * (dockWidgets.count() - 1)));
+    }
+    QList<qreal> sl;
+    for (int i = 0; i < dockWidgets.count(); i++) {
+        auto dw = dockWidgets.at(i);
+
+        switch (displayType) {
+        case Dock::SplitView:
+            if (isVertical()) {
+                dw->setHeight(itemSizes.at(i) * freeSize);
+                dw->setY(ss);
+                dw->setX(q->x() + usableArea.x());
+                dw->setWidth(usableArea.width());
+                ss += dw->height() + dockStyle->resizeHandleSize();
+                sl.append(dw->height());
+            }
+            if (isHorizontal()) {
+                dw->setWidth(itemSizes.at(i) * freeSize);
+                dw->setX(ss);
+                dw->setY(q->y() + usableArea.y());
+                dw->setHeight(usableArea.height());
+                ss += dw->width() + dockStyle->resizeHandleSize();
+                sl.append(dw->width());
+            }
+            if (i < dockWidgets.count() - 1) {
+                if (isVertical())
+                    handlers.at(i)->setY(ss - q->y() - dockStyle->resizeHandleSize());
+
+                if (isHorizontal())
+                    handlers.at(i)->setX(ss - q->x() - dockStyle->resizeHandleSize());
+            }
+            break;;
+
+        case Dock::TabbedView:
+        case Dock::StackedView:
+            dw->setPosition(q->position() + usableArea.topLeft());
+            dw->setSize(usableArea.size());
+            break;
+
+        case Dock::Hidden:
+            break;
+        }
+
+    }
+}
+
+void DockAreaPrivate::reorderHandles()
+{
+    Q_Q(DockArea);
+
+    int index{0};
+    for (auto h : handlers) {
+        if (displayType == Dock::SplitView) {
+        h->setIndex(index++);
+        if (isVertical()) {
+            h->setX(0);
+            h->setWidth(q->width());
+        }
+        if (isHorizontal()) {
+            h->setY(0);
+            h->setHeight(q->height());
+        }
+        } else {
+            h->setVisible(false);
+        }
+    }
+}
+
+void DockAreaPrivate::normalizeItemSizes()
+{
+    qreal sum{0};
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+    itemSizes.resize(dockWidgets.count());
+#else
+    {
+        auto d = dockWidgets.count() - itemSizes.count();
+        if (d > 0)
+            for (auto i = 0; i < d; i++)
+                itemSizes.append(0);
+
+        if (d < 0)
+            for (auto i = 0; i < -d; i++)
+                itemSizes.removeLast();
+    }
+#endif
+
+    for (auto i = 0; i != itemSizes.count(); ++i) {
+        if (qFuzzyCompare(0, itemSizes.at(i)))
+            itemSizes[i] = 1. / itemSizes.count();
+        sum += itemSizes.at(i);
+    }
+
+    for (auto i = 0; i != itemSizes.count(); ++i) {
+        if (i == itemSizes.count())
+            itemSizes[i] = 1 - sum;
+        else
+            itemSizes[i] = itemSizes.at(i) / sum;
+    }
+}
+
+QRectF DockAreaPrivate::updateUsableArea()
+{
+    Q_Q(DockArea);
+    usableArea = QRectF(1, 1, q->width() - 2, q->height() - 2);
+
+    if (enableResizing)
+        switch (area) {
+        case Dock::Right:
+            usableArea.setLeft(dockStyle->resizeHandleSize() + 1);
+            break;
+
+        case Dock::Left:
+            usableArea.setRight(usableArea.right()
+                                - dockStyle->resizeHandleSize());
+            break;
+
+        case Dock::Top:
+            usableArea.setBottom(usableArea.bottom()
+                                - dockStyle->resizeHandleSize());
+            break;
+        case Dock::Bottom:
+            usableArea.setTop(dockStyle->resizeHandleSize() + 1);
+            break;
+
+        default:
+            break;
+        }
+    if (tabBarItem && displayType == Dock::TabbedView) {
+        switch (tabPosition) {
+        case Qt::TopEdge:
+            usableArea.setTop(usableArea.top() + tabBarItem->height());
+            break;
+        case Qt::RightEdge:
+            usableArea.setRight(usableArea.right() - tabBarItem->height());
+            break;
+        case Qt::LeftEdge:
+            usableArea.setLeft(usableArea.left() + tabBarItem->height());
+            break;
+        case Qt::BottomEdge:
+            usableArea.setBottom(usableArea.bottom() - tabBarItem->height());
+            break;
+        }
+        auto a = dockStyle->widgetTabPadding();
+        usableArea.adjust(a, a, -a, -a);
+    }
+    return usableArea;
+}
+
+DockArea::DockArea(QQuickItem *parent)
+    : QQuickPaintedItem(parent), d_ptr(new DockAreaPrivate(this))
+{
+    Q_D(DockArea);
+    d->area = Dock::Float;
+    setClip(true);
+    setAcceptHoverEvents(true);
+    setAcceptedMouseButtons(Qt::LeftButton);
+}
+
+void DockArea::hoverMoveEvent(QHoverEvent *event)
+{
+    Q_D(DockArea);
+
+    if (d->mousepRessed)
+        return;
+
+    switch (d->area) {
+    case Dock::Right:
+    case Dock::Left:
+        setCursor(d->acceptResizeEvent(event->pos()) ? Qt::SizeHorCursor
+                                                     : Qt::ArrowCursor);
+        break;
+
+    case Dock::Bottom:
+    case Dock::Top:
+        setCursor(d->acceptResizeEvent(event->pos()) ? Qt::SizeVerCursor
+                                                     : Qt::ArrowCursor);
+        break;
+
+    case Dock::Float:
+    case Dock::Center:
+        break;
+    }
+}
+
+bool DockArea::childMouseEventFilter(QQuickItem *, QEvent *e)
+{
+    Q_D(DockArea);
+
+    static QPointF _lastMousePos;
+    static QPointF _lastChildPos;
+
+    auto me = static_cast<QMouseEvent *>(e);
+    switch (e->type()) {
+    case QEvent::MouseButtonPress:
+        _lastMousePos = me->windowPos();
+        _lastChildPos = position();
+        e->accept();
+        break;
+
+    case QEvent::MouseMove: {
+        auto pt = _lastChildPos + (me->windowPos() - _lastMousePos);
+        switch (d->area) {
+        case Dock::Right:
+        case Dock::Left:
+            setWidth(pt.x());
+            break;
+
+        case Dock::Bottom:
+        case Dock::Top:
+            break;
+
+        case Dock::Float:
+        case Dock::Center:
+            break;
+        }
+
+        break;
+    }
+
+    default:
+        break;
+    }
+
+    return false;
+}
+
+void DockArea::mousePressEvent(QMouseEvent *event)
+{
+    Q_D(DockArea);
+
+    d->mousepRessed = true;
+    switch (d->area) {
+    case Dock::Right:
+    case Dock::Left:
+        d->lastMousePos = event->windowPos().x();
+        d->lastGroupSize = width();
+        setKeepMouseGrab(true);
+        break;
+
+    case Dock::Bottom:
+    case Dock::Top:
+        d->lastMousePos = event->windowPos().y();
+        d->lastGroupSize = height();
+        setKeepMouseGrab(true);
+        break;
+
+    case Dock::Float:
+    case Dock::Center:
+        break;
+    }
+}
+
+void DockArea::mouseMoveEvent(QMouseEvent *event)
+{
+    Q_D(DockArea);
+
+    switch (d->area) {
+    case Dock::Left:
+        setPanelSize(d->lastGroupSize
+                     + (event->windowPos().x() - d->lastMousePos));
+        break;
+
+    case Dock::Right:
+        setPanelSize(d->lastGroupSize
+                     + (d->lastMousePos - event->windowPos().x()));
+        break;
+
+    case Dock::Top:
+        setPanelSize(d->lastGroupSize
+                     + (event->windowPos().y() - d->lastMousePos));
+        break;
+
+    case Dock::Bottom:
+        setPanelSize(d->lastGroupSize
+                     + (d->lastMousePos - event->windowPos().y()));
+        break;
+
+    default:
+        break;
+    }
+}
+
+void DockArea::mouseReleaseEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event)
+    Q_D(DockArea);
+    d->mousepRessed = false;
+    setKeepMouseGrab(false);
+}
+
+void DockArea::geometryChanged(const QRectF &newGeometry,
+                                const QRectF &oldGeometry)
+{
+    Q_D(DockArea);
+
+    if (!d->dockWidgets.count() || !isComponentComplete())
+        return;
+
+    d->rearrange();
+    d->arrangeTabBar();
+    QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);
+}
+
+void DockArea::updatePolish()
+{
+    geometryChanged(QRectF(), QRectF());
+    qDebug() << "update polish";
+    QQuickPaintedItem::updatePolish();
+}
+
+void DockArea::dockWidget_closed()
+{
+    Q_D(DockArea);
+    if (d->displayType == Dock::TabbedView
+        || d->displayType == Dock::StackedView) {
+        removeDockWidget(qobject_cast<DockWidget *>(sender()));
+    }
+}
+
+void DockArea::tabBar_currentIndexChanged(int index)
+{
+    Q_D(DockArea);
+    if (d->displayType != Dock::TabbedView && d->displayType != Dock::StackedView)
+        return;
+
+    for (int i = 0; i < d->dockWidgets.count(); ++i) {
+        d->dockWidgets.at(i)->setVisible(i == index);
+    }
+}
+
+void DockArea::handler_moving(qreal pos, bool *ok)
+{
+    Q_D(DockArea);
+
+    auto handler = qobject_cast<DockAreaResizeHandler *>(sender());
+    if (!handler)
+        return;
+
+    auto ps = handler->index() ? pos - d->handlers.at(handler->index() - 1)->pos()
+                               - dockStyle->resizeHandleSize()
+                         : pos;
+
+    auto ns = handler->index() == d->handlers.count() - 1
+                  ? (d->isVertical() ? height() : width()) - pos
+                        - dockStyle->resizeHandleSize()
+                  : d->handlers.at(handler->index() + 1)->pos() - pos
+                        - dockStyle->resizeHandleSize();
+
+    auto prevDockWidget = d->dockWidgets.at(handler->index());
+    auto nextDockWidget = d->dockWidgets.at(handler->index() + 1);
+
+    if (ns > 30 && ps > 30) {
+        if (d->isVertical()) {
+            nextDockWidget->setY(y() + pos + dockStyle->resizeHandleSize());
+            nextDockWidget->setHeight(ns);
+            prevDockWidget->setHeight(ps);
+        }
+        if (d->isHorizontal()) {
+            nextDockWidget->setX(x() + pos + dockStyle->resizeHandleSize());
+            nextDockWidget->setWidth(ns);
+            prevDockWidget->setWidth(ps);
+        }
+        *ok = true;
+    }
+}
+
+void DockArea::handler_moved()
+{
+    Q_D(DockArea);
+    qreal freeSize;
+    qreal totalSpace{0};
+
+    if (d->isVertical()) {
+        foreach (auto dw, d->dockWidgets)
+            totalSpace += dw->height();
+        freeSize = (height()
+                    - (dockStyle->resizeHandleSize() * (d->dockWidgets.count() - 1)));
+    }
+
+    if (d->isHorizontal()) {
+        foreach (auto dw, d->dockWidgets)
+            totalSpace += dw->width();
+        freeSize = (width()
+                    - (dockStyle->resizeHandleSize() * (d->dockWidgets.count() - 1)));
+    }
+
+    int index{0};
+    foreach (auto dw, d->dockWidgets) {
+        if (d->isVertical())
+            d->itemSizes[index++] = (dw->height() / totalSpace);
+        //*freeSize;
+        if (d->isHorizontal())
+            d->itemSizes[index++] = (dw->width() / totalSpace);
+        //*freeSize;
+    }
+    d->reorderItems();
+}
+
+bool DockArea::isOpen() const
+{
+    Q_D(const DockArea);
+    return d->dockWidgets.count();
+    //isOpen;
+}
+
+qreal DockArea::panelSize() const
+{
+    Q_D(const DockArea);
+    return d->panelSize;
+}
+
+Dock::Area DockArea::area() const
+{
+    Q_D(const DockArea);
+    return d->area;
+}
+
+bool DockArea::enableResizing() const
+{
+    Q_D(const DockArea);
+    return d->enableResizing;
+}
+
+QList<DockWidget *> DockArea::widgets() const
+{
+    Q_D(const DockArea);
+    return d->dockWidgets;
+}
+
+Dock::DockWidgetDisplayType DockArea::displayType() const
+{
+    Q_D(const DockArea);
+    return d->displayType;
+}
+
+qreal DockArea::minimumSize() const
+{
+    Q_D(const DockArea);
+    return d->minimumSize;
+}
+
+qreal DockArea::maximumSize() const
+{
+    Q_D(const DockArea);
+    return d->maximumSize;
+}
+
+QList<DockWidget *> DockArea::dockWidgets() const
+{
+    Q_D(const DockArea);
+    return d->dockWidgets;
+}
+Qt::Edge DockArea::tabPosition() const
+{
+    Q_D(const DockArea);
+    return d->tabPosition;
 }
 
 void DockArea::componentComplete()
 {
-    if (!_dockGroups.contains(Dock::Center)) {
-        createGroup(Dock::Center);
-        _dockGroups[Dock::Center]->setDisplayType(Dock::TabbedView);
-    }
-    connect(window(), &QQuickWindow::activeFocusItemChanged, [this]() {
-        auto dockWidget = Dock::findInParents<DockWidget>(
-            window()->activeFocusItem());
-        if (dockWidget)
-            qDebug() << "Dock=" << dockWidget->title();
-    });
-    createGroup(Dock::Left);
-    createGroup(Dock::Right);
-    createGroup(Dock::Top);
-    createGroup(Dock::Bottom);
-
-    for (auto &dw : _initialWidgets)
-        addDockWidget(dw);
-
-    for (auto &dg: _dockGroups.values()) {
-        connect(dg, &DockGroup::panelSizeChanged, this, &DockArea::reorderDockGroups);
-        connect(dg, &DockGroup::isOpenChanged, this, &DockArea::reorderDockGroups);
+    Q_D(DockArea);
+    if (!d->tabBarItem) {
+        d->tabBar = new DockTabBar(this);
+        d->tabBar->setVisible(false);
+        d->tabBar->setZ(10000);
+        d->tabBar->setTransformOrigin(QQuickItem::TopLeft);
+        d->tabBar->setHeight(dockStyle->tabBarSize());
+        d->tabBarItem = d->tabBar;
+        connect(d->tabBar,
+                &DockTabBar::currentIndexChanged,
+                this,
+                &DockArea::tabBar_currentIndexChanged);
     }
 
-    _dockGroups[Dock::Left]->polish();
-    _dockGroups[Dock::Top]->polish();
-    _dockGroups[Dock::Right]->polish();
-    _dockGroups[Dock::Bottom]->polish();
-    _dockGroups[Dock::Center]->polish();
-    //    reorderDockGroups();
+    d->tabBarItem->setVisible(d->displayType == Dock::TabbedView);
+    QQuickPaintedItem::componentComplete();
+}
+
+QQuickItem *DockArea::tabBar() const
+{
+    Q_D(const DockArea);
+    return d->tabBarItem;
+}
+
+int DockArea::currentIndex() const
+{
+    Q_D(const DockArea);
+    return d->currentIndex;
+}
+
+void DockArea::addDockWidget(DockWidget *item)
+{
+    Q_D(DockArea);
+    item->setArea(d->area);
+    item->setDockArea(this);
+    //    addItem(item);
+    d->dockWidgets.append(item);
+    d->normalizeItemSizes();
+
+    if (d->dockWidgets.count() > 1) {
+        auto h = d->createHandlers();
+        if (h)
+            d->handlers.append(h);
+    }
+
+    if (d->tabBar) {
+        d->tabBar->addTab(item->title());
+        d->tabBar->setCurrentIndex(d->dockWidgets.count() - 1);
+    }
+
+    if (isComponentComplete())
+        d->rearrange();
+
+    connect(item, &DockWidget::closed, this, &DockArea::dockWidget_closed);
+
+    setIsOpen(d->dockWidgets.count());
+    emit dockWidgetsChanged(d->dockWidgets);
+}
+
+void DockArea::removeDockWidget(DockWidget *item)
+{
+    Q_D(DockArea);
+    auto index = d->dockWidgets.indexOf(item);
+    if (index == -1)
+        return;
+
+    d->dockWidgets.removeOne(item);
+    item->setDockArea(nullptr);
+
+    if (d->tabBar) {
+        d->tabBar->removeTab(index);
+        d->tabBar->setCurrentIndex(d->tabBar->currentIndex());
+    }
+
+    if (d->handlers.count()) {
+        auto h = d->handlers.takeAt(d->handlers.count() - 1);
+
+        if (h) {
+            h->setParentItem(nullptr);
+            h->deleteLater();
+        }
+    }
+
+    if (!d->dockWidgets.count()){
+        update();
+    }
+
+    setIsOpen(d->dockWidgets.count());
+    geometryChanged(QRect(), QRect());
+    d->normalizeItemSizes();
+
+    if (d->displayType == Dock::SplitView)
+        d->reorderHandles();
+    d->reorderItems();
+
+    emit dockWidgetsChanged(d->dockWidgets);
+}
+
+void DockArea::setIsOpen(bool isOpen)
+{
+    Q_D(DockArea);
+    if (d->isOpen == isOpen)
+        return;
+
+    d->isOpen = isOpen;
+    emit isOpenChanged(isOpen);
+}
+
+void DockArea::setPanelSize(qreal panelSize)
+{
+    Q_D(DockArea);
+    if (qFuzzyCompare(d->panelSize, panelSize))
+        return;
+
+    d->panelSize = qBound(d->minimumSize, panelSize, d->maximumSize);
+    emit panelSizeChanged(panelSize);
+}
+
+void DockArea::setArea(Dock::Area area)
+{
+    Q_D(DockArea);
+    if (d->area == area)
+        return;
+
+    d->area = area;
+    emit areaChanged(area);
+}
+
+void DockArea::setEnableResizing(bool enableResizing)
+{
+    Q_D(DockArea);
+    if (d->enableResizing == enableResizing)
+        return;
+
+    d->enableResizing = enableResizing;
+    emit enableResizingChanged(enableResizing);
+}
+
+void DockArea::setDisplayType(Dock::DockWidgetDisplayType displayType)
+{
+    Q_D(DockArea);
+
+    if (d->displayType == displayType)
+        return;
+
+    if (d->tabBarItem)
+        d->tabBarItem->setVisible(displayType == Dock::TabbedView);
+    d->displayType = displayType;
+    emit displayTypeChanged(displayType);
+}
+
+void DockArea::setMinimumSize(qreal minimumSize)
+{
+    Q_D(DockArea);
+    if (qFuzzyCompare(d->minimumSize, minimumSize))
+        return;
+
+    d->minimumSize = minimumSize;
+    emit minimumSizeChanged(d->minimumSize);
+
+    if (d->panelSize < minimumSize)
+        setPanelSize(minimumSize);
+}
+
+void DockArea::setMaximumSize(qreal maximumSize)
+{
+    Q_D(DockArea);
+    if (qFuzzyCompare(d->maximumSize, maximumSize))
+        return;
+
+    d->maximumSize = maximumSize;
+    emit maximumSizeChanged(d->maximumSize);
+
+    if (d->panelSize > maximumSize)
+        setPanelSize(maximumSize);
+}
+
+void DockArea::setTabPosition(Qt::Edge tabPosition)
+{
+    Q_D(DockArea);
+
+    if (!isComponentComplete())
+        return;
+
+    if (d->tabPosition == tabPosition)
+        return;
+    switch (tabPosition) {
+    case Qt::TopEdge:
+    case Qt::BottomEdge:
+        d->tabBarItem->setRotation(0);
+        break;
+
+    case Qt::LeftEdge:
+        d->tabBarItem->setRotation(-90);
+        break;
+
+    case Qt::RightEdge:
+        d->tabBarItem->setRotation(90);
+        break;
+    }
+    d->tabPosition = tabPosition;
+//    d->updateUsableArea();
+
+    if (d->tabBar)
+        d->tabBar->setEdge(tabPosition);
     geometryChanged(QRectF(), QRectF());
+    update();
+    emit tabPositionChanged(d->tabPosition);
+}
+void DockArea::setCurrentIndex(int currentIndex)
+{
+    Q_D(DockArea);
+    if (d->currentIndex == currentIndex)
+        return;
 
-    QQuickItem::componentComplete();
+    d->currentIndex = qBound(0, currentIndex, d->dockWidgets.count() - 1);
+    if (d->tabBar)
+        d->tabBar->setCurrentIndex(currentIndex);
+    emit currentIndexChanged(currentIndex);
 }
 
-void DockArea::storeSettings()
+void DockArea::setTabBar(QQuickItem *tabBar)
 {
-    QSettings set;
-    QMetaEnum e = QMetaEnum::fromType<Dock::Area>();
+    Q_D(DockArea);
 
-    for (auto &dw : _dockWidgets) {
-        set.beginGroup(dw->title());
-        set.setValue("area", e.valueToKey(dw->area()));
-        set.setValue("position", QStringLiteral("%1,%2").arg(dw->x()).arg(dw->y()));
-        set.setValue("size", QStringLiteral("%1,%2").arg(dw->width()).arg(dw->height()));
-        set.setValue("visible", dw->isVisible());
-        set.endGroup();
-    }
+    if (d->tabBarItem == tabBar)
+        return;
 
-    set.sync();
-    qDebug() << set.fileName();
-}
-
-void DockArea::restoreSettings()
-{
-
+    tabBar->setParentItem(this);
+    d->tabBarItem = tabBar;
+    polish();
+    emit tabBarChanged(tabBar);
 }
 
 void DockArea::paint(QPainter *painter)
 {
     dockStyle->paintDockArea(painter, this);
-}
-
-QList<DockWidget *> DockArea::dockWidgets() const
-{
-    return _dockWidgets;
-}
-
-void DockArea::itemChange(QQuickItem::ItemChange change,
-                          const QQuickItem::ItemChangeData &data)
-{
-    if (change == QQuickItem::ItemChildAddedChange) {
-        auto dw = qobject_cast<DockWidget *>(data.item);
-        if (dw) {
-            if (isComponentComplete())
-                addDockWidget(dw);
-            else
-                _initialWidgets.append(dw);
-        }
-
-        auto dg = qobject_cast<DockGroup *>(data.item);
-        if (dg) {
-            if (!_dockGroups.contains(dg->area()))
-                _dockGroups.insert(dg->area(), dg);
-        }
-    }
-
-    if (change == QQuickItem::ItemChildRemovedChange) {
-        auto dw = qobject_cast<DockWidget *>(data.item);
-        if (dw) {
-            _dockWidgets.removeOne(dw);
-            if (dw->dockGroup())
-                dw->dockGroup()->removeDockWidget(dw);
-      }
-    }
-
-    QQuickItem::itemChange(change, data);
-}
-
-void DockArea::addDockWidget(DockWidget *widget)
-{
-    widget->setZ(widget->area() == Dock::Float ? Z_WIDGET_FLOAT : Z_WIDGET);
-
-    widget->setDockArea(this);
-//    widget->setParentItem(this);
-    _dockWidgets.append(widget);
-
-    connect(widget,
-            &DockWidget::beginMove,
-            this,
-            &DockArea::dockWidget_beginMove,
-            Qt::QueuedConnection);
-
-    connect(widget, &DockWidget::moving, this, &DockArea::dockWidget_moving);
-    connect(widget, &DockWidget::moved, this, &DockArea::dockWidget_moved);
-    connect(widget,
-            &QQuickItem::visibleChanged,
-            this,
-            &DockArea::dockWidget_visibleChanged);
-
-    if (m_enableStateStoring) {
-        QSettings set;
-        QMetaEnum e = QMetaEnum::fromType<Dock::Area>();
-        set.beginGroup(widget->title());
-        if (set.contains("area"))
-            widget->setArea(
-                (Dock::Area) e.keyToValue(set.value("area", widget->area())
-                                              .toString()
-                                              .toLocal8Bit()
-                                              .data()));
-    }
-    switch (widget->area()) {
-    case Dock::Left:
-    case Dock::Right:
-    case Dock::Top:
-    case Dock::Bottom:
-    case Dock::Center:
-        _dockGroups[widget->area()]->addDockWidget(widget);
-        _dockGroups[widget->area()]->polish();
-        break;
-
-        //TODO: remove this or keep!
-    case Dock::NoArea:
-        _dockGroups[Dock::Center]->addDockWidget(widget);
-        _dockGroups[Dock::Center]->polish();
-        break;
-    default:
-        qDebug() << "dock has no area " << widget->title();
-        break;
-    }
-
-    qDebug() << widget->title() << "added to" << widget->area();
-    if (isComponentComplete())
-        reorderDockGroups();
-
-    emit dockWidgetsChanged(_dockWidgets);
-}
-
-void DockArea::reorderDockGroups()
-{
-    QRectF rc;
-
-    rc.setLeft(panelSize(Dock::Left));
-    rc.setTop(panelSize(Dock::Top));
-    rc.setWidth(width() - panelSize(Dock::Right) - panelSize(Dock::Left));
-    rc.setHeight(height() - panelSize(Dock::Top) - panelSize(Dock::Bottom));
-
-    qreal leftStart, leftEnd;
-    qreal topStart, topEnd;
-    qreal rightStart, rightEnd;
-    qreal bottomStart, bottomEnd;
-
-    if (m_topLeftOwner == Qt::LeftEdge) {
-        leftStart = 0;
-        topStart = rc.left();
-    } else {
-        leftStart = rc.top();
-        topStart = 0;
-    }
-
-    if (m_topRightOwner == Qt::RightEdge) {
-        topEnd = rc.right();
-        rightStart = 0;
-    } else {
-        topEnd = width();
-        rightStart = rc.top();
-    }
-
-    if (m_bottomLeftOwner == Qt::LeftEdge) {
-        leftEnd = height();
-        bottomStart = rc.left();
-    } else {
-        leftEnd = rc.bottom();
-        bottomStart = 0;
-    }
-
-    if (m_bottomRightOwner == Qt::RightEdge) {
-        bottomEnd = rc.right();
-        rightEnd = height();
-    } else {
-        bottomEnd = width();
-        rightEnd = rc.bottom();
-    }
-    _dockGroups[Dock::Left]->setPosition(QPointF(0, leftStart));
-    _dockGroups[Dock::Left]->setSize(QSizeF(rc.left(), leftEnd - leftStart));
-
-    _dockGroups[Dock::Top]->setPosition(QPointF(topStart, 0));
-    _dockGroups[Dock::Top]->setSize(QSizeF(topEnd - topStart, rc.top()));
-
-    _dockGroups[Dock::Right]->setPosition(QPointF(rc.right(), rightStart));
-    _dockGroups[Dock::Right]->setSize(QSizeF(width() - rc.right(), rightEnd - rightStart));
-
-    _dockGroups[Dock::Bottom]->setPosition(QPointF(bottomStart, rc.bottom()));
-    _dockGroups[Dock::Bottom]->setSize(QSizeF(bottomEnd - bottomStart, height() - rc.bottom()));
-
-    _dockGroups[Dock::Center]->setPosition(rc.topLeft());
-    _dockGroups[Dock::Center]->setSize(rc.size());
-}
-
-void DockArea::setTopLeftOwner(Qt::Edge topLeftOwner)
-{
-    if (topLeftOwner != Qt::LeftEdge && topLeftOwner != Qt::TopEdge) {
-        qWarning() << "Invalid value for topLeftOwner: " << topLeftOwner;
-        return;
-    }
-    if (m_topLeftOwner == topLeftOwner)
-        return;
-
-    m_topLeftOwner = topLeftOwner;
-    if (isComponentComplete())
-        reorderDockGroups();
-    emit topLeftOwnerChanged(m_topLeftOwner);
-}
-
-void DockArea::setTopRightOwner(Qt::Edge topRightOwner)
-{
-    if (topRightOwner != Qt::TopEdge && topRightOwner != Qt::RightEdge) {
-        qWarning() << "Invalid value for topRightOwner: " << topRightOwner;
-        return;
-    }
-
-    if (m_topRightOwner == topRightOwner)
-        return;
-
-    m_topRightOwner = topRightOwner;
-    if (isComponentComplete())
-        reorderDockGroups();
-    emit topRightOwnerChanged(m_topRightOwner);
-}
-
-void DockArea::setBottomLeftOwner(Qt::Edge bottomLeftOwner)
-{
-    if (bottomLeftOwner != Qt::BottomEdge && bottomLeftOwner != Qt::LeftEdge) {
-        qWarning() << "Invalid value for bottomLeftOwner: " << bottomLeftOwner;
-        return;
-    }
-
-    if (m_bottomLeftOwner == bottomLeftOwner)
-        return;
-
-    m_bottomLeftOwner = bottomLeftOwner;
-    if (isComponentComplete())
-        reorderDockGroups();
-    emit bottomLeftOwnerChanged(m_bottomLeftOwner);
-}
-
-void DockArea::setBottomRightOwner(Qt::Edge bottomRightOwner)
-{
-    if (bottomRightOwner != Qt::BottomEdge && bottomRightOwner != Qt::RightEdge) {
-        qWarning() << "Invalid value for bottomRightOwner: " << bottomRightOwner;
-        return;
-    }
-
-    if (m_bottomRightOwner == bottomRightOwner)
-        return;
-
-    m_bottomRightOwner = bottomRightOwner;
-    if (isComponentComplete())
-        reorderDockGroups();
-    emit bottomRightOwnerChanged(m_bottomRightOwner);
-}
-
-void DockArea::setEnableStateStoring(bool enableStateStoring)
-{
-    if (m_enableStateStoring == enableStateStoring)
-        return;
-
-    m_enableStateStoring = enableStateStoring;
-    emit enableStateStoringChanged(m_enableStateStoring);
-}
-
-void DockArea::dockWidget_beginMove()
-{
-    auto dw = qobject_cast<DockWidget *>(sender());
-
-    for (auto d : _dockWidgets)
-        d->setZ(d->z() - 1);
-    dw->setZ(Z_WIDGET_FLOAT);
-
-    if (dw->dockGroup()) {
-        //        dw->beginDetach();
-        dw->setArea(Dock::Float);
-        dw->dockGroup()->removeDockWidget(dw);
-        dw->restoreSize();
-    }
-
-    _dockMoveGuide->setAllowedAreas(dw->allowedAreas());
-    _dockMoveGuide->begin(mapToGlobal(QPoint(0, 0)),
-                size());
-//    _dockMoveGuide->setSize(size());
-//    _dockMoveGuide->setVisible(true);
-}
-
-void DockArea::dockWidget_moving(const QPointF &pt)
-{
-    _dockMoveGuide->setMousePos(pt);
-}
-
-void DockArea::dockWidget_moved()
-{
-    _dockMoveGuide->end();
-
-    auto dw = qobject_cast<DockWidget *>(sender());
-    if (!dw)
-        return;
-
-    switch (_dockMoveGuide->area()) {
-    case Dock::Left:
-    case Dock::Right:
-    case Dock::Top:
-    case Dock::Bottom:
-    case Dock::Center:
-        if (dw->dockGroup() != _dockGroups[_dockMoveGuide->area()]) {
-            _dockGroups[_dockMoveGuide->area()]->addDockWidget(dw);
-        }
-        dw->setZ(Z_WIDGET);
-        reorderDockGroups();
-        break;
-    case Dock::Float:
-    case Dock::Detached:
-        dw->setArea(_dockMoveGuide->area());
-        break;
-
-    default:
-        break;
-    }
-}
-
-void DockArea::dockWidget_visibleChanged()
-{
-    auto dw = qobject_cast<DockWidget *>(sender());
-    if (!dw)
-        return;
-
-    if (dw->area() == Dock::Float)
-        return;
-
-    if (dw->dockGroup()) {
-        auto dt = dw->dockGroup()->displayType();
-        if (dt == Dock::TabbedView)
-            return;
-    }
-
-    if (dw->isVisible()) {
-        _dockGroups[dw->area()]->addDockWidget(dw);
-    } else {
-        if (dw->dockGroup()) {
-            dw->dockGroup()->removeDockWidget(dw);
-        }
-    }
-}
-
-void DockArea::geometryChanged(const QRectF &newGeometry,
-                               const QRectF &oldGeometry)
-{
-    if (isComponentComplete())
-        reorderDockGroups();
-    QQuickItem::geometryChanged(newGeometry, oldGeometry);
-}
-
-int DockArea::panelSize(Dock::Area area) const
-{
-    return _dockGroups[area]->isOpen()
-               ? _dockGroups[area]->panelSize()
-               : 0.;
-}
-
-DockGroup *DockArea::createGroup(Dock::Area area, DockGroup *item)
-{
-    if (_dockGroups.contains(area))
-        return _dockGroups.value(area);
-
-    if (!item)
-        item = new DockGroup(this);
-    item->setArea(area);
-    item->setVisible(true);
-    item->setZ(Z_GROUP);
-    item->setPanelSize(120);
-    item->setDisplayType(Dock::SplitView);
-
-    _dockGroups.insert(area, item);
-
-    return item;
-}
-
-QRectF DockArea::panelRect(Dock::Area area) const
-{
-    auto d = _dockGroups.value(area);
-
-    if (d->isOpen())
-        return QRectF(d->position(), d->size());
-
-    constexpr qreal s{50};
-
-    switch (area) {
-    case Dock::Left:
-        return QRectF(0, 0, s, height() - 1);
-
-    case Dock::Top:
-        return QRectF(0, 0, width() - 1, s);
-
-    case Dock::Right:
-        return QRectF(width() - s, 0, s, height() - 1);
-
-    case Dock::Bottom:
-        return QRectF(0, height() - s, width() - 1, s);
-
-    default:
-        return QRectF();
-    }
-}
-
-Qt::Edge DockArea::topLeftOwner() const
-{
-    return m_topLeftOwner;
-}
-
-Qt::Edge DockArea::topRightOwner() const
-{
-    return m_topRightOwner;
-}
-
-Qt::Edge DockArea::bottomLeftOwner() const
-{
-    return m_bottomLeftOwner;
-}
-
-Qt::Edge DockArea::bottomRightOwner() const
-{
-    return m_bottomRightOwner;
-}
-
-bool DockArea::enableStateStoring() const
-{
-    return m_enableStateStoring;
 }

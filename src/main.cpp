@@ -1,6 +1,6 @@
-#include "dockarea.h"
+#include "dockcontainer.h"
 #include "dockwidget.h"
-#include "dockgroup.h"
+#include "dockarea.h"
 
 #include <QApplication>
 #include <QQmlApplicationEngine>
@@ -16,9 +16,9 @@ int main(int argc, char *argv[])
 
     QQuickStyle::setStyle("material");
 
-    qmlRegisterType<DockArea>("AI", 1, 0, "DockArea");
+    qmlRegisterType<DockContainer>("AI", 1, 0, "DockContainer");
     qmlRegisterType<DockWidget>("AI", 1, 0, "DockWidget");
-    qmlRegisterType<DockGroup>("AI", 1, 0, "DockGroup");
+    qmlRegisterType<DockArea>("AI", 1, 0, "DockArea");
     qmlRegisterUncreatableMetaObject(Dock::staticMetaObject,
                                      "AI",
                                      1,
