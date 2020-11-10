@@ -522,15 +522,27 @@ void DockArea::dockWidget_closed()
     }
 }
 
-void DockArea::tabBar_currentIndexChanged(int index)
+void DockArea::tabBar_currentIndexChanged(int index) {}
+
+void DockArea::tabBar_tabClicked(int index)
 {
     Q_D(DockArea);
-    if (d->displayType != Dock::TabbedView && d->displayType != Dock::StackedView)
+    if (d->displayType != Dock::TabbedView
+        && d->displayType != Dock::StackedView)
         return;
 
     for (int i = 0; i < d->dockWidgets.count(); ++i) {
         d->dockWidgets.at(i)->setVisible(i == index);
     }
+    d->tabBar->setCurrentIndex(index);
+}
+
+void DockArea::tabBar_closeButtonClicked(int index)
+{
+    Q_D(DockArea);
+    auto item = d->dockWidgets.at(index);
+    if (item)
+        item->close();
 }
 
 void DockArea::handler_moving(qreal pos, bool *ok)
@@ -672,9 +684,13 @@ void DockArea::componentComplete()
         d->tabBar->setHeight(dockStyle->tabBarSize());
         d->tabBarItem = d->tabBar;
         connect(d->tabBar,
-                &DockTabBar::currentIndexChanged,
+                &DockTabBar::tabClicked,
                 this,
-                &DockArea::tabBar_currentIndexChanged);
+                &DockArea::tabBar_tabClicked);
+        connect(d->tabBar,
+                &DockTabBar::closeButtonClicked,
+                this,
+                &DockArea::tabBar_closeButtonClicked);
     }
 
     d->tabBarItem->setVisible(d->displayType == Dock::TabbedView);
@@ -702,16 +718,22 @@ void DockArea::addDockWidget(DockWidget *item)
     d->dockWidgets.append(item);
     d->normalizeItemSizes();
 
+    if (d->tabBar)
+        d->tabBar->addTab(item->title());
+
     if (d->dockWidgets.count() > 1) {
         auto h = d->createHandlers();
         if (h)
             d->handlers.append(h);
+
+        if (d->displayType == Dock::TabbedView
+            || d->displayType == Dock::StackedView)
+            item->setVisible(false);
+
+    } else {
+        setCurrentIndex(0);
     }
 
-    if (d->tabBar) {
-        d->tabBar->addTab(item->title());
-        d->tabBar->setCurrentIndex(d->dockWidgets.count() - 1);
-    }
 
     if (isComponentComplete())
         d->rearrange();
@@ -734,8 +756,9 @@ void DockArea::removeDockWidget(DockWidget *item)
 
     if (d->tabBar) {
         d->tabBar->removeTab(index);
-        d->tabBar->setCurrentIndex(d->tabBar->currentIndex());
+        //d->tabBar->setCurrentIndex(d->tabBar->currentIndex());
     }
+    setCurrentIndex(currentIndex());
 
     if (d->handlers.count()) {
         auto h = d->handlers.takeAt(d->handlers.count() - 1);
@@ -875,13 +898,18 @@ void DockArea::setTabPosition(Qt::Edge tabPosition)
 void DockArea::setCurrentIndex(int currentIndex)
 {
     Q_D(DockArea);
-    if (d->currentIndex == currentIndex)
+    auto newIndex = qBound(0, currentIndex, d->dockWidgets.count() - 1);
+
+    if (d->currentIndex == newIndex)
         return;
 
-    d->currentIndex = qBound(0, currentIndex, d->dockWidgets.count() - 1);
+    d->currentIndex = newIndex;
+    for (int i = 0; i < d->dockWidgets.count(); ++i)
+        d->dockWidgets.at(i)->setVisible(i == currentIndex);
+
     if (d->tabBar)
-        d->tabBar->setCurrentIndex(currentIndex);
-    emit currentIndexChanged(currentIndex);
+        d->tabBar->setCurrentIndex(d->currentIndex);
+    emit currentIndexChanged(d->currentIndex);
 }
 
 void DockArea::setTabBar(QQuickItem *tabBar)

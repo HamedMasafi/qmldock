@@ -26,30 +26,34 @@ void DockTabBar::setCurrentIndex(int currentIndex)
     if (m_currentIndex == currentIndex)
         return;
 
-    if (currentIndex > _tabs.count() - 1) {
-        qDebug() << "Invalid index";
-        return;
-    }
-    if (currentIndex == -1) {
-        for (auto &t : _tabs)
-            t->setChecked(false);
-        m_currentIndex = -1;
-        emit currentIndexChanged(m_currentIndex);
-        return;
-    }
+//    if (currentIndex > _tabs.count() - 1) {
+//        qDebug() << "Invalid index";
+//        return;
+//    }
+//    if (currentIndex == -1) {
+//        for (auto &t : _tabs)
+//            t->setChecked(false);
+//        m_currentIndex = -1;
+//        emit currentIndexChanged(m_currentIndex);
+//        return;
+//    }
 
-    if (m_currentIndex != -1 && m_currentIndex <= _tabs.count() - 1)
+    //    if (m_currentIndex != -1 && m_currentIndex <= _tabs.count() - 1)
+    //        _tabs.at(m_currentIndex)->setChecked(false);
+
+    if (m_currentIndex != -1)
         _tabs.at(m_currentIndex)->setChecked(false);
-
-        m_currentIndex = currentIndex;
+    m_currentIndex = currentIndex;
     _tabs.at(m_currentIndex)->setChecked(true);
 
     emit currentIndexChanged(m_currentIndex);
 }
 
 DockTabBar::DockTabBar(QQuickItem *parent)
-    : QQuickPaintedItem(parent), m_currentIndex{-1}, _edge{Qt::TopEdge},
-      _tabsStartPos{0.}
+    : QQuickPaintedItem(parent)
+      , _edge{Qt::TopEdge}
+      , m_currentIndex{-1}
+      , _tabsStartPos{0.}
 {
     setClip(true);
 
@@ -84,6 +88,7 @@ int DockTabBar::addTab(const QString &name)
     t->setY(0);
     _tabsSize += t->width();
     connect(t, &DockTabButton::clicked, this, &DockTabBar::tabButton_clicked);
+    connect(t, &DockTabButton::closeButtonClicked, this, &DockTabBar::tabButton_closeButtonClicked);
     _tabs.append(t);
     reorderTabs();
     return _tabs.count() - 1;
@@ -156,9 +161,17 @@ void DockTabBar::tabButton_clicked()
         return;
 
     auto index = _tabs.indexOf(btn);
-    if (m_currentIndex == index)
+    emit tabClicked(index);
+}
+
+void DockTabBar::tabButton_closeButtonClicked()
+{
+    auto btn = qobject_cast<DockTabButton *>(sender());
+    if (!btn)
         return;
-    setCurrentIndex(index);
+
+    auto index = _tabs.indexOf(btn);
+    emit closeButtonClicked(index);
 }
 
 void DockTabBar::geometryChanged(const QRectF &newGeometry,

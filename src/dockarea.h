@@ -90,6 +90,8 @@ protected:
 private slots:
     void dockWidget_closed();
     void tabBar_currentIndexChanged(int index);
+    void tabBar_tabClicked(int index);
+    void tabBar_closeButtonClicked(int index);
     void handler_moving(qreal pos, bool *ok);
     void handler_moved();
 
