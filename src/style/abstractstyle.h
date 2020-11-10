@@ -33,7 +33,7 @@ public:
     //sizes
     virtual qreal tabBarSize() const = 0;
     virtual qreal resizeHandleSize() const = 0;
-    virtual qreal widgetPadding() const = 0;
+    virtual qreal widgetPadding(DockWidget *widget) const = 0;
     virtual qreal widgetResizePadding() const = 0;
     virtual qreal widgetTabPadding() const = 0;
     virtual qreal dropButtonSize() const = 0;

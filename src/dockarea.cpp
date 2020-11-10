@@ -726,14 +726,12 @@ void DockArea::addDockWidget(DockWidget *item)
         if (h)
             d->handlers.append(h);
 
-        if (d->displayType == Dock::TabbedView
-            || d->displayType == Dock::StackedView)
-            item->setVisible(false);
+//        if (d->displayType == Dock::TabbedView
+//            || d->displayType == Dock::StackedView)
+//            item->setVisible(false);
 
-    } else {
-        setCurrentIndex(0);
     }
-
+    setCurrentIndex(d->dockWidgets.count() - 1);
 
     if (isComponentComplete())
         d->rearrange();

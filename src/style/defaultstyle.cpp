@@ -61,8 +61,10 @@ qreal DefaultStyle::resizeHandleSize() const
     return 8;
 }
 
-qreal DefaultStyle::widgetPadding() const
+qreal DefaultStyle::widgetPadding(DockWidget *widget) const
 {
+    if (widget->dockArea() && widget->dockArea()->displayType() == Dock::TabbedView)
+        return 0;
     return 3;
 }
 
@@ -452,12 +454,16 @@ void DefaultStyle::paintDockArea(QPainter *p, DockArea *item)
 
 void DefaultStyle::paintDockWidget(QPainter *p, DockWidget *item)
 {
-    p->fillRect(item->clipRect(), m_borderColor);
-    qreal a;
-//    if (item->area() == Dock::Float || item->area() == Dock::Detached)
-//        a = 10;
-//    else
+    //    if (item->isActive())
+    //        p->fillRect(item->clipRect(), Qt::red);
+    //    else
+
+    qreal a{0};
+    if (item->dockArea()
+        && item->dockArea()->displayType() != Dock::TabbedView) {
+        p->fillRect(item->clipRect(), m_borderColor);
         a = 1;
+    }
     p->fillRect(item->clipRect().adjusted(a, a, -a, -a), m_widgetColor);
 }
 

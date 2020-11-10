@@ -20,6 +20,7 @@ DockContainer::DockContainer(QQuickItem *parent) : QQuickPaintedItem(parent)
         , m_topRightOwner(Qt::RightEdge)
         , m_bottomLeftOwner(Qt::LeftEdge)
         , m_bottomRightOwner(Qt::RightEdge)
+       , _activeDockWidget{nullptr}
 {
 
     _dockMoveGuide = new DockMoveGuide(this);
@@ -40,8 +41,13 @@ void DockContainer::componentComplete()
     connect(window(), &QQuickWindow::activeFocusItemChanged, [this]() {
         auto dockWidget = Dock::findInParents<DockWidget>(
             window()->activeFocusItem());
-        if (dockWidget)
+        if (dockWidget) {
             qDebug() << "Dock=" << dockWidget->title();
+            if (_activeDockWidget)
+                _activeDockWidget->setIsActive(false);
+            _activeDockWidget = dockWidget;
+            _activeDockWidget->setIsActive(true);
+        }
     });
     createGroup(Dock::Left);
     createGroup(Dock::Right);

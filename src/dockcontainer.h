@@ -31,6 +31,7 @@ class DockContainer : public QQuickPaintedItem {
     Qt::Edge m_topRightOwner;
     Qt::Edge m_bottomLeftOwner;
     Qt::Edge m_bottomRightOwner;
+    DockWidget *_activeDockWidget;
 
 public:
     DockContainer(QQuickItem *parent = nullptr);

@@ -43,7 +43,7 @@ public:
     QFont font() const override;
 
     qreal resizeHandleSize() const override;
-    qreal widgetPadding() const override;
+    qreal widgetPadding(DockWidget *widget) const override;
     qreal widgetResizePadding() const override;
     qreal widgetTabPadding() const override;
     qreal tabBarSize() const override;

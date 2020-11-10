@@ -59,8 +59,8 @@ T *findInParents(QQuickItem *item)
         if (p)
             return p;
         i = i->parentItem();
-        return nullptr;
     }
+    return nullptr;
 }
 } // namespace Dock
 #endif // DOCK_H

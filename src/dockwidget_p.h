@@ -44,6 +44,7 @@ public:
     QPointF resizeMousePos;
 
     bool autoCreateHeader;
+    bool isActive;
 
     Q_DECL_DEPRECATED
     bool detachable;

@@ -41,7 +41,7 @@ void DockTabBar::setCurrentIndex(int currentIndex)
     //    if (m_currentIndex != -1 && m_currentIndex <= _tabs.count() - 1)
     //        _tabs.at(m_currentIndex)->setChecked(false);
 
-    if (m_currentIndex != -1)
+    if (m_currentIndex != -1 && m_currentIndex <= _tabs.count() - 1)
         _tabs.at(m_currentIndex)->setChecked(false);
     m_currentIndex = currentIndex;
     _tabs.at(m_currentIndex)->setChecked(true);

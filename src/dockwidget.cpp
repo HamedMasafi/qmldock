@@ -30,6 +30,7 @@ DockWidgetPrivate::DockWidgetPrivate(DockWidget *parent)
       , dockArea{nullptr}
       , isClosed{false}
       , autoCreateHeader{true}
+      , isActive{false}
       , detachable{false}
       , isDetached{false}
 {
@@ -281,12 +282,23 @@ void DockWidget::setTitleBar(QQuickItem *titleBar)
     emit titleBarChanged(d->titleBarItem);
 }
 
+void DockWidget::setIsActive(bool isActive)
+{
+    Q_D(DockWidget);
+    if (d->isActive == isActive)
+        return;
+
+    d->isActive = isActive;
+    update();
+    emit isActiveChanged(d->isActive);
+}
+
 void DockWidget::header_moveStarted()
 {
     //    if (isDetached)
     //        d->dockWindow->startSystemMove();
 
-//    beginDetach();
+    //    beginDetach();
     emit beginMove();
 }
 
@@ -385,10 +397,8 @@ void DockWidget::geometryChanged(const QRectF &newGeometry,
 //        rc.adjust(10, 10, -10, -10);
 //    } else {
 //    }
-    rc.adjust(dockStyle->widgetPadding(),
-              dockStyle->widgetPadding(),
-              -dockStyle->widgetPadding(),
-              -dockStyle->widgetPadding());
+    auto p = dockStyle->widgetPadding(this);
+    rc.adjust(p, p, -p, -p);
 
     qreal titlebarHeight{0};
 
@@ -437,8 +447,8 @@ void DockWidget::componentComplete()
     if (!d->titleBarItem && d->autoCreateHeader) {
         d->titleBar = new DockWidgetHeader(this);
         d->titleBarItem = d->titleBar;
-        d->titleBar->setPosition(
-            QPointF(dockStyle->widgetPadding(), dockStyle->widgetPadding()));
+        auto p = dockStyle->widgetPadding(this);
+        d->titleBar->setPosition(QPointF(p, p));
         d->titleBar->setSize(QSizeF(width(), 30));
         d->titleBar->setVisible(true);
         d->titleBar->setZ(999);
@@ -459,6 +469,12 @@ void DockWidget::componentComplete()
     }
     setSize(QSizeF(200, 200));
     QQuickPaintedItem::componentComplete();
+}
+
+bool DockWidget::isActive() const
+{
+    Q_D(const DockWidget);
+    return d->isActive;
 }
 
 DockContainer *DockWidget::dockContainer() const
