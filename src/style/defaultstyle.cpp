@@ -459,8 +459,8 @@ void DefaultStyle::paintDockWidget(QPainter *p, DockWidget *item)
     //    else
 
     qreal a{0};
-    if (item->dockArea()
-        && item->dockArea()->displayType() != Dock::TabbedView) {
+    if ((item->dockArea() && item->dockArea()->displayType() != Dock::TabbedView)
+        || item->area() == Dock::Float) {
         p->fillRect(item->clipRect(), m_borderColor);
         a = 1;
     }
