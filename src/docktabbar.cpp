@@ -169,7 +169,7 @@ void DockTabBar::geometryChanged(const QRectF &newGeometry,
 
     if (tabsAreaSize > _tabsSize)
         _tabsStartPos = 0;
-    qDebug() << _tabsStartPos << _tabsSize << tabsAreaSize;
+
     reorderTabs();
     QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);
 }

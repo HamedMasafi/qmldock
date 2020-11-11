@@ -58,7 +58,6 @@ void DockContainer::componentComplete()
         auto dockWidget = Dock::findInParents<DockWidget>(
             window()->activeFocusItem());
         if (dockWidget) {
-            qDebug() << "Dock=" << dockWidget->title();
             if (d->activeDockWidget)
                 d->activeDockWidget->setIsActive(false);
             d->activeDockWidget = dockWidget;
@@ -105,7 +104,6 @@ void DockContainer::storeSettings()
     }
 
     set.sync();
-    qDebug() << set.fileName();
 }
 
 void DockContainer::restoreSettings()
@@ -206,11 +204,10 @@ void DockContainer::addDockWidget(DockWidget *widget)
         d->dockAreas[Dock::Center]->polish();
         break;
     default:
-        qDebug() << "dock has no area " << widget->title();
+        qWarning() << "dock has no area " << widget->title();
         break;
     }
 
-    qDebug() << widget->title() << "added to" << widget->area();
     if (isComponentComplete())
         reorderDockAreas();
 
