@@ -20,10 +20,13 @@ DockAreaPrivate::DockAreaPrivate(DockArea *parent)
 {
 }
 
-void DockAreaPrivate::rearrange()
+void DockAreaPrivate::relayout()
 {
     updateUsableArea();
-    arrangeTabBar();
+
+    if (tabBarItem && displayType == Dock::TabbedView)
+        arrangeTabBar();
+
     reorderHandles();
 
     reorderItems();
@@ -33,7 +36,7 @@ void DockAreaPrivate::arrangeTabBar()
 {
     Q_Q(DockArea);
 
-    if (!tabBarItem || displayType != Dock::TabbedView)
+    if (!tabBarItem)
         return;
 
     switch (tabPosition) {
@@ -184,14 +187,6 @@ void DockAreaPrivate::reorderItems()
     Q_Q(DockArea);
     int ss;
 
-    //    for (auto h : _handlers) {
-    //        _dockWidgets.at(h->index())->setY(y() + ss);
-    //        _dockWidgets.at(h->index())->setHeight(h->y() - ss);
-    //        ss += h->y() + h->height();
-    //    }
-    //    _dockWidgets.last()->setY(y() + ss);
-    //    _dockWidgets.last()->setHeight(height() - ss);
-
     qreal freeSize;
 
     if (isVertical()) {
@@ -240,6 +235,7 @@ void DockAreaPrivate::reorderItems()
         case Dock::StackedView:
             dw->setPosition(q->position() + usableArea.topLeft());
             dw->setSize(usableArea.size());
+            dw->setVisible(i == currentIndex);
             break;
 
         case Dock::Hidden:
@@ -256,15 +252,15 @@ void DockAreaPrivate::reorderHandles()
     int index{0};
     for (auto h : handlers) {
         if (displayType == Dock::SplitView) {
-        h->setIndex(index++);
-        if (isVertical()) {
-            h->setX(0);
-            h->setWidth(q->width());
-        }
-        if (isHorizontal()) {
-            h->setY(0);
-            h->setHeight(q->height());
-        }
+            h->setIndex(index++);
+            if (isVertical()) {
+                h->setX(0);
+                h->setWidth(q->width());
+            }
+            if (isHorizontal()) {
+                h->setY(0);
+                h->setHeight(q->height());
+            }
         } else {
             h->setVisible(false);
         }
@@ -301,6 +297,14 @@ void DockAreaPrivate::normalizeItemSizes()
         else
             itemSizes[i] = itemSizes.at(i) / sum;
     }
+}
+
+void DockAreaPrivate::updateTabbedView()
+{
+    for (int i = 0; i < dockWidgets.count(); ++i)
+        dockWidgets.at(i)->setVisible(i == currentIndex);
+    if (tabBar)
+        tabBar->setCurrentIndex(currentIndex);
 }
 
 QRectF DockAreaPrivate::updateUsableArea()
@@ -381,8 +385,7 @@ void DockArea::hoverMoveEvent(QHoverEvent *event)
                                                      : Qt::ArrowCursor);
         break;
 
-    case Dock::Float:
-    case Dock::Center:
+    default:
         break;
     }
 }
@@ -414,8 +417,7 @@ bool DockArea::childMouseEventFilter(QQuickItem *, QEvent *e)
         case Dock::Top:
             break;
 
-        case Dock::Float:
-        case Dock::Center:
+        default:
             break;
         }
 
@@ -449,8 +451,7 @@ void DockArea::mousePressEvent(QMouseEvent *event)
         setKeepMouseGrab(true);
         break;
 
-    case Dock::Float:
-    case Dock::Center:
+    default:
         break;
     }
 }
@@ -501,16 +502,23 @@ void DockArea::geometryChanged(const QRectF &newGeometry,
     if (!d->dockWidgets.count() || !isComponentComplete())
         return;
 
-    d->rearrange();
+    d->relayout();
     d->arrangeTabBar();
+
     QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);
 }
 
 void DockArea::updatePolish()
 {
-    geometryChanged(QRectF(), QRectF());
-    qDebug() << "update polish";
+    Q_D(DockArea);
+
     QQuickPaintedItem::updatePolish();
+
+    if (!d->dockWidgets.count() || !isComponentComplete())
+        return;
+
+    d->relayout();
+    d->arrangeTabBar();
 }
 
 void DockArea::dockWidget_closed()
@@ -521,8 +529,6 @@ void DockArea::dockWidget_closed()
         removeDockWidget(qobject_cast<DockWidget *>(sender()));
     }
 }
-
-void DockArea::tabBar_currentIndexChanged(int index) {}
 
 void DockArea::tabBar_tabClicked(int index)
 {
@@ -734,7 +740,7 @@ void DockArea::addDockWidget(DockWidget *item)
     setCurrentIndex(d->dockWidgets.count() - 1);
 
     if (isComponentComplete())
-        d->rearrange();
+        d->relayout();
 
     connect(item, &DockWidget::closed, this, &DockArea::dockWidget_closed);
 
@@ -757,7 +763,9 @@ void DockArea::removeDockWidget(DockWidget *item)
         //d->tabBar->setCurrentIndex(d->tabBar->currentIndex());
     }
     setCurrentIndex(currentIndex());
+    setIsOpen(d->dockWidgets.count());
 
+    //remove one handler
     if (d->handlers.count()) {
         auto h = d->handlers.takeAt(d->handlers.count() - 1);
 
@@ -766,18 +774,18 @@ void DockArea::removeDockWidget(DockWidget *item)
             h->deleteLater();
         }
     }
-
-    if (!d->dockWidgets.count()){
-        update();
-    }
-
-    setIsOpen(d->dockWidgets.count());
-    geometryChanged(QRect(), QRect());
     d->normalizeItemSizes();
+    d->relayout();
 
-    if (d->displayType == Dock::SplitView)
-        d->reorderHandles();
-    d->reorderItems();
+//    if (!d->dockWidgets.count()){
+//        update();
+//    }
+
+//    geometryChanged(QRect(), QRect());
+
+//    if (d->displayType == Dock::SplitView)
+//        d->reorderHandles();
+//    d->reorderItems();
 
     emit dockWidgetsChanged(d->dockWidgets);
 }
@@ -902,11 +910,10 @@ void DockArea::setCurrentIndex(int currentIndex)
         return;
 
     d->currentIndex = newIndex;
-    for (int i = 0; i < d->dockWidgets.count(); ++i)
-        d->dockWidgets.at(i)->setVisible(i == currentIndex);
 
-    if (d->tabBar)
-        d->tabBar->setCurrentIndex(d->currentIndex);
+    if (d->displayType == Dock::TabbedView || d->displayType == Dock::StackedView)
+        d->updateTabbedView();
+
     emit currentIndexChanged(d->currentIndex);
 }
 

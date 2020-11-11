@@ -36,7 +36,7 @@ public:
     QRectF usableArea;
     Dock::DockWidgetDisplayType displayType;
 
-    void rearrange();
+    void relayout();
     void arrangeTabBar();
     bool isHorizontal() const;
     bool isVertical() const;
@@ -45,6 +45,8 @@ public:
     void reorderItems();
     void reorderHandles();
     void normalizeItemSizes();
+
+    void updateTabbedView();
     QRectF updateUsableArea();
     DockAreaResizeHandler *createHandlers();
 

@@ -23,28 +23,14 @@ int DockTabBar::currentIndex() const
 
 void DockTabBar::setCurrentIndex(int currentIndex)
 {
+    //allways do this even if m_currentIndex == currentIndex
+    for (int i = 0; i < _tabs.size(); ++i)
+        _tabs.at(i)->setChecked(i == currentIndex);
+
     if (m_currentIndex == currentIndex)
         return;
 
-//    if (currentIndex > _tabs.count() - 1) {
-//        qDebug() << "Invalid index";
-//        return;
-//    }
-//    if (currentIndex == -1) {
-//        for (auto &t : _tabs)
-//            t->setChecked(false);
-//        m_currentIndex = -1;
-//        emit currentIndexChanged(m_currentIndex);
-//        return;
-//    }
-
-    //    if (m_currentIndex != -1 && m_currentIndex <= _tabs.count() - 1)
-    //        _tabs.at(m_currentIndex)->setChecked(false);
-
-    if (m_currentIndex != -1 && m_currentIndex <= _tabs.count() - 1)
-        _tabs.at(m_currentIndex)->setChecked(false);
     m_currentIndex = currentIndex;
-    _tabs.at(m_currentIndex)->setChecked(true);
 
     emit currentIndexChanged(m_currentIndex);
 }

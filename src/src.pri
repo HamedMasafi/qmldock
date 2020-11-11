@@ -52,6 +52,7 @@ HEADERS += \
     $$PWD/dockarea.h \
     $$PWD/dockarea_p.h \
     $$PWD/dockcontainer.h \
+    $$PWD/dockcontainer_p.h \
     $$PWD/dockgroupresizehandler.h \
     $$PWD/dockmoveguide.h \
     $$PWD/dockplugin.h \

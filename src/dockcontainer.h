@@ -9,8 +9,12 @@ class DockWidget;
 class DockMoveGuide;
 class DockArea;
 class DockAreaResizeHandler;
+class DockContainerPrivate;
 class DockContainer : public QQuickPaintedItem {
     Q_OBJECT
+    Q_DECLARE_PRIVATE(DockContainer);
+    DockContainerPrivate *d_ptr;
+
     Q_PROPERTY(QList<DockWidget *> dockWidgets READ dockWidgets NOTIFY
                    dockWidgetsChanged)
     Q_PROPERTY(Qt::Edge topLeftOwner READ topLeftOwner WRITE setTopLeftOwner
@@ -22,16 +26,7 @@ class DockContainer : public QQuickPaintedItem {
     Q_PROPERTY(Qt::Edge bottomRightOwner READ bottomRightOwner WRITE
                    setBottomRightOwner NOTIFY bottomRightOwnerChanged)
     Q_PROPERTY(bool enableStateStoring READ enableStateStoring WRITE setEnableStateStoring NOTIFY enableStateStoringChanged)
-
-    QList<DockWidget *> _initialWidgets;
-    QList<DockWidget *> _dockWidgets;
-    DockMoveGuide *_dockMoveGuide;
-    QMap<Dock::Area, DockArea *> _dockAreas;
-    Qt::Edge m_topLeftOwner;
-    Qt::Edge m_topRightOwner;
-    Qt::Edge m_bottomLeftOwner;
-    Qt::Edge m_bottomRightOwner;
-    DockWidget *_activeDockWidget;
+    Q_PROPERTY(Dock::DockWidgetDisplayType defaultDisplayType READ defaultDisplayType WRITE setDefaultDisplayType NOTIFY defaultDisplayTypeChanged)
 
 public:
     DockContainer(QQuickItem *parent = nullptr);
@@ -50,6 +45,8 @@ signals:
     void bottomRightOwnerChanged(Qt::Edge bottomRightOwner);
 
     void enableStateStoringChanged(bool enableStateStoring);
+
+    void defaultDisplayTypeChanged(Dock::DockWidgetDisplayType defaultDisplayType);
 
 protected:
     void geometryChanged(const QRectF &newGeometry,
@@ -71,6 +68,8 @@ public slots:
 
     void setEnableStateStoring(bool enableStateStoring);
 
+    void setDefaultDisplayType(Dock::DockWidgetDisplayType defaultDisplayType);
+
 private slots:
     void dockWidget_beginMove();
     void dockWidget_moving(const QPointF &pt);
@@ -82,8 +81,6 @@ private:
     DockArea *createGroup(Dock::Area area, DockArea *item = nullptr);
     QRectF panelRect(Dock::Area area) const;
 
-    bool m_enableStateStoring;
-
 public:
     Qt::Edge topLeftOwner() const;
     Qt::Edge topRightOwner() const;
@@ -92,6 +89,7 @@ public:
 
     friend class DockMoveGuide;
     bool enableStateStoring() const;
+    Dock::DockWidgetDisplayType defaultDisplayType() const;
 };
 
 #endif // DOCKCONTAINER_H
