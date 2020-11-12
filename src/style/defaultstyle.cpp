@@ -438,10 +438,10 @@ void DefaultStyle::paintDockArea(QPainter *p, DockArea *item)
             rc.setBottom(rc.bottom() - resizeHandleSize());
             break;
         case Dock::Right:
-            rc.setX(rc.x() - resizeHandleSize());
+            rc.setX(rc.x() + resizeHandleSize());
             break;
         case Dock::Bottom:
-            rc.setY(rc.y() - resizeHandleSize());
+            rc.setY(rc.y() + resizeHandleSize());
             break;
         default:
             break;

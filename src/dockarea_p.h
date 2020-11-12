@@ -35,6 +35,8 @@ public:
     QQuickItem *tabBarItem;
     QRectF usableArea;
     Dock::DockWidgetDisplayType displayType;
+    QPointF tabBarPosition;
+    qreal tabBarWidth;
 
     void relayout();
     void arrangeTabBar();

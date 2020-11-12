@@ -487,6 +487,22 @@ DockArea *DockContainer::createGroup(Dock::Area area, DockArea *item)
     item->setPanelSize(120);
     item->setDisplayType(d->defaultDisplayType);
 
+    switch (area) {
+    case Dock::Left:
+        item->setTabPosition(Qt::LeftEdge);
+        break;
+    case Dock::Right:
+        item->setTabPosition(Qt::RightEdge);
+        break;
+
+    case Dock::Bottom:
+        item->setTabPosition(Qt::BottomEdge);
+        break;
+
+    default:
+        item->setTabPosition(Qt::TopEdge);
+        break;
+    }
     d->dockAreas.insert(area, item);
 
     return item;

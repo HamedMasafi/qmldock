@@ -39,28 +39,31 @@ void DockAreaPrivate::arrangeTabBar()
     if (!tabBarItem)
         return;
 
-    switch (tabPosition) {
-    case Qt::TopEdge:
-        tabBarItem->setX(0);
-        tabBarItem->setY(0);
-        tabBarItem->setWidth(q->width() - dockStyle->resizeHandleSize());
-        break;
-    case Qt::LeftEdge:
-        tabBarItem->setX(0);
-        tabBarItem->setY(q->height());
-        tabBarItem->setWidth(q->height());
-        break;
-    case Qt::RightEdge:
-        tabBarItem->setY(0);
-        tabBarItem->setX(q->width());
-        tabBarItem->setWidth(q->height());
-        break;
-    case Qt::BottomEdge:
-        tabBarItem->setX(0);
-        tabBarItem->setY(q->height() - tabBarItem->height());
-        tabBarItem->setWidth(q->width());
-        break;
-    }
+    //    auto r = dockStyle->resizeHandleSize();
+    //    switch (tabPosition) {
+    //    case Qt::TopEdge:
+    //        tabBarItem->setX(area == Dock::Right ? r : 0);
+    //        tabBarItem->setY(area == Dock::Bottom ? r : 0);
+    //        tabBarItem->setWidth(q->width() - *** dockStyle->resizeHandleSize());
+    //        break;
+    //    case Qt::LeftEdge:
+    //        tabBarItem->setX(0);
+    //        tabBarItem->setY(q->height());
+    //        tabBarItem->setWidth(q->height());
+    //        break;
+    //    case Qt::RightEdge:
+    //        tabBarItem->setX(q->width());
+    //        tabBarItem->setY(0);
+    //        tabBarItem->setWidth(q->height());
+    //        break;
+    //    case Qt::BottomEdge:
+    //        tabBarItem->setX(0);
+    //        tabBarItem->setY(q->height() - tabBarItem->height());
+    //        tabBarItem->setWidth(q->width());
+    //        break;
+    //    }
+    tabBarItem->setPosition(tabBarPosition);
+    tabBarItem->setWidth(tabBarWidth);
 }
 
 DockAreaResizeHandler *DockAreaPrivate::createHandlers()
@@ -334,6 +337,9 @@ QRectF DockAreaPrivate::updateUsableArea()
         default:
             break;
         }
+    tabBarPosition.setX(usableArea.x() - 1);
+    tabBarPosition.setY(usableArea.y() - 1);
+    tabBarWidth = usableArea.width();
     if (tabBarItem && displayType == Dock::TabbedView) {
         switch (tabPosition) {
         case Qt::TopEdge:
@@ -349,8 +355,8 @@ QRectF DockAreaPrivate::updateUsableArea()
             usableArea.setBottom(usableArea.bottom() - tabBarItem->height());
             break;
         }
-        auto a = dockStyle->widgetTabPadding();
-        usableArea.adjust(a, a, -a, -a);
+//        auto a = dockStyle->widgetTabPadding();
+//        usableArea.adjust(a, a, -a, -a);
     }
     return usableArea;
 }
@@ -537,10 +543,11 @@ void DockArea::tabBar_tabClicked(int index)
         && d->displayType != Dock::StackedView)
         return;
 
-    for (int i = 0; i < d->dockWidgets.count(); ++i) {
-        d->dockWidgets.at(i)->setVisible(i == index);
-    }
-    d->tabBar->setCurrentIndex(index);
+    //    for (int i = 0; i < d->dockWidgets.count(); ++i) {
+    //        d->dockWidgets.at(i)->setVisible(i == index);
+    //    }
+    //    d->tabBar->setCurrentIndex(index);
+    setCurrentIndex(index);
 }
 
 void DockArea::tabBar_closeButtonClicked(int index)
@@ -878,20 +885,22 @@ void DockArea::setTabPosition(Qt::Edge tabPosition)
 
     if (d->tabPosition == tabPosition)
         return;
-    switch (tabPosition) {
-    case Qt::TopEdge:
-    case Qt::BottomEdge:
-        d->tabBarItem->setRotation(0);
-        break;
 
-    case Qt::LeftEdge:
-        d->tabBarItem->setRotation(-90);
-        break;
+    if (d->tabBarItem)
+        switch (tabPosition) {
+        case Qt::TopEdge:
+        case Qt::BottomEdge:
+            d->tabBarItem->setRotation(0);
+            break;
 
-    case Qt::RightEdge:
-        d->tabBarItem->setRotation(90);
-        break;
-    }
+        case Qt::LeftEdge:
+            d->tabBarItem->setRotation(-90);
+            break;
+
+        case Qt::RightEdge:
+            d->tabBarItem->setRotation(90);
+            break;
+        }
     d->tabPosition = tabPosition;
 //    d->updateUsableArea();
 
