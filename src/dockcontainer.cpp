@@ -7,6 +7,8 @@
 #include "style/abstractstyle.h"
 #include "dockwindow.h"
 #include "dockarea.h"
+#include "dockwidgetmovehandler.h"
+#include "dockwidgetheader.h"
 
 #include <QDebug>
 #include <QPainter>
@@ -37,6 +39,8 @@ DockContainer::DockContainer(QQuickItem *parent)
 {
     Q_D(DockContainer);
     d->dockMoveGuide = new DockMoveGuide(this);
+
+//    setFiltersChildMouseEvents(true);
 }
 
 DockContainer::~DockContainer()
@@ -570,4 +574,17 @@ Dock::DockWidgetDisplayType DockContainer::defaultDisplayType() const
 {
     Q_D(const DockContainer);
     return d->defaultDisplayType;
+}
+
+bool DockContainer::childMouseEventFilter(QQuickItem *item, QEvent *event)
+{
+    auto handler = qobject_cast<DockWidgetMoveHandler *>(item);
+    if (handler) {
+        if (event->type() == QEvent::MouseButtonPress) {
+            handler->dockWidget()->setArea(Dock::Detached);
+            return true;
+        }
+    }
+
+    return false;
 }

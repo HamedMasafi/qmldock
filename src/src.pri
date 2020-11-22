@@ -34,6 +34,7 @@ SOURCES += \
     $$PWD/dockwidgetbackground.cpp \
     $$PWD/dockwidgetheader.cpp \
     $$PWD/dockwidgetheaderbutton.cpp \
+    $$PWD/dockwidgetmovehandler.cpp \
     $$PWD/dockwindow.cpp \
     $$PWD/movedropguide.cpp \
     $$PWD/style/abstractstyle.cpp \
@@ -64,6 +65,7 @@ HEADERS += \
     $$PWD/dockwidgetbackground.h \
     $$PWD/dockwidgetheader.h \
     $$PWD/dockwidgetheaderbutton.h \
+    $$PWD/dockwidgetmovehandler.h \
     $$PWD/dockwindow.h \
     $$PWD/movedropguide.h \
     $$PWD/style/abstractstyle.h \

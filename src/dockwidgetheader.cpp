@@ -2,6 +2,7 @@
 #include "dockwidget.h"
 #include "dockwidgetheader.h"
 #include "dockwidgetheaderbutton.h"
+#include "dockwidgetmovehandler.h"
 #include "dockwindow.h"
 
 #include <QDebug>
@@ -49,9 +50,11 @@ void DockWidgetHeader::setPinButtonVisible(bool pinButtonVisible)
 }
 
 DockWidgetHeader::DockWidgetHeader(DockWidget *parent)
-    : QQuickPaintedItem(parent), parentDock(parent)
-    , pinButton(new DockWidgetHeaderButton(this))
-    , closeButton(new DockWidgetHeaderButton(this))
+    : QQuickPaintedItem(parent),
+      parentDock(parent)
+      , pinButton{new DockWidgetHeaderButton(this)}
+      , closeButton{new DockWidgetHeaderButton(this)}
+      , moveHandler{new DockWidgetMoveHandler(this)}
       , _enableMove(true)
 
 {
@@ -76,6 +79,10 @@ DockWidgetHeader::DockWidgetHeader(DockWidget *parent)
             &DockWidgetHeaderButton::clicked,
             parent,
             &DockWidget::detach);
+
+    moveHandler->setParentItem(this);
+    moveHandler->setDockWidget(parent);
+
 }
 
 void DockWidgetHeader::paint(QPainter *painter)
@@ -135,34 +142,16 @@ void DockWidgetHeader::mouseReleaseEvent(QMouseEvent *event)
     ungrabMouse();
 }
 
-void DockWidgetHeader::hoverMoveEvent(QHoverEvent *event)
-{
-
-}
-
-void DockWidgetHeader::drawButton(QPainter *painter,
-                                  int index,
-                                  const QImage &icon,
-                                  ButtonStatus status)
-{
-    auto xx = width() - (0 + (24 * index));
-    QRectF rc(xx, 2, 18, 18);
-    painter->drawImage(rc, icon);
-
-
-    switch (status) {
-    case Hovered:
-        painter->drawEllipse(rc);
-        break;
-    default:
-        break;
-    }
-}
-
 void DockWidgetHeader::geometryChanged(const QRectF &newGeometry,
                                        const QRectF &oldGeometry)
 {
+    QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);
+
+    if (!isComponentComplete())
+        return;
+
     closeButton->setX(width() - 20);
     pinButton->setX(width() - 40);
-    QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);
+    moveHandler->setHeight(height());
+    moveHandler->setWidth(width() - 40);
 }

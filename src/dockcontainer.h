@@ -90,6 +90,10 @@ public:
     friend class DockMoveGuide;
     bool enableStateStoring() const;
     Dock::DockWidgetDisplayType defaultDisplayType() const;
+
+    // QQuickItem interface
+protected:
+    bool childMouseEventFilter(QQuickItem *, QEvent *) override;
 };
 
 #endif // DOCKCONTAINER_H

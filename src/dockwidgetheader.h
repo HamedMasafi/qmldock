@@ -6,6 +6,7 @@
 
 class DockWidget;
 class DockWidgetHeaderButton;
+class DockWidgetMoveHandler;
 class DockWidgetHeader : public QQuickPaintedItem
 {
     Q_OBJECT
@@ -14,8 +15,10 @@ class DockWidgetHeader : public QQuickPaintedItem
     QPointF _lastParentPos;
     bool _moveEmitted;
     QString _title;
+
     DockWidgetHeaderButton *pinButton;
     DockWidgetHeaderButton *closeButton;
+    DockWidgetMoveHandler *moveHandler;
     enum ButtonStatus {
         Normal,
         Hovered,
@@ -53,15 +56,7 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
-    void hoverMoveEvent(QHoverEvent *event);
 
-private:
-    void drawButton(QPainter *painter, int index, const QImage &icon, ButtonStatus status);
-
-    // QQuickItem interface
-protected:
-
-    // QQuickItem interface
 protected:
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
 };

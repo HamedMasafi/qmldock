@@ -473,11 +473,12 @@ void DefaultStyle::paintDockWidgetHeader(QPainter *p, DockWidgetHeader *item)
     QBrush b(m_mainColor);
     b.setStyle(Qt::Dense6Pattern);
     auto tw = QFontMetrics(font()).horizontalAdvance(item->title());
-    p->fillRect(10 + tw, 10, item->width() - 30 - tw, item->height() - 20, b);
+    auto padding = item->closeButtonVisible() ? 32 : 10;
+    p->fillRect(10 + tw, 10, item->width() - padding - 10 -tw, item->height() - 20, b);
     p->setPen(m_textColor);
     p->drawText(8,
                 0,
-                item->width() - 60,
+                item->width() - padding,
                 item->height(),
                 Qt::AlignVCenter,
                 item->title());
