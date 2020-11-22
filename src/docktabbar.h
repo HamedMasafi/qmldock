@@ -36,7 +36,7 @@ private slots:
     void tabButton_closeButtonClicked();
 
 public slots:
-    int addTab(const QString &name);
+    int addTab(const QString &name, bool closable);
     void removeTab(int index);
     void setCurrentIndex(int currentIndex);
 

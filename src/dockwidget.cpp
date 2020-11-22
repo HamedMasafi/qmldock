@@ -453,6 +453,7 @@ void DockWidget::componentComplete()
         d->titleBar->setVisible(true);
         d->titleBar->setZ(999);
         d->titleBar->setTitle(d->title);
+        d->titleBar->setCloseButtonVisible(d->closable);
 
         connect(d->titleBar,
                 &DockWidgetHeader::moveStarted,

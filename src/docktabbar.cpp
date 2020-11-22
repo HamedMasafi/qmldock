@@ -67,11 +67,12 @@ DockTabBar::DockTabBar(QQuickItem *parent)
             &DockTabBar::nextButton_clicked);
 }
 
-int DockTabBar::addTab(const QString &name)
+int DockTabBar::addTab(const QString &name, bool closable)
 {
     auto t = new DockTabButton{name, this};
     t->setFitSize(QFontMetrics(dockStyle->font()).horizontalAdvance(name) + 15);
     t->setY(0);
+    t->setShowCloseButton(closable);
     _tabsSize += t->width();
     connect(t, &DockTabButton::clicked, this, &DockTabBar::tabButton_clicked);
     connect(t, &DockTabButton::closeButtonClicked, this, &DockTabBar::tabButton_closeButtonClicked);
