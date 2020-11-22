@@ -53,9 +53,11 @@ public:
 
     QQuickItem * tabBar() const;
 
-public slots:
+private:
     void addDockWidget(DockWidget *item);
     void removeDockWidget(DockWidget *item);
+
+public slots:
     void setIsOpen(bool isOpen);
     void setPanelSize(qreal panelSize);
     void setArea(Dock::Area area);
@@ -101,6 +103,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
 
+    friend class DockContainer;
 };
 
 #endif // DOCKAREA_H

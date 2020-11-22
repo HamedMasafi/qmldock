@@ -14,6 +14,7 @@ public:
     DockContainerPrivate(DockContainer *parent);
     QList<DockWidget *> initialWidgets;
     QList<DockWidget *> dockWidgets;
+    QList<DockWidget *> removedDockWidgets;
     QMap<Dock::Area, DockArea *> dockAreas;
 
     DockMoveGuide *dockMoveGuide;

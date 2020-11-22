@@ -5,6 +5,7 @@
 #include "dockwidgetbackground.h"
 #include "dockwidgetmovehandler.h"
 #include "dockwindow.h"
+#include "dockarea.h"
 #include "style/abstractstyle.h"
 #include "dockcontainer.h"
 
@@ -116,17 +117,31 @@ void DockWidget::beginDetach()
     Q_D(DockWidget);
     setArea(Dock::Detached);
 
-//    d->titleBar->grabMouse();
+    //    d->titleBar->grabMouse();
+}
+
+void DockWidget::open()
+{
+    //    Q_D(DockWidget);
+    //    if (d->isDetached && d->dockWindow)
+    //        d->dockWindow->setVisible(true);
+    //    else
+    //        setVisible(false);
+    //    d->isClosed = true;
+    if (!dockArea())
+        return;
+    emit opened();
 }
 
 void DockWidget::close()
 {
-    Q_D(DockWidget);
-    if (d->isDetached && d->dockWindow)
-        d->dockWindow->setVisible(false);
-    else
-        setVisible(false);
-    d->isClosed = true;
+//    Q_D(DockWidget);
+//    if (d->isDetached && d->dockWindow)
+//        d->dockWindow->setVisible(false);
+//    else
+//        setVisible(false);
+//    d->isClosed = true;
+//    dockArea()->removeDockWidget(this);
     emit closed();
 }
 
@@ -489,6 +504,7 @@ DockContainer *DockWidget::dockContainer() const
 void DockWidget::setDockContainer(DockContainer *dockContainer)
 {
     Q_D(DockWidget);
+    setParentItem(dockContainer);
     d->dockContainer = dockContainer;
 }
 

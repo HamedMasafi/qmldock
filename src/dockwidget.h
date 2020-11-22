@@ -26,6 +26,7 @@ class DockWidget : public QQuickPaintedItem {
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     Q_PROPERTY(Dock::Areas allowedAreas READ allowedAreas WRITE setAllowedAreas NOTIFY allowedAreasChanged)
     Q_PROPERTY(bool isActive READ isActive WRITE setIsActive NOTIFY isActiveChanged)
+
 //    Q_PROPERTY(DockWidgetFlags flags READ flags WRITE setFlags NOTIFY flagsChanged)
 
 public:
@@ -70,6 +71,7 @@ public slots:
     void detach();
 
     void beginDetach();
+    void open();
     void close();
     void restoreSize();
 
@@ -109,6 +111,7 @@ signals:
     void moving(const QPointF &pt);
     void moved();
     void closed();
+    void opened();
     void areaChanged(Dock::Area area);
     void closableChanged(bool closable);
     void resizableChanged(bool resizable);

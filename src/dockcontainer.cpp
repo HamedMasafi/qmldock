@@ -176,6 +176,8 @@ void DockContainer::addDockWidget(DockWidget *widget)
 
     connect(widget, &DockWidget::moving, this, &DockContainer::dockWidget_moving);
     connect(widget, &DockWidget::moved, this, &DockContainer::dockWidget_moved);
+    connect(widget, &DockWidget::closed, this, &DockContainer::dockWidget_closed);
+    connect(widget, &DockWidget::opened, this, &DockContainer::dockWidget_opened);
     connect(widget,
             &QQuickItem::visibleChanged,
             this,
@@ -216,6 +218,15 @@ void DockContainer::addDockWidget(DockWidget *widget)
         reorderDockAreas();
 
     emit dockWidgetsChanged(d->dockWidgets);
+}
+
+void DockContainer::removeDockWidget(DockWidget *widget)
+{
+    Q_D(DockContainer);
+    if (widget->dockArea())
+        widget->dockArea()->removeDockWidget(widget);
+    widget->setParentItem(nullptr);
+    d->removedDockWidgets.append(widget);
 }
 
 void DockContainer::reorderDockAreas()
@@ -433,6 +444,15 @@ void DockContainer::dockWidget_moved()
     default:
         break;
     }
+}
+
+void DockContainer::dockWidget_opened() {}
+
+void DockContainer::dockWidget_closed()
+{
+    auto w = qobject_cast<DockWidget *>(sender());
+    if (w)
+        removeDockWidget(w);
 }
 
 void DockContainer::dockWidget_visibleChanged()

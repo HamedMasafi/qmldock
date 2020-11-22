@@ -59,6 +59,7 @@ public slots:
     void restoreSettings();
 
     void addDockWidget(DockWidget *widget);
+    void removeDockWidget(DockWidget *widget);
     void reorderDockAreas();
 
     void setTopLeftOwner(Qt::Edge topLeftOwner);
@@ -74,6 +75,8 @@ private slots:
     void dockWidget_beginMove();
     void dockWidget_moving(const QPointF &pt);
     void dockWidget_moved();
+    void dockWidget_opened();
+    void dockWidget_closed();
     void dockWidget_visibleChanged();
 
 private:
