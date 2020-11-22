@@ -40,7 +40,7 @@ DockContainer::DockContainer(QQuickItem *parent)
     Q_D(DockContainer);
     d->dockMoveGuide = new DockMoveGuide(this);
 
-//    setFiltersChildMouseEvents(true);
+    setFiltersChildMouseEvents(true);
 }
 
 DockContainer::~DockContainer()
@@ -578,9 +578,14 @@ Dock::DockWidgetDisplayType DockContainer::defaultDisplayType() const
 
 bool DockContainer::childMouseEventFilter(QQuickItem *item, QEvent *event)
 {
+
     auto handler = qobject_cast<DockWidgetMoveHandler *>(item);
     if (handler) {
         if (event->type() == QEvent::MouseButtonPress) {
+            auto me = static_cast<QMouseEvent *>(event);
+
+
+            handler->mousePressEvent(me);
             handler->dockWidget()->setArea(Dock::Detached);
             return true;
         }

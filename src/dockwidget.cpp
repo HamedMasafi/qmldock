@@ -3,6 +3,7 @@
 #include "dockwidgetheader.h"
 #include "debugrect.h"
 #include "dockwidgetbackground.h"
+#include "dockwidgetmovehandler.h"
 #include "dockwindow.h"
 #include "style/abstractstyle.h"
 #include "dockcontainer.h"
@@ -455,16 +456,17 @@ void DockWidget::componentComplete()
         d->titleBar->setTitle(d->title);
         d->titleBar->setCloseButtonVisible(d->closable);
 
-        connect(d->titleBar,
-                &DockWidgetHeader::moveStarted,
+        auto handler = d->titleBar->moveHandler();
+        connect(handler,
+                &DockWidgetMoveHandler::moveStarted,
                 this,
                 &DockWidget::header_moveStarted);
-        connect(d->titleBar,
-                &DockWidgetHeader::moving,
+        connect(handler,
+                &DockWidgetMoveHandler::moving,
                 this,
                 &DockWidget::header_moving);
-        connect(d->titleBar,
-                &DockWidgetHeader::moveEnded,
+        connect(handler,
+                &DockWidgetMoveHandler::moveEnded,
                 this,
                 &DockWidget::header_moveEnded);
     }

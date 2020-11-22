@@ -3,7 +3,7 @@
 #include "dockwindow.h"
 
 DockWidgetMoveHandler::DockWidgetMoveHandler(QQuickItem *parent)
-: QQuickItem(parent)
+    : QQuickItem(parent), _enableMove{true}
 {
     setAcceptedMouseButtons(Qt::LeftButton);
     setCursor(Qt::ArrowCursor);
@@ -24,54 +24,53 @@ void DockWidgetMoveHandler::setDockWidget(DockWidget *dockWidget)
 }
 
 
-//void DockWidgetMoveHandler::mousePressEvent(QMouseEvent *event)
-//{
-//    if (!_enableMove) {
-//        event->ignore();
-//        return;
-//    }
-//    _moveEmitted = false;
-//    if (m_dockWidget->getIsDetached()) {
-//        _lastParentPos = m_dockWidget->dockWindow()->position();
-//        _lastMousePos = event->globalPos();
-//    } else {
-//        _lastMousePos = event->windowPos();
-//        _lastParentPos = m_dockWidget->position();
-//    }
+void DockWidgetMoveHandler::mousePressEvent(QMouseEvent *event)
+{
+    if (!_enableMove) {
+        event->ignore();
+        return;
+    }
+    _moveEmitted = false;
+    if (m_dockWidget->getIsDetached()) {
+        _lastParentPos = m_dockWidget->dockWindow()->position();
+        _lastMousePos = event->globalPos();
+    } else {
+        _lastMousePos = event->windowPos();
+        _lastParentPos = m_dockWidget->position();
+    }
 //    grabMouse();
-//}
+}
 
-//void DockWidgetMoveHandler::mouseMoveEvent(QMouseEvent *event)
-//{
-//    if (!_enableMove) {
-//        event->ignore();
-//        return;
-//    }
-//    if (_moveEmitted) {
-//        if (m_dockWidget->getIsDetached())
-//            emit moving(_lastParentPos + (event->globalPos() - _lastMousePos),
-//                        event->pos() + m_dockWidget->dockWindow()->position());
-//        else
-//            emit moving(_lastParentPos + (event->windowPos() - _lastMousePos),
-//                        event->pos() + m_dockWidget->position());
-//    } else {
-//        emit moveStarted();
-//        _moveEmitted = true;
-//    }
-//    //    m_dockWidget->setPosition(_lastParentPos + (event->windowPos() - _lastMousePos));
-//}
+void DockWidgetMoveHandler::mouseMoveEvent(QMouseEvent *event)
+{
+    if (!_enableMove) {
+        event->ignore();
+        return;
+    }
+    if (_moveEmitted) {
+        if (m_dockWidget->getIsDetached())
+            emit moving(_lastParentPos + (event->globalPos() - _lastMousePos),
+                        event->pos() + m_dockWidget->dockWindow()->position());
+        else
+            emit moving(_lastParentPos + (event->windowPos() - _lastMousePos),
+                        event->pos() + m_dockWidget->position());
+    } else {
+        emit moveStarted();
+        _moveEmitted = true;
+    }
+}
 
-//void DockWidgetMoveHandler::mouseReleaseEvent(QMouseEvent *event)
-//{
-//    if (!_enableMove) {
-//        event->ignore();
-//        return;
-//    }
-//    Q_UNUSED(event)
+void DockWidgetMoveHandler::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (!_enableMove) {
+        event->ignore();
+        return;
+    }
+    Q_UNUSED(event)
 
-//    if (_moveEmitted)
-//        emit moveEnded();
+    if (_moveEmitted)
+        emit moveEnded();
 
-//    _moveEmitted = false;
-//    ungrabMouse();
-//}
+    _moveEmitted = false;
+    ungrabMouse();
+}

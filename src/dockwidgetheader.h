@@ -10,7 +10,7 @@ class DockWidgetMoveHandler;
 class DockWidgetHeader : public QQuickPaintedItem
 {
     Q_OBJECT
-    DockWidget *parentDock;
+    DockWidget *_parentDock;
     QPointF _lastMousePos;
     QPointF _lastParentPos;
     bool _moveEmitted;
@@ -18,7 +18,7 @@ class DockWidgetHeader : public QQuickPaintedItem
 
     DockWidgetHeaderButton *pinButton;
     DockWidgetHeaderButton *closeButton;
-    DockWidgetMoveHandler *moveHandler;
+    DockWidgetMoveHandler *_moveHandler;
     enum ButtonStatus {
         Normal,
         Hovered,
@@ -28,10 +28,10 @@ class DockWidgetHeader : public QQuickPaintedItem
 public:
     DockWidgetHeader(DockWidget *parent = nullptr);
 
-signals:
-    void moveStarted();
-    void moving(const QPointF &windowPos, const QPointF &cursorPos);
-    void moveEnded();
+//signals:
+//    void moveStarted();
+//    void moving(const QPointF &windowPos, const QPointF &cursorPos);
+//    void moveEnded();
 
     // QQuickPaintedItem interface
 public:
@@ -49,13 +49,17 @@ public:
     bool pinButtonVisible() const;
     void setPinButtonVisible(bool pinButtonVisible);
 
+    DockWidget *parentDock() const;
+
+    DockWidgetMoveHandler *moveHandler() const;
+
 public slots:
     void setTitle(const QString &title);
 
-protected:
-    void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
+//protected:
+//    void mousePressEvent(QMouseEvent *event);
+//    void mouseMoveEvent(QMouseEvent *event);
+//    void mouseReleaseEvent(QMouseEvent *event);
 
 protected:
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
