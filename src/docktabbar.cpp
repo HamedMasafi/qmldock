@@ -2,6 +2,7 @@
 #include "docktabbar.h"
 #include "docktabbutton.h"
 #include "docktabbararrorbutton.h"
+#include "dockwidget.h"
 
 #include <QPainter>
 #include <QApplication>
@@ -67,15 +68,17 @@ DockTabBar::DockTabBar(QQuickItem *parent)
             &DockTabBar::nextButton_clicked);
 }
 
-int DockTabBar::addTab(const QString &name, bool closable)
+int DockTabBar::addTab(DockWidget *widget)
 {
-    auto t = new DockTabButton{name, this};
-    t->setFitSize(QFontMetrics(dockStyle->font()).horizontalAdvance(name) + 15);
+    auto t = new DockTabButton{widget->title(), this};
+    t->setFitSize(
+        QFontMetrics(dockStyle->font()).horizontalAdvance(widget->title()) + 15);
     t->setY(0);
-    t->setShowCloseButton(closable);
+    t->setShowCloseButton(widget->closable());
     _tabsSize += t->width();
     connect(t, &DockTabButton::clicked, this, &DockTabBar::tabButton_clicked);
     connect(t, &DockTabButton::closeButtonClicked, this, &DockTabBar::tabButton_closeButtonClicked);
+    connect(widget, &DockWidget::titleChanged, t, &DockTabButton::setTitle);
     _tabs.append(t);
     reorderTabs();
     return _tabs.count() - 1;

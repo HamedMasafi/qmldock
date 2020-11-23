@@ -732,7 +732,7 @@ void DockArea::addDockWidget(DockWidget *item)
     d->normalizeItemSizes();
 
     if (d->tabBar)
-        d->tabBar->addTab(item->title(), item->closable());
+        d->tabBar->addTab(item);
 
     if (d->dockWidgets.count() > 1) {
         auto h = d->createHandlers();

@@ -3,6 +3,7 @@
 
 #include <QQuickPaintedItem>
 
+class DockWidget;
 class DockTabButton;
 class DockTabBarArrorButton;
 class DockTabBar : public QQuickPaintedItem
@@ -36,7 +37,7 @@ private slots:
     void tabButton_closeButtonClicked();
 
 public slots:
-    int addTab(const QString &name, bool closable);
+    int addTab(DockWidget *widget);
     void removeTab(int index);
     void setCurrentIndex(int currentIndex);
 
