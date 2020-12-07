@@ -34,34 +34,32 @@ void DockAreaPrivate::relayout()
 
 void DockAreaPrivate::arrangeTabBar()
 {
-    Q_Q(DockArea);
-
     if (!tabBarItem)
         return;
 
-    //    auto r = dockStyle->resizeHandleSize();
-    //    switch (tabPosition) {
-    //    case Qt::TopEdge:
-    //        tabBarItem->setX(area == Dock::Right ? r : 0);
-    //        tabBarItem->setY(area == Dock::Bottom ? r : 0);
-    //        tabBarItem->setWidth(q->width() - *** dockStyle->resizeHandleSize());
-    //        break;
-    //    case Qt::LeftEdge:
-    //        tabBarItem->setX(0);
-    //        tabBarItem->setY(q->height());
-    //        tabBarItem->setWidth(q->height());
-    //        break;
-    //    case Qt::RightEdge:
-    //        tabBarItem->setX(q->width());
-    //        tabBarItem->setY(0);
-    //        tabBarItem->setWidth(q->height());
-    //        break;
-    //    case Qt::BottomEdge:
-    //        tabBarItem->setX(0);
-    //        tabBarItem->setY(q->height() - tabBarItem->height());
-    //        tabBarItem->setWidth(q->width());
-    //        break;
-    //    }
+//    auto r = dockStyle->resizeHandleSize();
+//    switch (tabPosition) {
+//    case Qt::TopEdge:
+//        tabBarItem->setX(area == Dock::Right ? r : 0);
+//        tabBarItem->setY(area == Dock::Bottom ? r : 0);
+//        tabBarItem->setWidth(tabBarWidth);
+//        break;
+//    case Qt::LeftEdge:
+//        tabBarItem->setX(0);
+//        tabBarItem->setY(q->height());
+//        tabBarItem->setWidth(q->height());
+//        break;
+//    case Qt::RightEdge:
+//        tabBarItem->setX(q->width());
+//        tabBarItem->setY(0);
+//        tabBarItem->setWidth(q->height());
+//        break;
+//    case Qt::BottomEdge:
+//        tabBarItem->setX(0);
+//        tabBarItem->setY(q->height() - tabBarItem->height());
+//        tabBarItem->setWidth(q->width());
+//        break;
+//    }
     tabBarItem->setPosition(tabBarPosition);
     tabBarItem->setWidth(tabBarWidth);
 }
@@ -346,12 +344,18 @@ QRectF DockAreaPrivate::updateUsableArea()
             usableArea.setTop(usableArea.top() + tabBarItem->height());
             break;
         case Qt::RightEdge:
+            tabBarPosition = QPointF(q->width(), 0);
+            tabBarWidth = usableArea.height();
             usableArea.setRight(usableArea.right() - tabBarItem->height());
             break;
         case Qt::LeftEdge:
+            tabBarPosition = QPointF(0, q->height());
+            tabBarWidth = usableArea.height();
             usableArea.setLeft(usableArea.left() + tabBarItem->height());
             break;
         case Qt::BottomEdge:
+            tabBarPosition = QPointF(0, q->height() - tabBarItem->height());
+            tabBarWidth = usableArea.width();
             usableArea.setBottom(usableArea.bottom() - tabBarItem->height());
             break;
         }
@@ -689,6 +693,7 @@ Qt::Edge DockArea::tabPosition() const
 void DockArea::componentComplete()
 {
     Q_D(DockArea);
+    QQuickPaintedItem::componentComplete();
     if (!d->tabBarItem) {
         d->tabBar = new DockTabBar(this);
         d->tabBar->setVisible(false);
@@ -704,10 +709,25 @@ void DockArea::componentComplete()
                 &DockTabBar::closeButtonClicked,
                 this,
                 &DockArea::tabBar_closeButtonClicked);
+
+        switch (d->tabPosition) {
+        case Qt::TopEdge:
+        case Qt::BottomEdge:
+            d->tabBarItem->setRotation(0);
+            break;
+
+        case Qt::LeftEdge:
+            d->tabBarItem->setRotation(-90);
+            break;
+
+        case Qt::RightEdge:
+            d->tabBarItem->setRotation(90);
+            break;
+        }
+        d->tabBar->setEdge(d->tabPosition);
     }
 
     d->tabBarItem->setVisible(d->displayType == Dock::TabbedView);
-    QQuickPaintedItem::componentComplete();
 }
 
 QQuickItem *DockArea::tabBar() const
@@ -880,10 +900,13 @@ void DockArea::setTabPosition(Qt::Edge tabPosition)
 {
     Q_D(DockArea);
 
-    if (!isComponentComplete())
-        return;
 
     if (d->tabPosition == tabPosition)
+        return;
+
+    d->tabPosition = tabPosition;
+
+    if (!isComponentComplete())
         return;
 
     if (d->tabBarItem)
@@ -901,8 +924,8 @@ void DockArea::setTabPosition(Qt::Edge tabPosition)
             d->tabBarItem->setRotation(90);
             break;
         }
-    d->tabPosition = tabPosition;
-//    d->updateUsableArea();
+
+    //d->updateUsableArea();
 
     if (d->tabBar)
         d->tabBar->setEdge(tabPosition);

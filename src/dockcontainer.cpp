@@ -500,8 +500,10 @@ int DockContainer::panelSize(Dock::Area area) const
 DockArea *DockContainer::createGroup(Dock::Area area, DockArea *item)
 {
     Q_D(DockContainer);
-    if (d->dockAreas.contains(area))
+    if (d->dockAreas.contains(area)) {
+        qDebug() << "The area" << area << "exists" << d->dockAreas.value(area)->tabPosition();
         return d->dockAreas.value(area);
+    }
 
     if (!item)
         item = new DockArea(this);
