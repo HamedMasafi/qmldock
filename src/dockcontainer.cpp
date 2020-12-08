@@ -161,7 +161,7 @@ void DockContainer::itemChange(QQuickItem::ItemChange change,
 void DockContainer::addDockWidget(DockWidget *widget)
 {
     Q_D(DockContainer);
-    qDebug() << Q_FUNC_INFO;
+
     widget->setZ(widget->area() == Dock::Float ? Z_WIDGET_FLOAT : Z_WIDGET);
 
     widget->setDockContainer(this);
@@ -501,7 +501,6 @@ DockArea *DockContainer::createGroup(Dock::Area area, DockArea *item)
 {
     Q_D(DockContainer);
     if (d->dockAreas.contains(area)) {
-        qDebug() << "The area" << area << "exists" << d->dockAreas.value(area)->tabPosition();
         return d->dockAreas.value(area);
     }
 
