@@ -178,7 +178,7 @@ void DockAreaPrivate::fitItem(QQuickItem *item)
 //                       - dockStyle->tabBarHeight()));
         break;
 
-    case Dock::Float:
+    default:
         break;
     }
 }

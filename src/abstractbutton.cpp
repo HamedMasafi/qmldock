@@ -38,6 +38,7 @@ void AbstractButton::hoverLeaveEvent(QHoverEvent *event)
 
 void AbstractButton::mousePressEvent(QMouseEvent *event)
 {
+    Q_UNUSED(event)
     _status = Dock::Pressed;
     update();
 }
