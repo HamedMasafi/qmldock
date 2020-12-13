@@ -4,6 +4,7 @@
 #include "dockwidgetheaderbutton.h"
 
 #include <QDebug>
+#include <QCursor>
 #include <QFontMetrics>
 
 DockTabBar *DockTabButton::parentTabBar() const
@@ -41,6 +42,8 @@ DockTabButton::DockTabButton(QString title, DockTabBar *parent)
 {
     setAcceptedMouseButtons(Qt::LeftButton);
     setAcceptHoverEvents(true);
+    setCursor(Qt::ArrowCursor);
+
     _closeButton = new DockWidgetHeaderButton(this);
     _closeButton->setParentItem(this);
     _closeButton->setIcon(Dock::CloseIcon);

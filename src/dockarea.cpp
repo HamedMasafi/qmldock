@@ -786,6 +786,7 @@ void DockArea::removeDockWidget(DockWidget *item)
     item->setDockArea(nullptr);
 
     if (d->tabBar) {
+        d->tabBar->setCurrentIndex(-1);
         d->tabBar->removeTab(index);
         //d->tabBar->setCurrentIndex(d->tabBar->currentIndex());
     }
