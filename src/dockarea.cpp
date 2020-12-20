@@ -782,11 +782,13 @@ void DockArea::removeDockWidget(DockWidget *item)
     if (index == -1)
         return;
 
+    auto removedTabIndex = d->dockWidgets.indexOf(item);
+
     d->dockWidgets.removeOne(item);
     item->setDockArea(nullptr);
 
     if (d->tabBar) {
-        d->tabBar->setCurrentIndex(-1);
+//        d->tabBar->setCurrentIndex(-1);
         d->tabBar->removeTab(index);
         //d->tabBar->setCurrentIndex(d->tabBar->currentIndex());
     }
@@ -804,6 +806,14 @@ void DockArea::removeDockWidget(DockWidget *item)
     }
     d->normalizeItemSizes();
     d->relayout();
+
+    if (d->dockWidgets.size()) {
+        d->currentIndex = -1;
+        if (d->currentIndex == removedTabIndex) {
+            removedTabIndex--;
+        }
+        setCurrentIndex(removedTabIndex);
+    }
 
 //    if (!d->dockWidgets.count()){
 //        update();
