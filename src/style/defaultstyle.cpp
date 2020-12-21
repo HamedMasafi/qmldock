@@ -294,6 +294,7 @@ void DefaultStyle::paintTabBar(QPainter *p, DockTabBar *item)
 {
     Q_UNUSED(p)
     Q_UNUSED(item)
+//    p->fillRect(item->clipRect(), Qt::red);
 }
 
 void DefaultStyle::paintTabButton(QPainter *p,
@@ -306,7 +307,7 @@ void DefaultStyle::paintTabButton(QPainter *p,
     switch (status) {
     case Dock::Normal:
         p->setPen(m_borderColor);
-        rc.setBottom(rc.bottom() - 1);
+        rc.setBottom(rc.bottom());
         p->fillRect(rc, m_backgroundColor);
         if (item->parentTabBar()->edge() == Qt::BottomEdge)
             drawLineOnEdge(p, item, Qt::TopEdge);
@@ -317,7 +318,7 @@ void DefaultStyle::paintTabButton(QPainter *p,
 
     case Dock::Hovered:
         p->setPen(m_borderColor);
-        rc.setBottom(rc.bottom() - 1);
+        rc.setBottom(rc.bottom());
         p->setBrush(hoverColor());
         p->fillRect(rc, hoverColor());
         if (item->parentTabBar()->edge() == Qt::BottomEdge)

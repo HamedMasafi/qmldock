@@ -349,8 +349,9 @@ QRectF DockAreaPrivate::updateUsableArea()
             usableArea.setRight(usableArea.right() - tabBarItem->height());
             break;
         case Qt::LeftEdge:
-            tabBarPosition = QPointF(0, q->height());
-            tabBarWidth = usableArea.height();
+            tabBarPosition = usableArea.bottomLeft();
+            //QPointF(0, q->height());
+            tabBarWidth = usableArea.height() + 1;
             usableArea.setLeft(usableArea.left() + tabBarItem->height());
             break;
         case Qt::BottomEdge:
