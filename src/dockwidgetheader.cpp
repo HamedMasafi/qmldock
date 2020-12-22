@@ -93,6 +93,7 @@ DockWidgetHeader::DockWidgetHeader(DockWidget *parent)
     _moveHandler->setParentItem(this);
     _moveHandler->setDockWidget(parent);
 
+    AbstractStyle::registerThemableItem(this);
 }
 
 void DockWidgetHeader::paint(QPainter *painter)

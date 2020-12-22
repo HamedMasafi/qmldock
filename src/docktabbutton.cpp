@@ -52,6 +52,8 @@ DockTabButton::DockTabButton(QString title, DockTabBar *parent)
             &DockWidgetHeaderButton::clicked,
             this,
             &DockTabButton::closeButtonClicked);
+
+    AbstractStyle::registerThemableItem(this);
 }
 
 void DockTabButton::paint(QPainter *painter)

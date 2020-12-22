@@ -1,7 +1,10 @@
 #include "abstractstyle.h"
 #include "defaultstyle.h"
 
+#include <dockcontainer.h>
+
 AbstractStyle *AbstractStyle::_style{nullptr};
+QList<QQuickItem*> AbstractStyle::_items;
 
 AbstractStyle *AbstractStyle::style()
 {
@@ -10,9 +13,20 @@ AbstractStyle *AbstractStyle::style()
     return _style;
 }
 
-void AbstractStyle::setStyle(AbstractStyle *style)
+void AbstractStyle::setStyle(AbstractStyle *style, bool deleteOldStyle)
 {
-    if (Q_UNLIKELY(_style))
+    if (deleteOldStyle && Q_UNLIKELY(_style))
         delete _style;
     _style = style;
+
+    for (auto i = _items.begin(); i != _items.end(); ++i)
+        (*i)->update();
+}
+
+void AbstractStyle::registerThemableItem(QQuickItem *item)
+{
+    _items.append(item);
+    QObject::connect(item, &QObject::destroyed, [item]() {
+        _items.removeOne(item);
+    });
 }

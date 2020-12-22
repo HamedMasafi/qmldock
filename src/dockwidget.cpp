@@ -99,6 +99,7 @@ DockWidget::DockWidget(QQuickItem *parent)
     setClip(true);
     setAcceptHoverEvents(true);
     setAcceptedMouseButtons(Qt::LeftButton);
+    AbstractStyle::registerThemableItem(this);
 }
 
 DockWidget::~DockWidget()

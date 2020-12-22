@@ -42,6 +42,7 @@ DockTabBar::DockTabBar(QQuickItem *parent)
       , m_currentIndex{-1}
       , _tabsStartPos{0.}
 {
+    AbstractStyle::registerThemableItem(this);
     setClip(true);
 
     _prevButton = new DockTabBarArrorButton(this);

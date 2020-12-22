@@ -41,6 +41,7 @@ DockContainer::DockContainer(QQuickItem *parent)
     d->dockMoveGuide = new DockMoveGuide(this);
 
     setFiltersChildMouseEvents(true);
+    AbstractStyle::registerThemableItem(this);
 }
 
 DockContainer::~DockContainer()

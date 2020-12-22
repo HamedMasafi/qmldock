@@ -7,6 +7,7 @@ AbstractButton::AbstractButton(QQuickItem *parent)
     setSize(QSizeF(16, 16));
     setAcceptHoverEvents(true);
     setAcceptedMouseButtons(Qt::LeftButton);
+    AbstractStyle::registerThemableItem(this);
 }
 Dock::Icon AbstractButton::icon() const
 {

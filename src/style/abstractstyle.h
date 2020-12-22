@@ -22,11 +22,13 @@ class DockTabBarArrorButton;
 class AbstractStyle
 {
     static AbstractStyle *_style;
+    static QList<QQuickItem*> _items;
 public:
     AbstractStyle() = default;
     virtual ~AbstractStyle() = default;
     static AbstractStyle *style();
-    static void setStyle(AbstractStyle *style);
+    static void setStyle(AbstractStyle *style, bool deleteOldStyle = true);
+    static void registerThemableItem(QQuickItem *item);
 
     virtual QFont font() const = 0;
 
