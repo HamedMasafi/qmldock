@@ -60,14 +60,14 @@ void DockContainer::componentComplete()
         d->dockAreas[Dock::Center]->setDisplayType(Dock::TabbedView);
     }
     connect(window(), &QQuickWindow::activeFocusItemChanged, [this, d]() {
-        auto dockWidget = Dock::findInParents<DockWidget>(
-            window()->activeFocusItem());
-        if (dockWidget) {
-            if (d->activeDockWidget)
-                d->activeDockWidget->setIsActive(false);
-            d->activeDockWidget = dockWidget;
-            d->activeDockWidget->setIsActive(true);
-        }
+//        auto dockWidget = Dock::findInParents<DockWidget>(
+//            window()->activeFocusItem());
+//        if (dockWidget) {
+//            if (d->activeDockWidget)
+//                d->activeDockWidget->setIsActive(false);
+//            d->activeDockWidget = dockWidget;
+//            d->activeDockWidget->setIsActive(true);
+//        }
     });
     createGroup(Dock::Left);
     createGroup(Dock::Right);

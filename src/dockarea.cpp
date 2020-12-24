@@ -955,7 +955,11 @@ void DockArea::setCurrentIndex(int currentIndex)
     if (d->currentIndex == newIndex)
         return;
 
+    if (d->currentIndex > 0 && d->currentIndex < d->dockWidgets.size())
+        d->dockWidgets.at(d->currentIndex)->setIsActive(false);
+
     d->currentIndex = newIndex;
+    d->dockWidgets.at(d->currentIndex)->setIsActive(true);
 
     if (d->displayType == Dock::TabbedView || d->displayType == Dock::StackedView)
         d->updateTabbedView();

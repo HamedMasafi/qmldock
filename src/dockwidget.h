@@ -129,7 +129,9 @@ signals:
 
 private:
     void setIsActive(bool isActive);
+
     friend class DockContainer;
+    friend class DockArea;
 };
 
 #endif // DOCKWIDGET_H
