@@ -82,6 +82,7 @@ void DockTabButton::setChecked(bool checked)
 
 void DockTabButton::mousePressEvent(QMouseEvent *event)
 {
+    Q_UNUSED(event)
     if (_status == Dock::Checked)
         return;
 

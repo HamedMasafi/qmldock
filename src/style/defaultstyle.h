@@ -99,11 +99,11 @@ private:
     QColor m_backgroundColor;
     QColor m_mainColor;
     QColor m_borderColor;
+    QColor m_widgetColor;
     QColor m_hoverColor;
     QColor m_pressColor;
     QColor m_tabAreaColor;
     QColor m_textColor;
-    QColor m_widgetColor;
     QColor m_activeTextColor;
 
 };

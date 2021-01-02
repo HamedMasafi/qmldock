@@ -12,7 +12,7 @@
 #include <QPainter>
 
 DockAreaPrivate::DockAreaPrivate(DockArea *parent)
-    : q_ptr(parent), mousepRessed{false}, currentIndex{-1},
+    : q_ptr(parent), currentIndex{-1}, mousePressed{false},
       area(Dock::Float), enableResizing{true}, tabBar{nullptr},
       tabBarItem{nullptr}, displayType{Dock::SplitView}
       , minimumSize(80), maximumSize(400)
@@ -382,7 +382,7 @@ void DockArea::hoverMoveEvent(QHoverEvent *event)
 {
     Q_D(DockArea);
 
-    if (d->mousepRessed)
+    if (d->mousePressed)
         return;
 
     switch (d->area) {
@@ -448,7 +448,7 @@ void DockArea::mousePressEvent(QMouseEvent *event)
 {
     Q_D(DockArea);
 
-    d->mousepRessed = true;
+    d->mousePressed = true;
     switch (d->area) {
     case Dock::Right:
     case Dock::Left:
@@ -503,7 +503,7 @@ void DockArea::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_UNUSED(event)
     Q_D(DockArea);
-    d->mousepRessed = false;
+    d->mousePressed = false;
     setKeepMouseGrab(false);
 }
 
@@ -604,7 +604,7 @@ void DockArea::handler_moving(qreal pos, bool *ok)
 void DockArea::handler_moved()
 {
     Q_D(DockArea);
-    qreal freeSize;
+    qreal freeSize{0};
     qreal totalSpace{0};
 
     if (d->isVertical()) {

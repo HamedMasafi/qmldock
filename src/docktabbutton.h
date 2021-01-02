@@ -9,9 +9,9 @@ class DockWidgetHeaderButton;
 class DockTabButton : public QQuickPaintedItem
 {
     Q_OBJECT
+    DockTabBar *_parentTabBar;
     QString _title;
     Dock::ButtonStatus _status;
-    DockTabBar *_parentTabBar;
     qreal _fitSize;
     bool _showCloseButton;
     DockWidgetHeaderButton *_closeButton;
