@@ -4,24 +4,49 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import Kaj.Dock 1.0
 
-Window {
+ApplicationWindow {
     visible: true
     width: 640
     height: 480
     title: qsTr("Hello World")
 
-    DockArea {
+    menuBar: MenuBar {
+        Menu {
+            title: "Windows"
+            Repeater {
+                model: dockArea.dockWidgets
+                MenuItem {
+                    text: modelData.title
+                    checkable: true
+                    checked: modelData.visibility !== DockWidget.Closed
+                    onCheckedChanged: {
+                        if (checked)
+                            modelData.open();
+                        else
+                            modelData.close();
+                    }
+                }
+            }
+        }
+    }
+
+    DockContainer {
         id: dockArea
         anchors.fill: parent
-        enableStateStoring: true
+        enableStateStoring: false
+        defaultDisplayType: Dock.TabbedView
 
-        DockGroup {
+        DockArea {
             id: centerDockGroup
             area: Dock.Center
             displayType: Dock.TabbedView
         }
+        DockArea {
+            area: Dock.Right
+            displayType: Dock.SplitView
+        }
 
-        DockGroup {
+        DockArea {
             id: leftDockGroup
             area: Dock.Left
             displayType: Dock.TabbedView
@@ -69,7 +94,7 @@ Window {
         DockWidget {
             title: "Top dock"
             area: Dock.Top
-            titleBar: null
+//            titleBar: null
             contentItem: Label {
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter

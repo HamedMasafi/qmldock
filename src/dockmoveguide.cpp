@@ -8,15 +8,6 @@
 #include "dockcontainer.h"
 #include "movedropguide.h"
 
-void DockMoveGuide::insertToAreas(Dock::Area a, const QRectF &rc)
-{
-    if (_areas.contains(a))
-        qDebug() << "Check:" << rc << _areas.value(a);
-    _areas.insert(a, qMakePair<QRectF, QRectF>(rc, {mapToGlobal(rc.topLeft()), rc.size()}));
-//    qDebug() << a << rc << "mapped to" << _globalAreas.value(a);
-//    qDebug() << _areas.keys();
-}
-
 DockMoveGuide::DockMoveGuide(DockContainer *parent) : QQuickPaintedItem(parent)
       ,_parentDockContainer(parent)
 {
@@ -24,7 +15,7 @@ DockMoveGuide::DockMoveGuide(DockContainer *parent) : QQuickPaintedItem(parent)
     setParentItem(_window->contentItem());
     _window->hide();
     _window->setFlags(Qt::FramelessWindowHint | Qt::Tool
-                      | Qt::WindowStaysOnTopHint);
+                      | Qt::WindowStaysOnTopHint | Qt::X11BypassWindowManagerHint);
     setPosition(QPointF(0, 0));
 
     _dropArea = new MoveDropGuide(parent);
@@ -163,4 +154,9 @@ void DockMoveGuide::paint(QPainter *painter)
 
     if (_area == Dock::Detached || _area == Dock::Float)
         _dropArea->setVisible(false);
+}
+
+void DockMoveGuide::insertToAreas(Dock::Area a, const QRectF &rc)
+{
+    _areas.insert(a, qMakePair<QRectF, QRectF>(rc, {mapToGlobal(rc.topLeft()), rc.size()}));
 }

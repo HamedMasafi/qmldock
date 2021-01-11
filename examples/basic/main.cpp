@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     DockPlugin::registerDockPlugin();
-    AbstractStyle::setStyle(new VSLightStyle);
+//    AbstractStyle::setStyle(new VSLightStyle);
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));

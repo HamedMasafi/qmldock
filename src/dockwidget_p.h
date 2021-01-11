@@ -2,6 +2,7 @@
 #define DOCKWIDGET_P_H
 
 #include "dock.h"
+#include "dockwidget.h"
 
 #include <QRectF>
 #include <QSizeF>
@@ -37,6 +38,7 @@ public:
     DockWindow *dockWindow;
     DockContainer *dockContainer;
     DockArea *dockArea;
+    DockWidget::DockWidgetVisibility visibility;
 
     bool isClosed;
     int resizeEdge;

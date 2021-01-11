@@ -28,7 +28,6 @@ void DockAreaPrivate::relayout()
         arrangeTabBar();
 
     reorderHandles();
-
     reorderItems();
 }
 
@@ -230,6 +229,7 @@ void DockAreaPrivate::reorderItems()
                 if (isHorizontal())
                     handlers.at(i)->setX(ss - q->x() - dockStyle->resizeHandleSize());
             }
+            dw->setVisibility(DockWidget::Openned);
             break;;
 
         case Dock::TabbedView:
@@ -237,6 +237,7 @@ void DockAreaPrivate::reorderItems()
             dw->setPosition(q->position() + usableArea.topLeft());
             dw->setSize(usableArea.size());
             dw->setVisible(i == currentIndex);
+            dw->setVisibility(i == currentIndex ? DockWidget::Openned : DockWidget::Hidden);
             break;
 
         case Dock::Hidden:

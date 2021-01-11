@@ -104,6 +104,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
 
     friend class DockContainer;
+    friend class DockWidget;
 };
 
 #endif // DOCKAREA_H

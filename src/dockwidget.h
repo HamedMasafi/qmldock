@@ -26,17 +26,28 @@ class DockWidget : public QQuickPaintedItem {
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     Q_PROPERTY(Dock::Areas allowedAreas READ allowedAreas WRITE setAllowedAreas NOTIFY allowedAreasChanged)
     Q_PROPERTY(bool isActive READ isActive WRITE setIsActive NOTIFY isActiveChanged)
-
+    Q_PROPERTY(DockWidgetVisibility visibility READ visibility WRITE setVisibility NOTIFY visibilityChanged)
 //    Q_PROPERTY(DockWidgetFlags flags READ flags WRITE setFlags NOTIFY flagsChanged)
 
 public:
-    enum DockWidgetFlag {
-        Movable,
-        Detachable,
-        Resizable
+//    enum DockWidgetFlag {
+//        Movable = 0x1,
+//        Detachable = 0x2,
+//        Resizable = 0x4,
+//        Closable = 0x8,
+//        ShowHeader = 0x10
+//    };
+//    Q_DECLARE_FLAGS(DockWidgetFlags, DockWidgetFlag);
+//    Q_FLAG(DockWidgetFlags)
+//    Q_ENUM(DockWidgetFlag)
+
+    enum DockWidgetVisibility {
+        Openned,
+        Active,
+        Hidden,
+        Closed
     };
-    Q_DECLARE_FLAGS(DockWidgetFlags, DockWidgetFlag);
-    Q_FLAG(DockWidgetFlags)
+    Q_ENUM(DockWidgetVisibility)
 
     DockWidget(QQuickItem *parent = nullptr);
     virtual ~DockWidget();
@@ -66,6 +77,8 @@ public:
 
     bool isActive() const;
 
+    DockWidgetVisibility visibility() const;
+
 public slots:
     Q_DECL_DEPRECATED
     void detach();
@@ -82,14 +95,11 @@ public slots:
     void setMovable(bool movable);
     void setShowHeader(bool showHeader);
     void setDetachable(bool detachable);
-
     void setContentItem(QQuickItem * contentItem);
-
     void setTitle(QString title);
-
     void setAllowedAreas(Dock::Areas allowedAreas);
-
     void setTitleBar(QQuickItem * titleBar);
+    void setVisibility(DockWidgetVisibility visibility);
 
 
 private slots:
@@ -126,6 +136,8 @@ signals:
     void titleBarChanged(QQuickItem * titleBar);
 
     void isActiveChanged(bool isActive);
+
+    void visibilityChanged(DockWidgetVisibility visibility);
 
 private:
     void setIsActive(bool isActive);

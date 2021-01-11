@@ -33,6 +33,7 @@ DockWidgetPrivate::DockWidgetPrivate(DockWidget *parent)
       , isClosed{false}
       , autoCreateHeader{true}
       , isActive{false}
+      , visibility{DockWidget::Closed}
       , detachable{false}
       , isDetached{false}
 {
@@ -123,26 +124,30 @@ void DockWidget::beginDetach()
 
 void DockWidget::open()
 {
-    //    Q_D(DockWidget);
+    Q_D(DockWidget);
     //    if (d->isDetached && d->dockWindow)
     //        d->dockWindow->setVisible(true);
     //    else
     //        setVisible(false);
     //    d->isClosed = true;
-    if (!dockArea())
+    if (!d->dockArea)
         return;
+    d->dockArea->addDockWidget(this);
+//    setVisibility(Openned);
     emit opened();
 }
 
 void DockWidget::close()
 {
-//    Q_D(DockWidget);
-//    if (d->isDetached && d->dockWindow)
-//        d->dockWindow->setVisible(false);
-//    else
-//        setVisible(false);
-//    d->isClosed = true;
-//    dockArea()->removeDockWidget(this);
+    Q_D(DockWidget);
+    if (d->isDetached && d->dockWindow)
+        d->dockWindow->setVisible(false);
+
+    setParentItem(nullptr);
+    d->isClosed = true;
+    setVisibility(Closed);
+
+    dockArea()->removeDockWidget(this);
     emit closed();
 }
 
@@ -159,10 +164,13 @@ void DockWidget::setArea(Dock::Area area)
     if (d->area == area)
         return;
 
+    qDebug() << "*****" << d->area << "to" << area;
     if (area == Dock::Detached) {
         auto wpos = mapToGlobal(QPointF(0, 0)).toPoint();
         if (!d->dockWindow)
             d->dockWindow = new DockWindow(this);
+        setParentItem(d->dockWindow->contentItem());
+        setPosition({0, 0});
         d->dockWindow->setPosition(wpos);
         d->dockWindow->setTitle(title());
         d->dockWindow->resize(size().toSize());
@@ -299,6 +307,17 @@ void DockWidget::setTitleBar(QQuickItem *titleBar)
     emit titleBarChanged(d->titleBarItem);
 }
 
+void DockWidget::setVisibility(DockWidget::DockWidgetVisibility visibility)
+{
+    Q_D(DockWidget);
+
+    if (d->visibility == visibility)
+        return;
+
+    d->visibility = visibility;
+    emit visibilityChanged(d->visibility);
+}
+
 void DockWidget::setIsActive(bool isActive)
 {
     Q_D(DockWidget);
@@ -348,7 +367,7 @@ bool DockWidget::childMouseEventFilter(QQuickItem *item, QEvent *e)
     }
 
     auto me = static_cast<QMouseEvent *>(e);
-    if (d->isDetached) {
+    if (d->area == Dock::Detached) {
         if (me->button() == Qt::LeftButton)
             d->dockWindow->startSystemMove();
         return true;
@@ -494,6 +513,12 @@ bool DockWidget::isActive() const
 {
     Q_D(const DockWidget);
     return d->isActive;
+}
+
+DockWidget::DockWidgetVisibility DockWidget::visibility() const
+{
+    Q_D(const DockWidget);
+    return d->visibility;
 }
 
 DockContainer *DockWidget::dockContainer() const

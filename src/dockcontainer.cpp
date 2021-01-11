@@ -77,7 +77,8 @@ void DockContainer::componentComplete()
     for (auto &dw : d->initialWidgets)
         addDockWidget(dw);
 
-    for (auto &dg: d->dockAreas.values()) {
+    for (auto i = d->dockAreas.begin(); i != d->dockAreas.end(); i++) {
+        const auto  &dg = *i;
         connect(dg, &DockArea::panelSizeChanged, this, &DockContainer::reorderDockAreas);
         connect(dg, &DockArea::isOpenChanged, this, &DockContainer::reorderDockAreas);
     }
@@ -134,10 +135,12 @@ void DockContainer::itemChange(QQuickItem::ItemChange change,
     if (change == QQuickItem::ItemChildAddedChange) {
         auto dw = qobject_cast<DockWidget *>(data.item);
         if (dw) {
-            if (isComponentComplete())
-                addDockWidget(dw);
-            else
+            if (isComponentComplete()) {
+                if (!d->dockWidgets.contains(dw))
+                    addDockWidget(dw);
+            } else {
                 d->initialWidgets.append(dw);
+            }
         }
 
         auto dg = qobject_cast<DockArea *>(data.item);
@@ -150,7 +153,9 @@ void DockContainer::itemChange(QQuickItem::ItemChange change,
     if (change == QQuickItem::ItemChildRemovedChange) {
         auto dw = qobject_cast<DockWidget *>(data.item);
         if (dw) {
-            d->dockWidgets.removeOne(dw);
+//            if (dw->visibility() == DockWidget::Closed)
+//                d->dockWidgets.removeOne(dw);
+
             if (dw->dockArea())
                 dw->dockArea()->removeDockWidget(dw);
       }
@@ -447,13 +452,19 @@ void DockContainer::dockWidget_moved()
     }
 }
 
-void DockContainer::dockWidget_opened() {}
+void DockContainer::dockWidget_opened()
+{
+//    auto w = qobject_cast<DockWidget *>(sender());
+//    if (w && w->dockArea())
+//        w->dockArea()->addDockWidget(w);
+}
 
 void DockContainer::dockWidget_closed()
 {
-    auto w = qobject_cast<DockWidget *>(sender());
-    if (w)
-        removeDockWidget(w);
+//    auto w = qobject_cast<DockWidget *>(sender());
+//    if (w)
+//        w->setParentItem(nullptr);
+//        removeDockWidget(w);
 }
 
 void DockContainer::dockWidget_visibleChanged()

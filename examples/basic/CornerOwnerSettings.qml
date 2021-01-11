@@ -6,7 +6,7 @@ import Kaj.Dock 1.0
 Pane {
     clip: true
 
-    property DockArea dockArea: null
+    property DockContainer dockArea: null
 
     ColumnLayout {
         RowLayout {
