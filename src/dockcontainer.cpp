@@ -88,8 +88,7 @@ void DockContainer::componentComplete()
     d->dockAreas[Dock::Right]->polish();
     d->dockAreas[Dock::Bottom]->polish();
     d->dockAreas[Dock::Center]->polish();
-    //    reorderDockAreas();
-    geometryChanged(QRectF(), QRectF());
+    reorderDockAreas();
 
     QQuickItem::componentComplete();
 }
@@ -454,16 +453,36 @@ void DockContainer::dockWidget_moved()
 
 void DockContainer::dockWidget_opened()
 {
-//    auto w = qobject_cast<DockWidget *>(sender());
-//    if (w && w->dockArea())
-//        w->dockArea()->addDockWidget(w);
+    Q_D(DockContainer);
+    auto widget = qobject_cast<DockWidget *>(sender());
+
+    switch (widget->area()) {
+    case Dock::Left:
+    case Dock::Right:
+    case Dock::Top:
+    case Dock::Bottom:
+    case Dock::Center:
+        d->dockAreas[widget->area()]->addDockWidget(widget);
+        d->dockAreas[widget->area()]->polish();
+        break;
+
+        //TODO: remove this or keep!
+    case Dock::NoArea:
+        d->dockAreas[Dock::Center]->addDockWidget(widget);
+        d->dockAreas[Dock::Center]->polish();
+        break;
+    default:
+        qWarning() << "dock has no area " << widget->title();
+        break;
+    }
+    widget->setVisible(true);
 }
 
 void DockContainer::dockWidget_closed()
 {
-//    auto w = qobject_cast<DockWidget *>(sender());
-//    if (w)
-//        w->setParentItem(nullptr);
+    auto w = qobject_cast<DockWidget *>(sender());
+    if (w)
+        w->setParentItem(nullptr);
 //        removeDockWidget(w);
 }
 

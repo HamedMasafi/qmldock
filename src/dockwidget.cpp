@@ -130,9 +130,8 @@ void DockWidget::open()
     //    else
     //        setVisible(false);
     //    d->isClosed = true;
-    if (!d->dockArea)
-        return;
-    d->dockArea->addDockWidget(this);
+//    if (!d->dockArea)
+//        return;
 //    setVisibility(Openned);
     emit opened();
 }
@@ -147,7 +146,7 @@ void DockWidget::close()
     d->isClosed = true;
     setVisibility(Closed);
 
-    dockArea()->removeDockWidget(this);
+//    dockArea()->removeDockWidget(this);
     emit closed();
 }
 
