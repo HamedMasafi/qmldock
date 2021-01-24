@@ -12,7 +12,7 @@ class DockWidgetPrivate;
 class DockWidget : public QQuickPaintedItem {
     Q_OBJECT
 
-    Q_DECLARE_PRIVATE(DockWidget);
+    Q_DECLARE_PRIVATE(DockWidget)
     DockWidgetPrivate *d_ptr;
 
     Q_PROPERTY(Dock::Area area READ area WRITE setArea NOTIFY areaChanged)
@@ -35,7 +35,7 @@ public:
         Detachable,
         Resizable
     };
-    Q_DECLARE_FLAGS(DockWidgetFlags, DockWidgetFlag);
+    Q_DECLARE_FLAGS(DockWidgetFlags, DockWidgetFlag)
     Q_FLAG(DockWidgetFlags)
 
     DockWidget(QQuickItem *parent = nullptr);
