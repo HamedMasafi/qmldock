@@ -97,7 +97,7 @@ void DockTabButton::mouseReleaseEvent(QMouseEvent *event)
 
     if (clipRect().contains(event->pos())) {
         _status = Dock::Hovered;
-        emit clicked();
+        Q_EMIT clicked();
     } else {
         _status = Dock::Normal;
     }

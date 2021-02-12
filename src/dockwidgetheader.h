@@ -28,7 +28,7 @@ class DockWidgetHeader : public QQuickPaintedItem
 public:
     DockWidgetHeader(DockWidget *parent = nullptr);
 
-//signals:
+//Q_SIGNALS:
 //    void moveStarted();
 //    void moving(const QPointF &windowPos, const QPointF &cursorPos);
 //    void moveEnded();
@@ -53,7 +53,7 @@ public:
 
     DockWidgetMoveHandler *moveHandler() const;
 
-public slots:
+public Q_SLOTS:
     void setTitle(const QString &title);
 
 //protected:

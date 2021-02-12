@@ -22,10 +22,10 @@ public:
 
     DockWidget *dockWidget() const;
 
-public slots:
+public Q_SLOTS:
     void setDockWidget(DockWidget *dockWidget);
 
-signals:
+Q_SIGNALS:
     void dockWidgetChanged(DockWidget *dockWidget);
     void moveStarted();
     void moving(const QPointF &windowPos, const QPointF &cursorPos);

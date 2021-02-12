@@ -24,12 +24,12 @@ public:
     bool showCloseButton() const;
     qreal fitSize() const;
 
-signals:
+Q_SIGNALS:
     void clicked();
     void closeButtonClicked();
 
     // QQuickPaintedItem interface
-public slots:
+public Q_SLOTS:
     void setTitle(const QString &title);
     void setChecked(bool checked);
     void setFitSize(const qreal &fitSize);

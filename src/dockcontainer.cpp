@@ -218,7 +218,7 @@ void DockContainer::addDockWidget(DockWidget *widget)
     if (isComponentComplete())
         reorderDockAreas();
 
-    emit dockWidgetsChanged(d->dockWidgets);
+    Q_EMIT dockWidgetsChanged(d->dockWidgets);
 }
 
 void DockContainer::removeDockWidget(DockWidget *widget)
@@ -307,7 +307,7 @@ void DockContainer::setTopLeftOwner(Qt::Edge topLeftOwner)
     d->topLeftOwner = topLeftOwner;
     if (isComponentComplete())
         reorderDockAreas();
-    emit topLeftOwnerChanged(d->topLeftOwner);
+    Q_EMIT topLeftOwnerChanged(d->topLeftOwner);
 }
 
 void DockContainer::setTopRightOwner(Qt::Edge topRightOwner)
@@ -325,7 +325,7 @@ void DockContainer::setTopRightOwner(Qt::Edge topRightOwner)
     d->topRightOwner = topRightOwner;
     if (isComponentComplete())
         reorderDockAreas();
-    emit topRightOwnerChanged(d->topRightOwner);
+    Q_EMIT topRightOwnerChanged(d->topRightOwner);
 }
 
 void DockContainer::setBottomLeftOwner(Qt::Edge bottomLeftOwner)
@@ -343,7 +343,7 @@ void DockContainer::setBottomLeftOwner(Qt::Edge bottomLeftOwner)
     d->bottomLeftOwner = bottomLeftOwner;
     if (isComponentComplete())
         reorderDockAreas();
-    emit bottomLeftOwnerChanged(d->bottomLeftOwner);
+    Q_EMIT bottomLeftOwnerChanged(d->bottomLeftOwner);
 }
 
 void DockContainer::setBottomRightOwner(Qt::Edge bottomRightOwner)
@@ -361,7 +361,7 @@ void DockContainer::setBottomRightOwner(Qt::Edge bottomRightOwner)
     d->bottomRightOwner = bottomRightOwner;
     if (isComponentComplete())
         reorderDockAreas();
-    emit bottomRightOwnerChanged(d->bottomRightOwner);
+    Q_EMIT bottomRightOwnerChanged(d->bottomRightOwner);
 }
 
 void DockContainer::setEnableStateStoring(bool enableStateStoring)
@@ -372,7 +372,7 @@ void DockContainer::setEnableStateStoring(bool enableStateStoring)
         return;
 
     d->enableStateStoring = enableStateStoring;
-    emit enableStateStoringChanged(d->enableStateStoring);
+    Q_EMIT enableStateStoringChanged(d->enableStateStoring);
 }
 
 void DockContainer::setDefaultDisplayType(Dock::DockWidgetDisplayType defaultDisplayType)
@@ -383,7 +383,7 @@ void DockContainer::setDefaultDisplayType(Dock::DockWidgetDisplayType defaultDis
         return;
 
     d->defaultDisplayType = defaultDisplayType;
-    emit defaultDisplayTypeChanged(d->defaultDisplayType);
+    Q_EMIT defaultDisplayTypeChanged(d->defaultDisplayType);
 }
 
 void DockContainer::dockWidget_beginMove()

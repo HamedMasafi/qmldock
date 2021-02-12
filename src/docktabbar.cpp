@@ -33,7 +33,7 @@ void DockTabBar::setCurrentIndex(int currentIndex)
 
     m_currentIndex = currentIndex;
 
-    emit currentIndexChanged(m_currentIndex);
+    Q_EMIT currentIndexChanged(m_currentIndex);
 }
 
 DockTabBar::DockTabBar(QQuickItem *parent)
@@ -152,7 +152,7 @@ void DockTabBar::tabButton_clicked()
         return;
 
     auto index = _tabs.indexOf(btn);
-    emit tabClicked(index);
+    Q_EMIT tabClicked(index);
 }
 
 void DockTabBar::tabButton_closeButtonClicked()
@@ -162,7 +162,7 @@ void DockTabBar::tabButton_closeButtonClicked()
         return;
 
     auto index = _tabs.indexOf(btn);
-    emit closeButtonClicked(index);
+    Q_EMIT closeButtonClicked(index);
 }
 
 void DockTabBar::geometryChanged(const QRectF &newGeometry,

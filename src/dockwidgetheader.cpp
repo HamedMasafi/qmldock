@@ -126,13 +126,13 @@ void DockWidgetHeader::paint(QPainter *painter)
 //    }
 //    if (_moveEmitted) {
 //        if (_parentDock->getIsDetached())
-//            emit moving(_lastParentPos + (event->globalPos() - _lastMousePos),
+//            Q_EMIT moving(_lastParentPos + (event->globalPos() - _lastMousePos),
 //                        event->pos() + _parentDock->dockWindow()->position());
 //        else
-//            emit moving(_lastParentPos + (event->windowPos() - _lastMousePos),
+//            Q_EMIT moving(_lastParentPos + (event->windowPos() - _lastMousePos),
 //                    event->pos() + _parentDock->position());
 //    } else {
-//        emit moveStarted();
+//        Q_EMIT moveStarted();
 //        _moveEmitted = true;
 //    }
 ////    parentDock->setPosition(_lastParentPos + (event->windowPos() - _lastMousePos));
@@ -147,7 +147,7 @@ void DockWidgetHeader::paint(QPainter *painter)
 //    Q_UNUSED(event)
 
 //    if (_moveEmitted)
-//        emit moveEnded();
+//        Q_EMIT moveEnded();
 
 //    _moveEmitted = false;
 //    ungrabMouse();

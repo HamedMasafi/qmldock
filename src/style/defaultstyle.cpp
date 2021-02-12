@@ -74,7 +74,7 @@ void DefaultStyle::setMainColor(QColor mainColor)
         return;
 
     m_mainColor = mainColor;
-    emit mainColorChanged(m_mainColor);
+    Q_EMIT mainColorChanged(m_mainColor);
 }
 
 void DefaultStyle::setBorderColor(QColor borderColor)
@@ -83,7 +83,7 @@ void DefaultStyle::setBorderColor(QColor borderColor)
         return;
 
     m_borderColor = borderColor;
-    emit borderColorChanged(m_borderColor);
+    Q_EMIT borderColorChanged(m_borderColor);
 }
 
 void DefaultStyle::setHoverColor(QColor hoverColor)
@@ -92,7 +92,7 @@ void DefaultStyle::setHoverColor(QColor hoverColor)
         return;
 
     m_hoverColor = hoverColor;
-    emit hoverColorChanged(m_hoverColor);
+    Q_EMIT hoverColorChanged(m_hoverColor);
 }
 
 void DefaultStyle::setPressColor(QColor pressColor)
@@ -101,7 +101,7 @@ void DefaultStyle::setPressColor(QColor pressColor)
         return;
 
     m_pressColor = pressColor;
-    emit pressColorChanged(m_pressColor);
+    Q_EMIT pressColorChanged(m_pressColor);
 }
 
 qreal DefaultStyle::widgetResizePadding() const
@@ -145,7 +145,7 @@ void DefaultStyle::setTabAreaColor(QColor tabAreaColor)
         return;
 
     m_tabAreaColor = tabAreaColor;
-    emit tabAreaColorChanged(m_tabAreaColor);
+    Q_EMIT tabAreaColorChanged(m_tabAreaColor);
 }
 
 void DefaultStyle::setTextColor(QColor textColor)
@@ -154,7 +154,7 @@ void DefaultStyle::setTextColor(QColor textColor)
         return;
 
     m_textColor = textColor;
-    emit textColorChanged(m_textColor);
+    Q_EMIT textColorChanged(m_textColor);
 }
 
 void DefaultStyle::setBackgroundColor(QColor backgroundColor)
@@ -163,7 +163,7 @@ void DefaultStyle::setBackgroundColor(QColor backgroundColor)
         return;
 
     m_backgroundColor = backgroundColor;
-    emit backgroundColorChanged(m_backgroundColor);
+    Q_EMIT backgroundColorChanged(m_backgroundColor);
 }
 
 void DefaultStyle::setWidgetColor(QColor widgetColor)
@@ -172,7 +172,7 @@ void DefaultStyle::setWidgetColor(QColor widgetColor)
         return;
 
     m_widgetColor = widgetColor;
-    emit widgetColorChanged(m_widgetColor);
+    Q_EMIT widgetColorChanged(m_widgetColor);
 }
 
 void DefaultStyle::setActiveTextColor(QColor activeTextColor)
@@ -181,7 +181,7 @@ void DefaultStyle::setActiveTextColor(QColor activeTextColor)
         return;
 
     m_activeTextColor = activeTextColor;
-    emit activeTextColorChanged(m_activeTextColor);
+    Q_EMIT activeTextColorChanged(m_activeTextColor);
 }
 
 QString DefaultStyle::iconToStr(Dock::Icon icon) const

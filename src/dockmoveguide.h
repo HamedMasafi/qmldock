@@ -38,7 +38,7 @@ public:
     Dock::Areas allowedAreas() const;
     void setAllowedAreas(const Dock::Areas &allowedAreas);
 
-signals:
+Q_SIGNALS:
     void dropped(Dock::Area area);
 };
 

@@ -15,7 +15,7 @@ class DockAreaResizeHandler : public QQuickPaintedItem
 public:
     DockAreaResizeHandler(Qt::Orientation orientation, QQuickItem *parent = nullptr);
 
-signals:
+Q_SIGNALS:
     void moving(qreal pos, bool *ok);
     void moved();
 

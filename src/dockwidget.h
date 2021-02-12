@@ -66,7 +66,7 @@ public:
 
     bool isActive() const;
 
-public slots:
+public Q_SLOTS:
     Q_DECL_DEPRECATED
     void detach();
 
@@ -92,7 +92,7 @@ public slots:
     void setTitleBar(QQuickItem * titleBar);
 
 
-private slots:
+private Q_SLOTS:
     void header_moveStarted();
     void header_moving(const QPointF &windowPos, const QPointF &cursorPos);
     void header_moveEnded();
@@ -106,7 +106,7 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
 
-signals:
+Q_SIGNALS:
     void beginMove();
     void moving(const QPointF &pt);
     void moved();

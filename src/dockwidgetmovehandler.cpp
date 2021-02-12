@@ -20,7 +20,7 @@ void DockWidgetMoveHandler::setDockWidget(DockWidget *dockWidget)
         return;
 
     m_dockWidget = dockWidget;
-    emit dockWidgetChanged(m_dockWidget);
+    Q_EMIT dockWidgetChanged(m_dockWidget);
 }
 
 
@@ -49,13 +49,13 @@ void DockWidgetMoveHandler::mouseMoveEvent(QMouseEvent *event)
     }
     if (_moveEmitted) {
         if (m_dockWidget->getIsDetached())
-            emit moving(_lastParentPos + (event->globalPos() - _lastMousePos),
+            Q_EMIT moving(_lastParentPos + (event->globalPos() - _lastMousePos),
                         event->pos() + m_dockWidget->dockWindow()->position());
         else
-            emit moving(_lastParentPos + (event->windowPos() - _lastMousePos),
+            Q_EMIT moving(_lastParentPos + (event->windowPos() - _lastMousePos),
                         event->pos() + m_dockWidget->position());
     } else {
-        emit moveStarted();
+        Q_EMIT moveStarted();
         _moveEmitted = true;
     }
 }
@@ -69,7 +69,7 @@ void DockWidgetMoveHandler::mouseReleaseEvent(QMouseEvent *event)
     Q_UNUSED(event)
 
     if (_moveEmitted)
-        emit moveEnded();
+        Q_EMIT moveEnded();
 
     _moveEmitted = false;
     ungrabMouse();

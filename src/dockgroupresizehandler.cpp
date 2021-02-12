@@ -83,7 +83,7 @@ void DockAreaResizeHandler::mouseMoveEvent(QMouseEvent *event)
     bool ok {};
     if (_orientation == Qt::Horizontal) {
         auto newY = _lastHandlerPos + (event->windowPos().y() - _lastMousePos);
-        emit moving(newY, &ok);
+        Q_EMIT moving(newY, &ok);
 
         if (ok) {
             setY(newY);
@@ -91,7 +91,7 @@ void DockAreaResizeHandler::mouseMoveEvent(QMouseEvent *event)
         }
     } else {
         auto newX = _lastHandlerPos + (event->windowPos().x() - _lastMousePos);
-        emit moving(newX, &ok);
+        Q_EMIT moving(newX, &ok);
 
         if (ok) {
             setX(newX);
@@ -102,7 +102,7 @@ void DockAreaResizeHandler::mouseMoveEvent(QMouseEvent *event)
 
 void DockAreaResizeHandler::mouseReleaseEvent(QMouseEvent *event)
 {
-    emit moved();
+    Q_EMIT moved();
     ungrabMouse();
     QQuickPaintedItem::mouseReleaseEvent(event);
 }

@@ -30,18 +30,18 @@ public:
     Qt::Edge edge() const;
     void setEdge(const Qt::Edge &edge);
 
-private slots:
+private Q_SLOTS:
     void prevButton_clicked();
     void nextButton_clicked();
     void tabButton_clicked();
     void tabButton_closeButtonClicked();
 
-public slots:
+public Q_SLOTS:
     int addTab(DockWidget *widget);
     void removeTab(int index);
     void setCurrentIndex(int currentIndex);
 
-signals:
+Q_SIGNALS:
     void tabClicked(int index);
     void closeButtonClicked(int index);
     void currentIndexChanged(int currentIndex);

@@ -57,7 +57,7 @@ private:
     void addDockWidget(DockWidget *item);
     void removeDockWidget(DockWidget *item);
 
-public slots:
+public Q_SLOTS:
     void setIsOpen(bool isOpen);
     void setPanelSize(qreal panelSize);
     void setArea(Dock::Area area);
@@ -70,7 +70,7 @@ public slots:
 
     void setTabBar(QQuickItem * tabBar);
 
-signals:
+Q_SIGNALS:
     void requestResize(const QRectF &rect, bool *ok);
     void isOpenChanged(bool isOpen);
     void panelSizeChanged(qreal panelSize);
@@ -89,7 +89,7 @@ protected:
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
     void updatePolish();
 
-private slots:
+private Q_SLOTS:
     void dockWidget_closed();
     void tabBar_tabClicked(int index);
     void tabBar_closeButtonClicked(int index);

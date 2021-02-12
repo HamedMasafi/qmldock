@@ -49,7 +49,7 @@ void AbstractButton::mouseReleaseEvent(QMouseEvent *event)
     _status = Dock::Normal;
     update();
     if (clipRect().contains(event->pos()))
-        emit clicked();
+        Q_EMIT clicked();
 }
 
 

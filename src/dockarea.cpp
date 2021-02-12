@@ -608,21 +608,21 @@ void DockArea::handler_moved()
     qreal totalSpace{0};
 
     if (d->isVertical()) {
-        foreach (auto dw, d->dockWidgets)
+        for (auto &dw: d->dockWidgets)
             totalSpace += dw->height();
         freeSize = (height()
                     - (dockStyle->resizeHandleSize() * (d->dockWidgets.count() - 1)));
     }
 
     if (d->isHorizontal()) {
-        foreach (auto dw, d->dockWidgets)
+        for (auto &dw: d->dockWidgets)
             totalSpace += dw->width();
         freeSize = (width()
                     - (dockStyle->resizeHandleSize() * (d->dockWidgets.count() - 1)));
     }
 
     int index{0};
-    foreach (auto dw, d->dockWidgets) {
+    for (auto &dw: d->dockWidgets) {
         if (d->isVertical())
             d->itemSizes[index++] = (dw->height() / totalSpace);
         //*freeSize;
@@ -775,7 +775,7 @@ void DockArea::addDockWidget(DockWidget *item)
     connect(item, &DockWidget::closed, this, &DockArea::dockWidget_closed);
 
     setIsOpen(d->dockWidgets.count());
-    emit dockWidgetsChanged(d->dockWidgets);
+    Q_EMIT dockWidgetsChanged(d->dockWidgets);
 }
 
 void DockArea::removeDockWidget(DockWidget *item)
@@ -828,7 +828,7 @@ void DockArea::removeDockWidget(DockWidget *item)
 //        d->reorderHandles();
 //    d->reorderItems();
 
-    emit dockWidgetsChanged(d->dockWidgets);
+    Q_EMIT dockWidgetsChanged(d->dockWidgets);
 }
 
 void DockArea::setIsOpen(bool isOpen)
@@ -838,7 +838,7 @@ void DockArea::setIsOpen(bool isOpen)
         return;
 
     d->isOpen = isOpen;
-    emit isOpenChanged(isOpen);
+    Q_EMIT isOpenChanged(isOpen);
 }
 
 void DockArea::setPanelSize(qreal panelSize)
@@ -848,7 +848,7 @@ void DockArea::setPanelSize(qreal panelSize)
         return;
 
     d->panelSize = qBound(d->minimumSize, panelSize, d->maximumSize);
-    emit panelSizeChanged(panelSize);
+    Q_EMIT panelSizeChanged(panelSize);
 }
 
 void DockArea::setArea(Dock::Area area)
@@ -858,7 +858,7 @@ void DockArea::setArea(Dock::Area area)
         return;
 
     d->area = area;
-    emit areaChanged(area);
+    Q_EMIT areaChanged(area);
 }
 
 void DockArea::setEnableResizing(bool enableResizing)
@@ -868,7 +868,7 @@ void DockArea::setEnableResizing(bool enableResizing)
         return;
 
     d->enableResizing = enableResizing;
-    emit enableResizingChanged(enableResizing);
+    Q_EMIT enableResizingChanged(enableResizing);
 }
 
 void DockArea::setDisplayType(Dock::DockWidgetDisplayType displayType)
@@ -881,7 +881,7 @@ void DockArea::setDisplayType(Dock::DockWidgetDisplayType displayType)
     if (d->tabBarItem)
         d->tabBarItem->setVisible(displayType == Dock::TabbedView);
     d->displayType = displayType;
-    emit displayTypeChanged(displayType);
+    Q_EMIT displayTypeChanged(displayType);
 }
 
 void DockArea::setMinimumSize(qreal minimumSize)
@@ -891,7 +891,7 @@ void DockArea::setMinimumSize(qreal minimumSize)
         return;
 
     d->minimumSize = minimumSize;
-    emit minimumSizeChanged(d->minimumSize);
+    Q_EMIT minimumSizeChanged(d->minimumSize);
 
     if (d->panelSize < minimumSize)
         setPanelSize(minimumSize);
@@ -904,7 +904,7 @@ void DockArea::setMaximumSize(qreal maximumSize)
         return;
 
     d->maximumSize = maximumSize;
-    emit maximumSizeChanged(d->maximumSize);
+    Q_EMIT maximumSizeChanged(d->maximumSize);
 
     if (d->panelSize > maximumSize)
         setPanelSize(maximumSize);
@@ -945,7 +945,7 @@ void DockArea::setTabPosition(Qt::Edge tabPosition)
         d->tabBar->setEdge(tabPosition);
     geometryChanged(QRectF(), QRectF());
     update();
-    emit tabPositionChanged(d->tabPosition);
+    Q_EMIT tabPositionChanged(d->tabPosition);
 }
 void DockArea::setCurrentIndex(int currentIndex)
 {
@@ -964,7 +964,7 @@ void DockArea::setCurrentIndex(int currentIndex)
     if (d->displayType == Dock::TabbedView || d->displayType == Dock::StackedView)
         d->updateTabbedView();
 
-    emit currentIndexChanged(d->currentIndex);
+    Q_EMIT currentIndexChanged(d->currentIndex);
 }
 
 void DockArea::setTabBar(QQuickItem *tabBar)
@@ -977,7 +977,7 @@ void DockArea::setTabBar(QQuickItem *tabBar)
     tabBar->setParentItem(this);
     d->tabBarItem = tabBar;
     polish();
-    emit tabBarChanged(tabBar);
+    Q_EMIT tabBarChanged(tabBar);
 }
 
 void DockArea::paint(QPainter *painter)

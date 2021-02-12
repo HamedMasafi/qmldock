@@ -36,8 +36,7 @@ public:
 
     QList<DockWidget *> dockWidgets() const;
 
-signals:
-
+Q_SIGNALS:
     void dockWidgetsChanged(QList<DockWidget *> dockWidgets);
     void topLeftOwnerChanged(Qt::Edge topLeftOwner);
     void topRightOwnerChanged(Qt::Edge topRightOwner);
@@ -54,7 +53,7 @@ protected:
     void itemChange(ItemChange, const ItemChangeData &) override;
     void componentComplete() override;
 
-public slots:
+public Q_SLOTS:
     void storeSettings();
     void restoreSettings();
 
@@ -71,7 +70,7 @@ public slots:
 
     void setDefaultDisplayType(Dock::DockWidgetDisplayType defaultDisplayType);
 
-private slots:
+private Q_SLOTS:
     void dockWidget_beginMove();
     void dockWidget_moving(const QPointF &pt);
     void dockWidget_moved();
