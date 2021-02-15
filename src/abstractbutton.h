@@ -18,7 +18,7 @@ public:
     Dock::Icon icon() const;
     void setIcon(const Dock::Icon &icon);
 
-signals:
+Q_SIGNALS:
     void clicked();
 
 protected:

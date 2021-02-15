@@ -62,7 +62,7 @@ public:
 
     QColor activeTextColor() const;
 
-signals:
+Q_SIGNALS:
     void mainColorChanged(QColor mainColor);
     void borderColorChanged(QColor borderColor);
     void hoverColorChanged(QColor hoverColor);
@@ -75,7 +75,7 @@ signals:
 
     void activeTextColorChanged(QColor activeTextColor);
 
-public slots:
+public Q_SLOTS:
     void setMainColor(QColor mainColor);
     void setBorderColor(QColor borderColor);
     void setHoverColor(QColor hoverColor);
@@ -99,11 +99,11 @@ private:
     QColor m_backgroundColor;
     QColor m_mainColor;
     QColor m_borderColor;
+    QColor m_widgetColor;
     QColor m_hoverColor;
     QColor m_pressColor;
     QColor m_tabAreaColor;
     QColor m_textColor;
-    QColor m_widgetColor;
     QColor m_activeTextColor;
 
 };

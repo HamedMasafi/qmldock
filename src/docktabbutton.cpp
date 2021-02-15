@@ -4,6 +4,7 @@
 #include "dockwidgetheaderbutton.h"
 
 #include <QDebug>
+#include <QCursor>
 #include <QFontMetrics>
 
 DockTabBar *DockTabButton::parentTabBar() const
@@ -41,6 +42,8 @@ DockTabButton::DockTabButton(QString title, DockTabBar *parent)
 {
     setAcceptedMouseButtons(Qt::LeftButton);
     setAcceptHoverEvents(true);
+    setCursor(Qt::ArrowCursor);
+
     _closeButton = new DockWidgetHeaderButton(this);
     _closeButton->setParentItem(this);
     _closeButton->setIcon(Dock::CloseIcon);
@@ -49,6 +52,8 @@ DockTabButton::DockTabButton(QString title, DockTabBar *parent)
             &DockWidgetHeaderButton::clicked,
             this,
             &DockTabButton::closeButtonClicked);
+
+    AbstractStyle::registerThemableItem(this);
 }
 
 void DockTabButton::paint(QPainter *painter)
@@ -77,6 +82,7 @@ void DockTabButton::setChecked(bool checked)
 
 void DockTabButton::mousePressEvent(QMouseEvent *event)
 {
+    Q_UNUSED(event)
     if (_status == Dock::Checked)
         return;
 
@@ -91,7 +97,7 @@ void DockTabButton::mouseReleaseEvent(QMouseEvent *event)
 
     if (clipRect().contains(event->pos())) {
         _status = Dock::Hovered;
-        emit clicked();
+        Q_EMIT clicked();
     } else {
         _status = Dock::Normal;
     }

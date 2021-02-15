@@ -12,7 +12,7 @@
 #include <QPainter>
 
 DockAreaPrivate::DockAreaPrivate(DockArea *parent)
-    : q_ptr(parent), mousepRessed{false}, currentIndex{-1},
+    : q_ptr(parent), currentIndex{-1}, mousePressed{false},
       area(Dock::Float), enableResizing{true}, tabBar{nullptr},
       tabBarItem{nullptr}, displayType{Dock::SplitView}
       , minimumSize(80), maximumSize(400)
@@ -34,34 +34,32 @@ void DockAreaPrivate::relayout()
 
 void DockAreaPrivate::arrangeTabBar()
 {
-    Q_Q(DockArea);
-
     if (!tabBarItem)
         return;
 
-    //    auto r = dockStyle->resizeHandleSize();
-    //    switch (tabPosition) {
-    //    case Qt::TopEdge:
-    //        tabBarItem->setX(area == Dock::Right ? r : 0);
-    //        tabBarItem->setY(area == Dock::Bottom ? r : 0);
-    //        tabBarItem->setWidth(q->width() - *** dockStyle->resizeHandleSize());
-    //        break;
-    //    case Qt::LeftEdge:
-    //        tabBarItem->setX(0);
-    //        tabBarItem->setY(q->height());
-    //        tabBarItem->setWidth(q->height());
-    //        break;
-    //    case Qt::RightEdge:
-    //        tabBarItem->setX(q->width());
-    //        tabBarItem->setY(0);
-    //        tabBarItem->setWidth(q->height());
-    //        break;
-    //    case Qt::BottomEdge:
-    //        tabBarItem->setX(0);
-    //        tabBarItem->setY(q->height() - tabBarItem->height());
-    //        tabBarItem->setWidth(q->width());
-    //        break;
-    //    }
+//    auto r = dockStyle->resizeHandleSize();
+//    switch (tabPosition) {
+//    case Qt::TopEdge:
+//        tabBarItem->setX(area == Dock::Right ? r : 0);
+//        tabBarItem->setY(area == Dock::Bottom ? r : 0);
+//        tabBarItem->setWidth(tabBarWidth);
+//        break;
+//    case Qt::LeftEdge:
+//        tabBarItem->setX(0);
+//        tabBarItem->setY(q->height());
+//        tabBarItem->setWidth(q->height());
+//        break;
+//    case Qt::RightEdge:
+//        tabBarItem->setX(q->width());
+//        tabBarItem->setY(0);
+//        tabBarItem->setWidth(q->height());
+//        break;
+//    case Qt::BottomEdge:
+//        tabBarItem->setX(0);
+//        tabBarItem->setY(q->height() - tabBarItem->height());
+//        tabBarItem->setWidth(q->width());
+//        break;
+//    }
     tabBarItem->setPosition(tabBarPosition);
     tabBarItem->setWidth(tabBarWidth);
 }
@@ -180,7 +178,7 @@ void DockAreaPrivate::fitItem(QQuickItem *item)
 //                       - dockStyle->tabBarHeight()));
         break;
 
-    case Dock::Float:
+    default:
         break;
     }
 }
@@ -346,12 +344,19 @@ QRectF DockAreaPrivate::updateUsableArea()
             usableArea.setTop(usableArea.top() + tabBarItem->height());
             break;
         case Qt::RightEdge:
+            tabBarPosition = QPointF(q->width(), 0);
+            tabBarWidth = usableArea.height();
             usableArea.setRight(usableArea.right() - tabBarItem->height());
             break;
         case Qt::LeftEdge:
+            tabBarPosition = usableArea.bottomLeft();
+            //QPointF(0, q->height());
+            tabBarWidth = usableArea.height() + 1;
             usableArea.setLeft(usableArea.left() + tabBarItem->height());
             break;
         case Qt::BottomEdge:
+            tabBarPosition = QPointF(0, q->height() - tabBarItem->height());
+            tabBarWidth = usableArea.width();
             usableArea.setBottom(usableArea.bottom() - tabBarItem->height());
             break;
         }
@@ -369,13 +374,15 @@ DockArea::DockArea(QQuickItem *parent)
     setClip(true);
     setAcceptHoverEvents(true);
     setAcceptedMouseButtons(Qt::LeftButton);
+
+    AbstractStyle::registerThemableItem(this);
 }
 
 void DockArea::hoverMoveEvent(QHoverEvent *event)
 {
     Q_D(DockArea);
 
-    if (d->mousepRessed)
+    if (d->mousePressed)
         return;
 
     switch (d->area) {
@@ -441,7 +448,7 @@ void DockArea::mousePressEvent(QMouseEvent *event)
 {
     Q_D(DockArea);
 
-    d->mousepRessed = true;
+    d->mousePressed = true;
     switch (d->area) {
     case Dock::Right:
     case Dock::Left:
@@ -496,7 +503,7 @@ void DockArea::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_UNUSED(event)
     Q_D(DockArea);
-    d->mousepRessed = false;
+    d->mousePressed = false;
     setKeepMouseGrab(false);
 }
 
@@ -597,25 +604,25 @@ void DockArea::handler_moving(qreal pos, bool *ok)
 void DockArea::handler_moved()
 {
     Q_D(DockArea);
-    qreal freeSize;
+    qreal freeSize{0};
     qreal totalSpace{0};
 
     if (d->isVertical()) {
-        foreach (auto dw, d->dockWidgets)
+        for (auto &dw: d->dockWidgets)
             totalSpace += dw->height();
         freeSize = (height()
                     - (dockStyle->resizeHandleSize() * (d->dockWidgets.count() - 1)));
     }
 
     if (d->isHorizontal()) {
-        foreach (auto dw, d->dockWidgets)
+        for (auto &dw: d->dockWidgets)
             totalSpace += dw->width();
         freeSize = (width()
                     - (dockStyle->resizeHandleSize() * (d->dockWidgets.count() - 1)));
     }
 
     int index{0};
-    foreach (auto dw, d->dockWidgets) {
+    for (auto &dw: d->dockWidgets) {
         if (d->isVertical())
             d->itemSizes[index++] = (dw->height() / totalSpace);
         //*freeSize;
@@ -689,6 +696,7 @@ Qt::Edge DockArea::tabPosition() const
 void DockArea::componentComplete()
 {
     Q_D(DockArea);
+    QQuickPaintedItem::componentComplete();
     if (!d->tabBarItem) {
         d->tabBar = new DockTabBar(this);
         d->tabBar->setVisible(false);
@@ -704,10 +712,25 @@ void DockArea::componentComplete()
                 &DockTabBar::closeButtonClicked,
                 this,
                 &DockArea::tabBar_closeButtonClicked);
+
+        switch (d->tabPosition) {
+        case Qt::TopEdge:
+        case Qt::BottomEdge:
+            d->tabBarItem->setRotation(0);
+            break;
+
+        case Qt::LeftEdge:
+            d->tabBarItem->setRotation(-90);
+            break;
+
+        case Qt::RightEdge:
+            d->tabBarItem->setRotation(90);
+            break;
+        }
+        d->tabBar->setEdge(d->tabPosition);
     }
 
     d->tabBarItem->setVisible(d->displayType == Dock::TabbedView);
-    QQuickPaintedItem::componentComplete();
 }
 
 QQuickItem *DockArea::tabBar() const
@@ -732,7 +755,7 @@ void DockArea::addDockWidget(DockWidget *item)
     d->normalizeItemSizes();
 
     if (d->tabBar)
-        d->tabBar->addTab(item->title(), item->closable());
+        d->tabBar->addTab(item);
 
     if (d->dockWidgets.count() > 1) {
         auto h = d->createHandlers();
@@ -752,7 +775,7 @@ void DockArea::addDockWidget(DockWidget *item)
     connect(item, &DockWidget::closed, this, &DockArea::dockWidget_closed);
 
     setIsOpen(d->dockWidgets.count());
-    emit dockWidgetsChanged(d->dockWidgets);
+    Q_EMIT dockWidgetsChanged(d->dockWidgets);
 }
 
 void DockArea::removeDockWidget(DockWidget *item)
@@ -762,10 +785,13 @@ void DockArea::removeDockWidget(DockWidget *item)
     if (index == -1)
         return;
 
+    auto removedTabIndex = d->dockWidgets.indexOf(item);
+
     d->dockWidgets.removeOne(item);
     item->setDockArea(nullptr);
 
     if (d->tabBar) {
+//        d->tabBar->setCurrentIndex(-1);
         d->tabBar->removeTab(index);
         //d->tabBar->setCurrentIndex(d->tabBar->currentIndex());
     }
@@ -784,6 +810,14 @@ void DockArea::removeDockWidget(DockWidget *item)
     d->normalizeItemSizes();
     d->relayout();
 
+    if (d->dockWidgets.size()) {
+        d->currentIndex = -1;
+        if (d->currentIndex == removedTabIndex) {
+            removedTabIndex--;
+        }
+        setCurrentIndex(removedTabIndex);
+    }
+
 //    if (!d->dockWidgets.count()){
 //        update();
 //    }
@@ -794,7 +828,7 @@ void DockArea::removeDockWidget(DockWidget *item)
 //        d->reorderHandles();
 //    d->reorderItems();
 
-    emit dockWidgetsChanged(d->dockWidgets);
+    Q_EMIT dockWidgetsChanged(d->dockWidgets);
 }
 
 void DockArea::setIsOpen(bool isOpen)
@@ -804,7 +838,7 @@ void DockArea::setIsOpen(bool isOpen)
         return;
 
     d->isOpen = isOpen;
-    emit isOpenChanged(isOpen);
+    Q_EMIT isOpenChanged(isOpen);
 }
 
 void DockArea::setPanelSize(qreal panelSize)
@@ -814,7 +848,7 @@ void DockArea::setPanelSize(qreal panelSize)
         return;
 
     d->panelSize = qBound(d->minimumSize, panelSize, d->maximumSize);
-    emit panelSizeChanged(panelSize);
+    Q_EMIT panelSizeChanged(panelSize);
 }
 
 void DockArea::setArea(Dock::Area area)
@@ -824,7 +858,7 @@ void DockArea::setArea(Dock::Area area)
         return;
 
     d->area = area;
-    emit areaChanged(area);
+    Q_EMIT areaChanged(area);
 }
 
 void DockArea::setEnableResizing(bool enableResizing)
@@ -834,7 +868,7 @@ void DockArea::setEnableResizing(bool enableResizing)
         return;
 
     d->enableResizing = enableResizing;
-    emit enableResizingChanged(enableResizing);
+    Q_EMIT enableResizingChanged(enableResizing);
 }
 
 void DockArea::setDisplayType(Dock::DockWidgetDisplayType displayType)
@@ -847,7 +881,7 @@ void DockArea::setDisplayType(Dock::DockWidgetDisplayType displayType)
     if (d->tabBarItem)
         d->tabBarItem->setVisible(displayType == Dock::TabbedView);
     d->displayType = displayType;
-    emit displayTypeChanged(displayType);
+    Q_EMIT displayTypeChanged(displayType);
 }
 
 void DockArea::setMinimumSize(qreal minimumSize)
@@ -857,7 +891,7 @@ void DockArea::setMinimumSize(qreal minimumSize)
         return;
 
     d->minimumSize = minimumSize;
-    emit minimumSizeChanged(d->minimumSize);
+    Q_EMIT minimumSizeChanged(d->minimumSize);
 
     if (d->panelSize < minimumSize)
         setPanelSize(minimumSize);
@@ -870,7 +904,7 @@ void DockArea::setMaximumSize(qreal maximumSize)
         return;
 
     d->maximumSize = maximumSize;
-    emit maximumSizeChanged(d->maximumSize);
+    Q_EMIT maximumSizeChanged(d->maximumSize);
 
     if (d->panelSize > maximumSize)
         setPanelSize(maximumSize);
@@ -880,10 +914,13 @@ void DockArea::setTabPosition(Qt::Edge tabPosition)
 {
     Q_D(DockArea);
 
-    if (!isComponentComplete())
-        return;
 
     if (d->tabPosition == tabPosition)
+        return;
+
+    d->tabPosition = tabPosition;
+
+    if (!isComponentComplete())
         return;
 
     if (d->tabBarItem)
@@ -901,14 +938,14 @@ void DockArea::setTabPosition(Qt::Edge tabPosition)
             d->tabBarItem->setRotation(90);
             break;
         }
-    d->tabPosition = tabPosition;
-//    d->updateUsableArea();
+
+    //d->updateUsableArea();
 
     if (d->tabBar)
         d->tabBar->setEdge(tabPosition);
     geometryChanged(QRectF(), QRectF());
     update();
-    emit tabPositionChanged(d->tabPosition);
+    Q_EMIT tabPositionChanged(d->tabPosition);
 }
 void DockArea::setCurrentIndex(int currentIndex)
 {
@@ -918,12 +955,16 @@ void DockArea::setCurrentIndex(int currentIndex)
     if (d->currentIndex == newIndex)
         return;
 
+    if (d->currentIndex > 0 && d->currentIndex < d->dockWidgets.size())
+        d->dockWidgets.at(d->currentIndex)->setIsActive(false);
+
     d->currentIndex = newIndex;
+    d->dockWidgets.at(d->currentIndex)->setIsActive(true);
 
     if (d->displayType == Dock::TabbedView || d->displayType == Dock::StackedView)
         d->updateTabbedView();
 
-    emit currentIndexChanged(d->currentIndex);
+    Q_EMIT currentIndexChanged(d->currentIndex);
 }
 
 void DockArea::setTabBar(QQuickItem *tabBar)
@@ -936,7 +977,7 @@ void DockArea::setTabBar(QQuickItem *tabBar)
     tabBar->setParentItem(this);
     d->tabBarItem = tabBar;
     polish();
-    emit tabBarChanged(tabBar);
+    Q_EMIT tabBarChanged(tabBar);
 }
 
 void DockArea::paint(QPainter *painter)

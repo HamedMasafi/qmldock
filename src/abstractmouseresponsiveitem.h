@@ -12,7 +12,7 @@ class AbstractMouseResponsiveItem : public QQuickPaintedItem
 public:
     AbstractMouseResponsiveItem(QQuickItem *parent = nullptr);
 
-signals:
+Q_SIGNALS:
 
 
     // QQuickItem interface

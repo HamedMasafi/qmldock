@@ -36,8 +36,7 @@ public:
 
     QList<DockWidget *> dockWidgets() const;
 
-signals:
-
+Q_SIGNALS:
     void dockWidgetsChanged(QList<DockWidget *> dockWidgets);
     void topLeftOwnerChanged(Qt::Edge topLeftOwner);
     void topRightOwnerChanged(Qt::Edge topRightOwner);
@@ -54,11 +53,12 @@ protected:
     void itemChange(ItemChange, const ItemChangeData &) override;
     void componentComplete() override;
 
-public slots:
+public Q_SLOTS:
     void storeSettings();
     void restoreSettings();
 
     void addDockWidget(DockWidget *widget);
+    void removeDockWidget(DockWidget *widget);
     void reorderDockAreas();
 
     void setTopLeftOwner(Qt::Edge topLeftOwner);
@@ -70,10 +70,12 @@ public slots:
 
     void setDefaultDisplayType(Dock::DockWidgetDisplayType defaultDisplayType);
 
-private slots:
+private Q_SLOTS:
     void dockWidget_beginMove();
     void dockWidget_moving(const QPointF &pt);
     void dockWidget_moved();
+    void dockWidget_opened();
+    void dockWidget_closed();
     void dockWidget_visibleChanged();
 
 private:
@@ -90,6 +92,10 @@ public:
     friend class DockMoveGuide;
     bool enableStateStoring() const;
     Dock::DockWidgetDisplayType defaultDisplayType() const;
+
+    // QQuickItem interface
+protected:
+    bool childMouseEventFilter(QQuickItem *, QEvent *) override;
 };
 
 #endif // DOCKCONTAINER_H

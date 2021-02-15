@@ -58,6 +58,7 @@ T *findInParents(QQuickItem *item)
         auto p = qobject_cast<T *>(i);
         if (p)
             return p;
+
         i = i->parentItem();
     }
     return nullptr;

@@ -74,7 +74,7 @@ void DefaultStyle::setMainColor(QColor mainColor)
         return;
 
     m_mainColor = mainColor;
-    emit mainColorChanged(m_mainColor);
+    Q_EMIT mainColorChanged(m_mainColor);
 }
 
 void DefaultStyle::setBorderColor(QColor borderColor)
@@ -83,7 +83,7 @@ void DefaultStyle::setBorderColor(QColor borderColor)
         return;
 
     m_borderColor = borderColor;
-    emit borderColorChanged(m_borderColor);
+    Q_EMIT borderColorChanged(m_borderColor);
 }
 
 void DefaultStyle::setHoverColor(QColor hoverColor)
@@ -92,7 +92,7 @@ void DefaultStyle::setHoverColor(QColor hoverColor)
         return;
 
     m_hoverColor = hoverColor;
-    emit hoverColorChanged(m_hoverColor);
+    Q_EMIT hoverColorChanged(m_hoverColor);
 }
 
 void DefaultStyle::setPressColor(QColor pressColor)
@@ -101,7 +101,7 @@ void DefaultStyle::setPressColor(QColor pressColor)
         return;
 
     m_pressColor = pressColor;
-    emit pressColorChanged(m_pressColor);
+    Q_EMIT pressColorChanged(m_pressColor);
 }
 
 qreal DefaultStyle::widgetResizePadding() const
@@ -145,7 +145,7 @@ void DefaultStyle::setTabAreaColor(QColor tabAreaColor)
         return;
 
     m_tabAreaColor = tabAreaColor;
-    emit tabAreaColorChanged(m_tabAreaColor);
+    Q_EMIT tabAreaColorChanged(m_tabAreaColor);
 }
 
 void DefaultStyle::setTextColor(QColor textColor)
@@ -154,7 +154,7 @@ void DefaultStyle::setTextColor(QColor textColor)
         return;
 
     m_textColor = textColor;
-    emit textColorChanged(m_textColor);
+    Q_EMIT textColorChanged(m_textColor);
 }
 
 void DefaultStyle::setBackgroundColor(QColor backgroundColor)
@@ -163,7 +163,7 @@ void DefaultStyle::setBackgroundColor(QColor backgroundColor)
         return;
 
     m_backgroundColor = backgroundColor;
-    emit backgroundColorChanged(m_backgroundColor);
+    Q_EMIT backgroundColorChanged(m_backgroundColor);
 }
 
 void DefaultStyle::setWidgetColor(QColor widgetColor)
@@ -172,7 +172,7 @@ void DefaultStyle::setWidgetColor(QColor widgetColor)
         return;
 
     m_widgetColor = widgetColor;
-    emit widgetColorChanged(m_widgetColor);
+    Q_EMIT widgetColorChanged(m_widgetColor);
 }
 
 void DefaultStyle::setActiveTextColor(QColor activeTextColor)
@@ -181,7 +181,7 @@ void DefaultStyle::setActiveTextColor(QColor activeTextColor)
         return;
 
     m_activeTextColor = activeTextColor;
-    emit activeTextColorChanged(m_activeTextColor);
+    Q_EMIT activeTextColorChanged(m_activeTextColor);
 }
 
 QString DefaultStyle::iconToStr(Dock::Icon icon) const
@@ -294,6 +294,7 @@ void DefaultStyle::paintTabBar(QPainter *p, DockTabBar *item)
 {
     Q_UNUSED(p)
     Q_UNUSED(item)
+//    p->fillRect(item->clipRect(), Qt::red);
 }
 
 void DefaultStyle::paintTabButton(QPainter *p,
@@ -306,7 +307,7 @@ void DefaultStyle::paintTabButton(QPainter *p,
     switch (status) {
     case Dock::Normal:
         p->setPen(m_borderColor);
-        rc.setBottom(rc.bottom() - 1);
+        rc.setBottom(rc.bottom());
         p->fillRect(rc, m_backgroundColor);
         if (item->parentTabBar()->edge() == Qt::BottomEdge)
             drawLineOnEdge(p, item, Qt::TopEdge);
@@ -317,7 +318,7 @@ void DefaultStyle::paintTabButton(QPainter *p,
 
     case Dock::Hovered:
         p->setPen(m_borderColor);
-        rc.setBottom(rc.bottom() - 1);
+        rc.setBottom(rc.bottom());
         p->setBrush(hoverColor());
         p->fillRect(rc, hoverColor());
         if (item->parentTabBar()->edge() == Qt::BottomEdge)
@@ -460,7 +461,8 @@ void DefaultStyle::paintDockWidget(QPainter *p, DockWidget *item)
 
     qreal a{0};
     if ((item->dockArea() && item->dockArea()->displayType() != Dock::TabbedView)
-        || item->area() == Dock::Float) {
+        || item->area() == Dock::Float
+        || item->area() == Dock::Detached) {
         p->fillRect(item->clipRect(), m_borderColor);
         a = 1;
     }
@@ -473,11 +475,12 @@ void DefaultStyle::paintDockWidgetHeader(QPainter *p, DockWidgetHeader *item)
     QBrush b(m_mainColor);
     b.setStyle(Qt::Dense6Pattern);
     auto tw = QFontMetrics(font()).horizontalAdvance(item->title());
-    p->fillRect(10 + tw, 10, item->width() - 30 - tw, item->height() - 20, b);
+    auto padding = item->closeButtonVisible() ? 32 : 10;
+    p->fillRect(10 + tw, 10, item->width() - padding - 10 -tw, item->height() - 20, b);
     p->setPen(m_textColor);
     p->drawText(8,
                 0,
-                item->width() - 60,
+                item->width() - padding,
                 item->height(),
                 Qt::AlignVCenter,
                 item->title());

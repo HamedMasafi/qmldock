@@ -10,7 +10,7 @@ public:
     explicit DockPlugin(QObject *parent = nullptr);
 
     static void registerDockPlugin();
-signals:
+Q_SIGNALS:
 
 };
 

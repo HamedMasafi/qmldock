@@ -28,7 +28,7 @@ public:
     bool isOpen;
     qreal lastGroupSize;
     qreal lastMousePos;
-    bool mousepRessed;
+    bool mousePressed;
     Dock::Area area;
     bool enableResizing;
     DockTabBar *tabBar;

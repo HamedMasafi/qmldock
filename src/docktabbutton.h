@@ -9,9 +9,9 @@ class DockWidgetHeaderButton;
 class DockTabButton : public QQuickPaintedItem
 {
     Q_OBJECT
+    DockTabBar *_parentTabBar;
     QString _title;
     Dock::ButtonStatus _status;
-    DockTabBar *_parentTabBar;
     qreal _fitSize;
     bool _showCloseButton;
     DockWidgetHeaderButton *_closeButton;
@@ -19,24 +19,20 @@ class DockTabButton : public QQuickPaintedItem
 public:
     DockTabButton(QString title, DockTabBar *parent = nullptr);
     void paint(QPainter *painter);
+    QString title() const;
+    DockTabBar *parentTabBar() const;
+    bool showCloseButton() const;
+    qreal fitSize() const;
 
-signals:
+Q_SIGNALS:
     void clicked();
     void closeButtonClicked();
 
     // QQuickPaintedItem interface
-public:
-    QString title() const;
+public Q_SLOTS:
     void setTitle(const QString &title);
     void setChecked(bool checked);
-
-    // QQuickItem interface
-    DockTabBar *parentTabBar() const;
-
-    qreal fitSize() const;
     void setFitSize(const qreal &fitSize);
-
-    bool showCloseButton() const;
     void setShowCloseButton(bool showCloseButton);
 
 protected:

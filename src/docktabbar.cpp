@@ -2,6 +2,7 @@
 #include "docktabbar.h"
 #include "docktabbutton.h"
 #include "docktabbararrorbutton.h"
+#include "dockwidget.h"
 
 #include <QPainter>
 #include <QApplication>
@@ -32,7 +33,7 @@ void DockTabBar::setCurrentIndex(int currentIndex)
 
     m_currentIndex = currentIndex;
 
-    emit currentIndexChanged(m_currentIndex);
+    Q_EMIT currentIndexChanged(m_currentIndex);
 }
 
 DockTabBar::DockTabBar(QQuickItem *parent)
@@ -41,6 +42,7 @@ DockTabBar::DockTabBar(QQuickItem *parent)
       , m_currentIndex{-1}
       , _tabsStartPos{0.}
 {
+    AbstractStyle::registerThemableItem(this);
     setClip(true);
 
     _prevButton = new DockTabBarArrorButton(this);
@@ -67,15 +69,17 @@ DockTabBar::DockTabBar(QQuickItem *parent)
             &DockTabBar::nextButton_clicked);
 }
 
-int DockTabBar::addTab(const QString &name, bool closable)
+int DockTabBar::addTab(DockWidget *widget)
 {
-    auto t = new DockTabButton{name, this};
-    t->setFitSize(QFontMetrics(dockStyle->font()).horizontalAdvance(name) + 15);
+    auto t = new DockTabButton{widget->title(), this};
+    t->setFitSize(
+        QFontMetrics(dockStyle->font()).horizontalAdvance(widget->title()) + 15);
     t->setY(0);
-    t->setShowCloseButton(closable);
+    t->setShowCloseButton(widget->closable());
     _tabsSize += t->width();
     connect(t, &DockTabButton::clicked, this, &DockTabBar::tabButton_clicked);
     connect(t, &DockTabButton::closeButtonClicked, this, &DockTabBar::tabButton_closeButtonClicked);
+    connect(widget, &DockWidget::titleChanged, t, &DockTabButton::setTitle);
     _tabs.append(t);
     reorderTabs();
     return _tabs.count() - 1;
@@ -148,7 +152,7 @@ void DockTabBar::tabButton_clicked()
         return;
 
     auto index = _tabs.indexOf(btn);
-    emit tabClicked(index);
+    Q_EMIT tabClicked(index);
 }
 
 void DockTabBar::tabButton_closeButtonClicked()
@@ -158,7 +162,7 @@ void DockTabBar::tabButton_closeButtonClicked()
         return;
 
     auto index = _tabs.indexOf(btn);
-    emit closeButtonClicked(index);
+    Q_EMIT closeButtonClicked(index);
 }
 
 void DockTabBar::geometryChanged(const QRectF &newGeometry,

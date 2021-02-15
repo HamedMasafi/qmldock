@@ -3,7 +3,9 @@
 #include "dockwidgetheader.h"
 #include "debugrect.h"
 #include "dockwidgetbackground.h"
+#include "dockwidgetmovehandler.h"
 #include "dockwindow.h"
+#include "dockarea.h"
 #include "style/abstractstyle.h"
 #include "dockcontainer.h"
 
@@ -97,6 +99,7 @@ DockWidget::DockWidget(QQuickItem *parent)
     setClip(true);
     setAcceptHoverEvents(true);
     setAcceptedMouseButtons(Qt::LeftButton);
+    AbstractStyle::registerThemableItem(this);
 }
 
 DockWidget::~DockWidget()
@@ -115,18 +118,32 @@ void DockWidget::beginDetach()
     Q_D(DockWidget);
     setArea(Dock::Detached);
 
-//    d->titleBar->grabMouse();
+    //    d->titleBar->grabMouse();
+}
+
+void DockWidget::open()
+{
+    //    Q_D(DockWidget);
+    //    if (d->isDetached && d->dockWindow)
+    //        d->dockWindow->setVisible(true);
+    //    else
+    //        setVisible(false);
+    //    d->isClosed = true;
+    if (!dockArea())
+        return;
+    Q_EMIT opened();
 }
 
 void DockWidget::close()
 {
-    Q_D(DockWidget);
-    if (d->isDetached && d->dockWindow)
-        d->dockWindow->setVisible(false);
-    else
-        setVisible(false);
-    d->isClosed = true;
-    emit closed();
+//    Q_D(DockWidget);
+//    if (d->isDetached && d->dockWindow)
+//        d->dockWindow->setVisible(false);
+//    else
+//        setVisible(false);
+//    d->isClosed = true;
+//    dockArea()->removeDockWidget(this);
+    Q_EMIT closed();
 }
 
 void DockWidget::restoreSize()
@@ -162,7 +179,7 @@ void DockWidget::setArea(Dock::Area area)
 //        d->dockWindow = nullptr;
     }
     d->area = area;
-    emit areaChanged(d->area);
+    Q_EMIT areaChanged(d->area);
 }
 
 void DockWidget::setClosable(bool closable)
@@ -174,7 +191,7 @@ void DockWidget::setClosable(bool closable)
     if (d->titleBar)
         d->titleBar->setCloseButtonVisible(closable);
     d->closable = closable;
-    emit closableChanged(d->closable);
+    Q_EMIT closableChanged(d->closable);
 }
 
 void DockWidget::setResizable(bool resizable)
@@ -184,7 +201,7 @@ void DockWidget::setResizable(bool resizable)
         return;
 
     d->resizable = resizable;
-    emit resizableChanged(d->resizable);
+    Q_EMIT resizableChanged(d->resizable);
 }
 
 void DockWidget::setMovable(bool movable)
@@ -196,7 +213,7 @@ void DockWidget::setMovable(bool movable)
     d->movable = movable;
     if (d->titleBar)
         d->titleBar->setEnableMove(movable);
-    emit movableChanged(d->movable);
+    Q_EMIT movableChanged(d->movable);
 }
 
 void DockWidget::setShowHeader(bool showHeader)
@@ -208,7 +225,7 @@ void DockWidget::setShowHeader(bool showHeader)
     if (d->titleBar)
         d->titleBar->setVisible(showHeader);
     d->showHeader = showHeader;
-    emit showHeaderChanged(d->showHeader);
+    Q_EMIT showHeaderChanged(d->showHeader);
 }
 
 void DockWidget::setDetachable(bool detachable)
@@ -220,7 +237,7 @@ void DockWidget::setDetachable(bool detachable)
     d->detachable = detachable;
     if (d->titleBar)
         d->titleBar->setPinButtonVisible(detachable);
-    emit detachableChanged(d->detachable);
+    Q_EMIT detachableChanged(d->detachable);
 }
 
 void DockWidget::setContentItem(QQuickItem *contentItem)
@@ -238,7 +255,7 @@ void DockWidget::setContentItem(QQuickItem *contentItem)
 //                                    +dockStyle->widgetPadding()
 //                                   ));
     geometryChanged(QRectF(), QRectF());
-    emit contentItemChanged(d->contentItem);
+    Q_EMIT contentItemChanged(d->contentItem);
 }
 
 void DockWidget::setTitle(QString title)
@@ -250,7 +267,7 @@ void DockWidget::setTitle(QString title)
     d->title = title;
     if (d->titleBar)
         d->titleBar->setTitle(title);
-    emit titleChanged(d->title);
+    Q_EMIT titleChanged(d->title);
 }
 
 void DockWidget::setAllowedAreas(Dock::Areas allowedAreas)
@@ -260,7 +277,7 @@ void DockWidget::setAllowedAreas(Dock::Areas allowedAreas)
         return;
 
     d->allowedAreas = allowedAreas;
-    emit allowedAreasChanged(d->allowedAreas);
+    Q_EMIT allowedAreasChanged(d->allowedAreas);
 }
 
 void DockWidget::setTitleBar(QQuickItem *titleBar)
@@ -279,7 +296,7 @@ void DockWidget::setTitleBar(QQuickItem *titleBar)
     titleBar->setZ(1000);
     titleBar->setParentItem(this);
     d->titleBarItem = titleBar;
-    emit titleBarChanged(d->titleBarItem);
+    Q_EMIT titleBarChanged(d->titleBarItem);
 }
 
 void DockWidget::setIsActive(bool isActive)
@@ -290,7 +307,7 @@ void DockWidget::setIsActive(bool isActive)
 
     d->isActive = isActive;
     update();
-    emit isActiveChanged(d->isActive);
+    Q_EMIT isActiveChanged(d->isActive);
 }
 
 void DockWidget::header_moveStarted()
@@ -299,24 +316,24 @@ void DockWidget::header_moveStarted()
     //        d->dockWindow->startSystemMove();
 
     //    beginDetach();
-    emit beginMove();
+    Q_EMIT beginMove();
 }
 
 void DockWidget::header_moving(const QPointF &windowPos, const QPointF &cursorPos)
 {
     Q_D(DockWidget);
     if (d->isDetached) {
-        emit moving(d->dockContainer->mapFromGlobal(cursorPos));
+        Q_EMIT moving(d->dockContainer->mapFromGlobal(cursorPos));
         d->dockWindow->setPosition(windowPos.toPoint());
     } else {
         setPosition(windowPos);
-        emit moving(cursorPos);
+        Q_EMIT moving(cursorPos);
     }
 }
 
 void DockWidget::header_moveEnded()
 {
-    emit moved();
+    Q_EMIT moved();
 }
 
 bool DockWidget::childMouseEventFilter(QQuickItem *item, QEvent *e)
@@ -341,27 +358,27 @@ bool DockWidget::childMouseEventFilter(QQuickItem *item, QEvent *e)
     case QEvent::MouseButtonPress:
         _lastMousePos = me->windowPos();
         _lastChildPos = position();
-        emit beginMove();
+        Q_EMIT beginMove();
 //        detach();
         _moveEmitted = false;
         break;
 
     case QEvent::MouseMove: {
         if (_moveEmitted) {
-            emit moving(me->localPos());
+            Q_EMIT moving(me->localPos());
         } else {
-            emit beginMove();
+            Q_EMIT beginMove();
             _moveEmitted = true;
         }
         auto pt = _lastChildPos + (me->windowPos() - _lastMousePos);
 
         setPosition(pt);
-        emit moving(pt + me->pos());
+        Q_EMIT moving(pt + me->pos());
         break;
     }
 
     case QEvent::MouseButtonRelease:
-        emit moved();
+        Q_EMIT moved();
         break;;
 
     default:
@@ -455,16 +472,17 @@ void DockWidget::componentComplete()
         d->titleBar->setTitle(d->title);
         d->titleBar->setCloseButtonVisible(d->closable);
 
-        connect(d->titleBar,
-                &DockWidgetHeader::moveStarted,
+        auto handler = d->titleBar->moveHandler();
+        connect(handler,
+                &DockWidgetMoveHandler::moveStarted,
                 this,
                 &DockWidget::header_moveStarted);
-        connect(d->titleBar,
-                &DockWidgetHeader::moving,
+        connect(handler,
+                &DockWidgetMoveHandler::moving,
                 this,
                 &DockWidget::header_moving);
-        connect(d->titleBar,
-                &DockWidgetHeader::moveEnded,
+        connect(handler,
+                &DockWidgetMoveHandler::moveEnded,
                 this,
                 &DockWidget::header_moveEnded);
     }
@@ -487,6 +505,7 @@ DockContainer *DockWidget::dockContainer() const
 void DockWidget::setDockContainer(DockContainer *dockContainer)
 {
     Q_D(DockWidget);
+    setParentItem(dockContainer);
     d->dockContainer = dockContainer;
 }
 

@@ -12,7 +12,7 @@ class DockWidgetPrivate;
 class DockWidget : public QQuickPaintedItem {
     Q_OBJECT
 
-    Q_DECLARE_PRIVATE(DockWidget);
+    Q_DECLARE_PRIVATE(DockWidget)
     DockWidgetPrivate *d_ptr;
 
     Q_PROPERTY(Dock::Area area READ area WRITE setArea NOTIFY areaChanged)
@@ -26,6 +26,7 @@ class DockWidget : public QQuickPaintedItem {
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     Q_PROPERTY(Dock::Areas allowedAreas READ allowedAreas WRITE setAllowedAreas NOTIFY allowedAreasChanged)
     Q_PROPERTY(bool isActive READ isActive WRITE setIsActive NOTIFY isActiveChanged)
+
 //    Q_PROPERTY(DockWidgetFlags flags READ flags WRITE setFlags NOTIFY flagsChanged)
 
 public:
@@ -34,7 +35,7 @@ public:
         Detachable,
         Resizable
     };
-    Q_DECLARE_FLAGS(DockWidgetFlags, DockWidgetFlag);
+    Q_DECLARE_FLAGS(DockWidgetFlags, DockWidgetFlag)
     Q_FLAG(DockWidgetFlags)
 
     DockWidget(QQuickItem *parent = nullptr);
@@ -65,11 +66,12 @@ public:
 
     bool isActive() const;
 
-public slots:
+public Q_SLOTS:
     Q_DECL_DEPRECATED
     void detach();
 
     void beginDetach();
+    void open();
     void close();
     void restoreSize();
 
@@ -90,7 +92,7 @@ public slots:
     void setTitleBar(QQuickItem * titleBar);
 
 
-private slots:
+private Q_SLOTS:
     void header_moveStarted();
     void header_moving(const QPointF &windowPos, const QPointF &cursorPos);
     void header_moveEnded();
@@ -104,11 +106,12 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
 
-signals:
+Q_SIGNALS:
     void beginMove();
     void moving(const QPointF &pt);
     void moved();
     void closed();
+    void opened();
     void areaChanged(Dock::Area area);
     void closableChanged(bool closable);
     void resizableChanged(bool resizable);
@@ -126,7 +129,9 @@ signals:
 
 private:
     void setIsActive(bool isActive);
+
     friend class DockContainer;
+    friend class DockArea;
 };
 
 #endif // DOCKWIDGET_H

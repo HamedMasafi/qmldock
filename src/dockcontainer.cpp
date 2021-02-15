@@ -7,6 +7,8 @@
 #include "style/abstractstyle.h"
 #include "dockwindow.h"
 #include "dockarea.h"
+#include "dockwidgetmovehandler.h"
+#include "dockwidgetheader.h"
 
 #include <QDebug>
 #include <QPainter>
@@ -37,6 +39,9 @@ DockContainer::DockContainer(QQuickItem *parent)
 {
     Q_D(DockContainer);
     d->dockMoveGuide = new DockMoveGuide(this);
+
+    setFiltersChildMouseEvents(true);
+    AbstractStyle::registerThemableItem(this);
 }
 
 DockContainer::~DockContainer()
@@ -55,14 +60,14 @@ void DockContainer::componentComplete()
         d->dockAreas[Dock::Center]->setDisplayType(Dock::TabbedView);
     }
     connect(window(), &QQuickWindow::activeFocusItemChanged, [this, d]() {
-        auto dockWidget = Dock::findInParents<DockWidget>(
-            window()->activeFocusItem());
-        if (dockWidget) {
-            if (d->activeDockWidget)
-                d->activeDockWidget->setIsActive(false);
-            d->activeDockWidget = dockWidget;
-            d->activeDockWidget->setIsActive(true);
-        }
+//        auto dockWidget = Dock::findInParents<DockWidget>(
+//            window()->activeFocusItem());
+//        if (dockWidget) {
+//            if (d->activeDockWidget)
+//                d->activeDockWidget->setIsActive(false);
+//            d->activeDockWidget = dockWidget;
+//            d->activeDockWidget->setIsActive(true);
+//        }
     });
     createGroup(Dock::Left);
     createGroup(Dock::Right);
@@ -172,6 +177,8 @@ void DockContainer::addDockWidget(DockWidget *widget)
 
     connect(widget, &DockWidget::moving, this, &DockContainer::dockWidget_moving);
     connect(widget, &DockWidget::moved, this, &DockContainer::dockWidget_moved);
+    connect(widget, &DockWidget::closed, this, &DockContainer::dockWidget_closed);
+    connect(widget, &DockWidget::opened, this, &DockContainer::dockWidget_opened);
     connect(widget,
             &QQuickItem::visibleChanged,
             this,
@@ -211,7 +218,16 @@ void DockContainer::addDockWidget(DockWidget *widget)
     if (isComponentComplete())
         reorderDockAreas();
 
-    emit dockWidgetsChanged(d->dockWidgets);
+    Q_EMIT dockWidgetsChanged(d->dockWidgets);
+}
+
+void DockContainer::removeDockWidget(DockWidget *widget)
+{
+    Q_D(DockContainer);
+    if (widget->dockArea())
+        widget->dockArea()->removeDockWidget(widget);
+    widget->setParentItem(nullptr);
+    d->removedDockWidgets.append(widget);
 }
 
 void DockContainer::reorderDockAreas()
@@ -291,7 +307,7 @@ void DockContainer::setTopLeftOwner(Qt::Edge topLeftOwner)
     d->topLeftOwner = topLeftOwner;
     if (isComponentComplete())
         reorderDockAreas();
-    emit topLeftOwnerChanged(d->topLeftOwner);
+    Q_EMIT topLeftOwnerChanged(d->topLeftOwner);
 }
 
 void DockContainer::setTopRightOwner(Qt::Edge topRightOwner)
@@ -309,7 +325,7 @@ void DockContainer::setTopRightOwner(Qt::Edge topRightOwner)
     d->topRightOwner = topRightOwner;
     if (isComponentComplete())
         reorderDockAreas();
-    emit topRightOwnerChanged(d->topRightOwner);
+    Q_EMIT topRightOwnerChanged(d->topRightOwner);
 }
 
 void DockContainer::setBottomLeftOwner(Qt::Edge bottomLeftOwner)
@@ -327,7 +343,7 @@ void DockContainer::setBottomLeftOwner(Qt::Edge bottomLeftOwner)
     d->bottomLeftOwner = bottomLeftOwner;
     if (isComponentComplete())
         reorderDockAreas();
-    emit bottomLeftOwnerChanged(d->bottomLeftOwner);
+    Q_EMIT bottomLeftOwnerChanged(d->bottomLeftOwner);
 }
 
 void DockContainer::setBottomRightOwner(Qt::Edge bottomRightOwner)
@@ -345,7 +361,7 @@ void DockContainer::setBottomRightOwner(Qt::Edge bottomRightOwner)
     d->bottomRightOwner = bottomRightOwner;
     if (isComponentComplete())
         reorderDockAreas();
-    emit bottomRightOwnerChanged(d->bottomRightOwner);
+    Q_EMIT bottomRightOwnerChanged(d->bottomRightOwner);
 }
 
 void DockContainer::setEnableStateStoring(bool enableStateStoring)
@@ -356,7 +372,7 @@ void DockContainer::setEnableStateStoring(bool enableStateStoring)
         return;
 
     d->enableStateStoring = enableStateStoring;
-    emit enableStateStoringChanged(d->enableStateStoring);
+    Q_EMIT enableStateStoringChanged(d->enableStateStoring);
 }
 
 void DockContainer::setDefaultDisplayType(Dock::DockWidgetDisplayType defaultDisplayType)
@@ -367,7 +383,7 @@ void DockContainer::setDefaultDisplayType(Dock::DockWidgetDisplayType defaultDis
         return;
 
     d->defaultDisplayType = defaultDisplayType;
-    emit defaultDisplayTypeChanged(d->defaultDisplayType);
+    Q_EMIT defaultDisplayTypeChanged(d->defaultDisplayType);
 }
 
 void DockContainer::dockWidget_beginMove()
@@ -431,6 +447,15 @@ void DockContainer::dockWidget_moved()
     }
 }
 
+void DockContainer::dockWidget_opened() {}
+
+void DockContainer::dockWidget_closed()
+{
+    auto w = qobject_cast<DockWidget *>(sender());
+    if (w)
+        removeDockWidget(w);
+}
+
 void DockContainer::dockWidget_visibleChanged()
 {
     Q_D(DockContainer);
@@ -476,8 +501,9 @@ int DockContainer::panelSize(Dock::Area area) const
 DockArea *DockContainer::createGroup(Dock::Area area, DockArea *item)
 {
     Q_D(DockContainer);
-    if (d->dockAreas.contains(area))
+    if (d->dockAreas.contains(area)) {
         return d->dockAreas.value(area);
+    }
 
     if (!item)
         item = new DockArea(this);
@@ -570,4 +596,22 @@ Dock::DockWidgetDisplayType DockContainer::defaultDisplayType() const
 {
     Q_D(const DockContainer);
     return d->defaultDisplayType;
+}
+
+bool DockContainer::childMouseEventFilter(QQuickItem *item, QEvent *event)
+{
+
+    auto handler = qobject_cast<DockWidgetMoveHandler *>(item);
+    if (handler) {
+        if (event->type() == QEvent::MouseButtonPress) {
+            auto me = static_cast<QMouseEvent *>(event);
+
+
+            handler->mousePressEvent(me);
+            handler->dockWidget()->setArea(Dock::Detached);
+            return true;
+        }
+    }
+
+    return false;
 }

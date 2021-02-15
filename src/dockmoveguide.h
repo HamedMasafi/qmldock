@@ -2,6 +2,7 @@
 #define DOCKMOVEGUIDE_H
 
 #include <QQuickPaintedItem>
+#include <QPair>
 #include "dock.h"
 
 class QQuickWindow;
@@ -15,9 +16,13 @@ class DockMoveGuide : public QQuickPaintedItem
     Dock::Area _area;
     Dock::Areas _allowedAreas;
     QQuickWindow *_window;
-    QMultiMap<Dock::Area, QRectF> _areas;
+    using LocalAndGlobalRect = QPair<QRectF, QRectF>;
+
+    QMultiMap<Dock::Area, LocalAndGlobalRect> _areas;
+//    QMultiMap<Dock::Area, QRectF> _globalAreas;
     MoveDropGuide *_dropArea;
 
+    void insertToAreas(Dock::Area, const QRectF &);
 public:
     DockMoveGuide(DockContainer *parent = nullptr);
 
@@ -33,7 +38,7 @@ public:
     Dock::Areas allowedAreas() const;
     void setAllowedAreas(const Dock::Areas &allowedAreas);
 
-signals:
+Q_SIGNALS:
     void dropped(Dock::Area area);
 };
 

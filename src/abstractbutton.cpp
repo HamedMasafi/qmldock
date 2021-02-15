@@ -7,6 +7,7 @@ AbstractButton::AbstractButton(QQuickItem *parent)
     setSize(QSizeF(16, 16));
     setAcceptHoverEvents(true);
     setAcceptedMouseButtons(Qt::LeftButton);
+    AbstractStyle::registerThemableItem(this);
 }
 Dock::Icon AbstractButton::icon() const
 {
@@ -38,6 +39,7 @@ void AbstractButton::hoverLeaveEvent(QHoverEvent *event)
 
 void AbstractButton::mousePressEvent(QMouseEvent *event)
 {
+    Q_UNUSED(event)
     _status = Dock::Pressed;
     update();
 }
@@ -47,7 +49,7 @@ void AbstractButton::mouseReleaseEvent(QMouseEvent *event)
     _status = Dock::Normal;
     update();
     if (clipRect().contains(event->pos()))
-        emit clicked();
+        Q_EMIT clicked();
 }
 
 

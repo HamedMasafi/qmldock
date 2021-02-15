@@ -11,7 +11,7 @@ class DebugRect : public QQuickPaintedItem
 public:
     DebugRect(QColor color, QQuickItem *parent);
 
-signals:
+Q_SIGNALS:
 
 
     // QQuickPaintedItem interface

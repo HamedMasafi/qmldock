@@ -1,10 +1,21 @@
 #include "dockmoveguide.h"
 
+#include <QApplication>
 #include <QPainter>
 #include <QQuickWindow>
+#include <QScreen>
 #include "style/abstractstyle.h"
 #include "dockcontainer.h"
 #include "movedropguide.h"
+
+void DockMoveGuide::insertToAreas(Dock::Area a, const QRectF &rc)
+{
+    if (_areas.contains(a))
+        qDebug() << "Check:" << rc << _areas.value(a);
+    _areas.insert(a, qMakePair<QRectF, QRectF>(rc, {mapToGlobal(rc.topLeft()), rc.size()}));
+//    qDebug() << a << rc << "mapped to" << _globalAreas.value(a);
+//    qDebug() << _areas.keys();
+}
 
 DockMoveGuide::DockMoveGuide(DockContainer *parent) : QQuickPaintedItem(parent)
       ,_parentDockContainer(parent)
@@ -20,12 +31,15 @@ DockMoveGuide::DockMoveGuide(DockContainer *parent) : QQuickPaintedItem(parent)
     _dropArea->setParentItem(parent);
     _dropArea->setVisible(false);
     _dropArea->setZ(999);
+
+    setCursor(Qt::ArrowCursor);
 }
 
 void DockMoveGuide::begin(const QPointF &pos, const QSizeF &size)
 {
-    _window->setPosition(pos.toPoint());
-    _window->resize(size.toSize());
+    QRect windowRect = QRect(pos.toPoint(), size.toSize()).intersected(qApp->primaryScreen()->geometry());
+    _window->setPosition(windowRect.topLeft());
+    _window->resize(windowRect.size());
     _window->show();
 
     setVisible(true);
@@ -39,7 +53,7 @@ void DockMoveGuide::begin(const QPointF &pos, const QSizeF &size)
     if (_allowedAreas & Dock::Center) {
         rc.moveCenter(QPoint(size.width() / 2, size.height() / 2));
         region = region.united(rc);
-        _areas.insert(Dock::Center, rc);
+        insertToAreas(Dock::Center, rc);
     }
 
     rc.setSize(QSize(dockStyle->dropButtonSize(), dockStyle->dropButtonSize()));
@@ -48,22 +62,22 @@ void DockMoveGuide::begin(const QPointF &pos, const QSizeF &size)
         rc.moveLeft(size.width() / 2 - dockStyle->dropButtonSize()
                     - dockStyle->dropButtonSpace());
         region = region.united(rc);
-        _areas.insert(Dock::Left, rc);
+        insertToAreas(Dock::Left, rc);
 
         rc.moveLeft(50);
         region = region.united(rc);
-        _areas.insert(Dock::Left, rc);
+        insertToAreas(Dock::Left, rc);
     }
 
     if (_allowedAreas & Dock::Right) {
         rc.moveRight(size.width() / 2 + dockStyle->dropButtonSize()
                      + dockStyle->dropButtonSpace());
         region = region.united(rc);
-        _areas.insert(Dock::Right, rc);
+        insertToAreas(Dock::Right, rc);
 
         rc.moveRight(size.width() - 50);
         region = region.united(rc);
-        _areas.insert(Dock::Right, rc);
+        insertToAreas(Dock::Right, rc);
     }
 
     //back to center
@@ -73,22 +87,22 @@ void DockMoveGuide::begin(const QPointF &pos, const QSizeF &size)
         rc.moveTop(size.height() / 2 - dockStyle->dropButtonSize()
                    - dockStyle->dropButtonSpace());
         region = region.united(rc);
-        _areas.insert(Dock::Top, rc);
+        insertToAreas(Dock::Top, rc);
 
         rc.moveTop(50);
         region = region.united(rc);
-        _areas.insert(Dock::Top, rc);
+        insertToAreas(Dock::Top, rc);
     }
 
     if (_allowedAreas & Dock::Bottom) {
         rc.moveBottom(size.height() / 2 + dockStyle->dropButtonSize()
                       + dockStyle->dropButtonSpace());
         region = region.united(rc);
-        _areas.insert(Dock::Bottom, rc);
+        insertToAreas(Dock::Bottom, rc);
 
         rc.moveBottom(size.height() - 50);
         region = region.united(rc);
-        _areas.insert(Dock::Bottom, rc);
+        insertToAreas(Dock::Bottom, rc);
     }
 
     _window->setMask(region);
@@ -131,12 +145,13 @@ void DockMoveGuide::paint(QPainter *painter)
 {
     _area = Dock::Detached;
 
-    if (_allowedAreas & Dock::Float && clipRect().contains(_mousePos))
-        _area = Dock::Float;
+    //    if (_allowedAreas & Dock::Float && clipRect().contains(_mousePos))
+    //        _area = Dock::Float;
 
+    auto mousePos = QCursor::pos();
     for (auto i = _areas.begin(); i != _areas.end(); ++i) {
-        auto contains = i.value().contains(_mousePos);
-        dockStyle->paintDropButton(painter, i.key(), i.value(), contains);
+        auto contains = i.value().second.contains(mousePos);
+        dockStyle->paintDropButton(painter, i.key(), i.value().first, contains);
         if (contains) {
             _area = i.key();
             auto rc = _parentDockContainer->panelRect(_area);
