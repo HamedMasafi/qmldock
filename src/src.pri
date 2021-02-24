@@ -24,6 +24,7 @@ SOURCES += \
     $$PWD/dock.cpp \
     $$PWD/dockarea.cpp \
     $$PWD/dockcontainer.cpp \
+    $$PWD/dockdockableitem.cpp \
     $$PWD/dockgroupresizehandler.cpp \
     $$PWD/dockmoveguide.cpp \
     $$PWD/dockplugin.cpp \
@@ -54,6 +55,8 @@ HEADERS += \
     $$PWD/dockarea_p.h \
     $$PWD/dockcontainer.h \
     $$PWD/dockcontainer_p.h \
+    $$PWD/dockdockableitem.h \
+    $$PWD/dockdockableitem_p.h \
     $$PWD/dockgroupresizehandler.h \
     $$PWD/dockmoveguide.h \
     $$PWD/dockplugin.h \

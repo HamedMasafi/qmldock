@@ -4,6 +4,7 @@
 #include "dockwidget.h"
 #include "dockarea.h"
 #include "docktabbar.h"
+#include "dockdockableitem.h"
 #include "dockwidgetmovehandler.h"
 #include "style/abstractstyle.h"
 
@@ -21,6 +22,7 @@ void DockPlugin::registerDockPlugin()
     qmlRegisterType<DockWidget>("Kaj.Dock", 1, 0, "DockWidget");
     qmlRegisterType<DockArea>("Kaj.Dock", 1, 0, "DockArea");
     qmlRegisterType<DockTabBar>("Kaj.Dock", 1, 0, "DockTabBar");
+    qmlRegisterType<DockDockableItem>("Kaj.Dock", 1, 0, "DockableItem");
     qmlRegisterType<DockWidgetMoveHandler>("Kaj.Dock", 1, 0, "DockWidgetMoveHandler");
     qmlRegisterUncreatableMetaObject(Dock::staticMetaObject,
                                      "Kaj.Dock",

@@ -2,7 +2,7 @@
 #include "dockwidget.h"
 #include <QDebug>
 
-DockWindow::DockWindow(DockWidget *dock, QWindow *parent) : QQuickWindow(parent)
+DockWindow::DockWindow(QQuickItem *dock, QWindow *parent) : QQuickWindow(parent)
       , _dockWidget(dock)
 {
     _dockWidget->setParentItem(contentItem());

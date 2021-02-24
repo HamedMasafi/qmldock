@@ -3,13 +3,12 @@
 
 #include <QQuickWindow>
 
-class DockWidget;
 class DockWindow : public QQuickWindow
 {
     Q_OBJECT
-    DockWidget *_dockWidget;
+    QQuickItem *_dockWidget;
 public:
-    DockWindow(DockWidget *dock, QWindow *parent = nullptr);
+    DockWindow(QQuickItem *dock, QWindow *parent = nullptr);
 
 //    // QWindow interface
 //protected:
