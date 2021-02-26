@@ -55,6 +55,11 @@ DockContainer::~DockContainer()
 void DockContainer::componentComplete()
 {
     Q_D(DockContainer);
+
+    auto areas = findChildren<DockArea*>();
+    for (auto &a: areas)
+        d->dockAreas.insert(a->area(), a);
+
     if (!d->dockAreas.contains(Dock::Center)) {
         createGroup(Dock::Center);
         d->dockAreas[Dock::Center]->setDisplayType(Dock::TabbedView);
