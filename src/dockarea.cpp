@@ -18,7 +18,6 @@ DockAreaPrivate::DockAreaPrivate(DockArea *parent)
       , minimumSize(80), maximumSize(400)
       , tabPosition{Qt::TopEdge}
 {
-    qDebug() << Q_FUNC_INFO;
 }
 
 void DockAreaPrivate::relayout()
@@ -377,7 +376,6 @@ DockArea::DockArea(QQuickItem *parent)
     setAcceptedMouseButtons(Qt::LeftButton);
 
     AbstractStyle::registerThemableItem(this);
-    qDebug() << Q_FUNC_INFO;
 }
 
 DockArea::~DockArea()
