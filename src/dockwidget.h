@@ -1,6 +1,7 @@
 #ifndef DOCKWIDGET_H
 #define DOCKWIDGET_H
 
+#include <QJSValue>
 #include <QQuickPaintedItem>
 #include "dock.h"
 
@@ -26,6 +27,7 @@ class DockWidget : public QQuickPaintedItem {
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     Q_PROPERTY(Dock::Areas allowedAreas READ allowedAreas WRITE setAllowedAreas NOTIFY allowedAreasChanged)
     Q_PROPERTY(bool isActive READ isActive WRITE setIsActive NOTIFY isActiveChanged)
+    Q_PROPERTY(QJSValue closeEvent READ closeEvent WRITE setCloseEvent NOTIFY closeEventChanged)
 
 //    Q_PROPERTY(DockWidgetFlags flags READ flags WRITE setFlags NOTIFY flagsChanged)
 
@@ -66,6 +68,8 @@ public:
 
     bool isActive() const;
 
+    QJSValue closeEvent() const;
+
 public Q_SLOTS:
     Q_DECL_DEPRECATED
     void detach();
@@ -91,6 +95,8 @@ public Q_SLOTS:
 
     void setTitleBar(QQuickItem * titleBar);
 
+
+    void setCloseEvent(QJSValue closeEvent);
 
 private Q_SLOTS:
     void header_moveStarted();
@@ -127,11 +133,14 @@ Q_SIGNALS:
 
     void isActiveChanged(bool isActive);
 
+    void closeEventChanged(QJSValue closeEvent);
+
 private:
     void setIsActive(bool isActive);
 
     friend class DockContainer;
     friend class DockArea;
+    QJSValue m_closeEvent;
 };
 
 #endif // DOCKWIDGET_H

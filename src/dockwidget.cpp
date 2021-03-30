@@ -143,7 +143,16 @@ void DockWidget::close()
 //        setVisible(false);
 //    d->isClosed = true;
 //    dockArea()->removeDockWidget(this);
-    Q_EMIT closed();
+    if (!m_closeEvent.isNull()) {
+        auto ret = m_closeEvent.call();
+
+        if (ret.isError())
+            qDebug() << ret.errorType();
+        if (ret.isBool() && ret.toBool())
+            Q_EMIT closed();
+    } else {
+        Q_EMIT closed();
+    }
 }
 
 void DockWidget::restoreSize()
@@ -297,6 +306,12 @@ void DockWidget::setTitleBar(QQuickItem *titleBar)
     titleBar->setParentItem(this);
     d->titleBarItem = titleBar;
     Q_EMIT titleBarChanged(d->titleBarItem);
+}
+
+void DockWidget::setCloseEvent(QJSValue closeEvent)
+{
+    m_closeEvent = closeEvent;
+    Q_EMIT closeEventChanged(m_closeEvent);
 }
 
 void DockWidget::setIsActive(bool isActive)
@@ -494,6 +509,11 @@ bool DockWidget::isActive() const
 {
     Q_D(const DockWidget);
     return d->isActive;
+}
+
+QJSValue DockWidget::closeEvent() const
+{
+    return m_closeEvent;
 }
 
 DockContainer *DockWidget::dockContainer() const
