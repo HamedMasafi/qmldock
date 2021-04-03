@@ -13,7 +13,7 @@ Window {
     DockContainer {
         id: dockArea
         anchors.fill: parent
-        enableStateStoring: true
+//        enableStateStoring: true
 
         DockArea {
             id: centerDockGroup
@@ -105,7 +105,7 @@ Window {
             area: Dock.Center
             title: "Tab potision"
             contentItem: TabPosition {
-                dockContainer: centerDockGroup
+                dockGroup: centerDockGroup
             }
         }
 

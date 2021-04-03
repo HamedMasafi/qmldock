@@ -177,6 +177,7 @@ void DockWidget::setArea(Dock::Area area)
         d->dockWindow->resize(size().toSize());
         d->dockWindow->show();
         d->isDetached = true;
+        qDebug() << Q_FUNC_INFO;
     }
 
     if (d->area == Dock::Detached) {

@@ -6,7 +6,7 @@ import Kaj.Dock 1.0
 Pane {
     clip: true
 
-    property DockContainer dockContainer: null
+    property DockArea dockGroup: null
 
     ColumnLayout {
         RowLayout {
@@ -18,16 +18,16 @@ Pane {
                 onCurrentTextChanged: {
                     switch (currentIndex) {
                     case 0:
-                        dockContainer.tabPosition = Qt.TopEdge
+                        dockGroup.tabPosition = Qt.TopEdge
                         break;
                     case 1:
-                        dockContainer.tabPosition = Qt.LeftEdge
+                        dockGroup.tabPosition = Qt.LeftEdge
                         break;
                     case 2:
-                        dockContainer.tabPosition = Qt.RightEdge
+                        dockGroup.tabPosition = Qt.RightEdge
                         break;
                     case 3:
-                        dockContainer.tabPosition = Qt.BottomEdge
+                        dockGroup.tabPosition = Qt.BottomEdge
                         break;
                     }
                 }
