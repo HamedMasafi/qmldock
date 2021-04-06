@@ -143,7 +143,7 @@ void DockWidget::close()
 //        setVisible(false);
 //    d->isClosed = true;
 //    dockArea()->removeDockWidget(this);
-    if (!m_closeEvent.isNull()) {
+    if (m_closeEvent.isCallable()) {
         auto ret = m_closeEvent.call();
 
         if (ret.isError())

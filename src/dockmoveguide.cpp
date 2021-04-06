@@ -157,7 +157,6 @@ void DockMoveGuide::setMousePos(const QPointF &mousePos)
 
 void DockMoveGuide::paint(QPainter *painter)
 {
-
     auto mousePos = QCursor::pos();
     for (auto i = _areas.begin(); i != _areas.end(); ++i) {
         auto contains = i.value().second.contains(mousePos);
