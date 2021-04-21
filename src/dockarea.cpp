@@ -754,6 +754,10 @@ int DockArea::currentIndex() const
 void DockArea::addDockWidget(DockWidget *item)
 {
     Q_D(DockArea);
+
+    if (d->dockWidgets.contains(item))
+        return;
+
     item->setArea(d->area);
     item->setDockArea(this);
     //    addItem(item);

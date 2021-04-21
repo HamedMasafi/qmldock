@@ -90,7 +90,6 @@ bool DockWidget::detachable() const
 void DockWidget::paint(QPainter *painter)
 {
     dockStyle->paintDockWidget(painter, this);
-//    QQuickPaintedItem::paint(painter);
 }
 
 DockWidget::DockWidget(QQuickItem *parent)
@@ -105,6 +104,7 @@ DockWidget::DockWidget(QQuickItem *parent)
 DockWidget::~DockWidget()
 {
     Q_D(DockWidget);
+    d->dockWindow->deleteLater();
     delete d;
 }
 
@@ -171,13 +171,14 @@ void DockWidget::setArea(Dock::Area area)
     if (area == Dock::Detached) {
         auto wpos = mapToGlobal(QPointF(0, 0)).toPoint();
         if (!d->dockWindow)
-            d->dockWindow = new DockWindow(this);
+            d->dockWindow = new DockWindow;
+
+        d->dockWindow->setDockWidget(this);
         d->dockWindow->setPosition(wpos);
         d->dockWindow->setTitle(title());
         d->dockWindow->resize(size().toSize());
         d->dockWindow->show();
         d->isDetached = true;
-        qDebug() << Q_FUNC_INFO;
     }
 
     if (d->area == Dock::Detached) {
@@ -185,8 +186,6 @@ void DockWidget::setArea(Dock::Area area)
         setVisible(true);
         d->isDetached = false;
         d->dockWindow->hide();
-//        d->dockWindow->deleteLater();
-//        d->dockWindow = nullptr;
     }
     d->area = area;
     Q_EMIT areaChanged(d->area);

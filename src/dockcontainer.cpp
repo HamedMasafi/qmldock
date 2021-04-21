@@ -184,6 +184,7 @@ void DockContainer::addDockWidget(DockWidget *widget)
     connect(widget, &DockWidget::moved, this, &DockContainer::dockWidget_moved);
     connect(widget, &DockWidget::closed, this, &DockContainer::dockWidget_closed);
     connect(widget, &DockWidget::opened, this, &DockContainer::dockWidget_opened);
+    connect(widget, &DockWidget::areaChanged, this, &DockContainer::dockWidget_areaChanged);
     connect(widget,
             &QQuickItem::visibleChanged,
             this,
@@ -485,6 +486,20 @@ void DockContainer::dockWidget_visibleChanged()
             dw->dockArea()->removeDockWidget(dw);
         }
     }
+}
+
+void DockContainer::dockWidget_areaChanged(Dock::Area area)
+{
+    Q_D(DockContainer);
+
+    auto dw = qobject_cast<DockWidget *>(sender());
+    if (!dw)
+        return;
+
+    if (dw->dockArea())
+        dw->dockArea()->removeDockWidget(dw);
+    if (area < 16 && area)
+        d->dockAreas[area]->addDockWidget(dw);
 }
 
 void DockContainer::geometryChanged(const QRectF &newGeometry,
