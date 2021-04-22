@@ -184,7 +184,7 @@ void DockContainer::addDockWidget(DockWidget *widget)
     connect(widget, &DockWidget::moved, this, &DockContainer::dockWidget_moved);
     connect(widget, &DockWidget::closed, this, &DockContainer::dockWidget_closed);
     connect(widget, &DockWidget::opened, this, &DockContainer::dockWidget_opened);
-    connect(widget, &DockWidget::areaChanged, this, &DockContainer::dockWidget_areaChanged);
+//    connect(widget, &DockWidget::areaChanged, this, &DockContainer::dockWidget_areaChanged);
     connect(widget,
             &QQuickItem::visibleChanged,
             this,

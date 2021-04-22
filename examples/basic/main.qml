@@ -13,7 +13,7 @@ Window {
     DockContainer {
         id: dockArea
         anchors.fill: parent
-//        enableStateStoring: true
+        enableStateStoring: false
 
         DockArea {
             id: centerDockGroup
@@ -42,7 +42,7 @@ Window {
                 delegate: Text {
                     width: listView60.width
                     text: modelData
-                    color: 'white'
+//                    color: 'white'
                 }
             }
         }

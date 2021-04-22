@@ -760,7 +760,7 @@ void DockArea::addDockWidget(DockWidget *item)
 
     item->setArea(d->area);
     item->setDockArea(this);
-    //    addItem(item);
+
     d->dockWidgets.append(item);
     d->normalizeItemSizes();
 
