@@ -6,6 +6,8 @@
 #include "style/abstractstyle.h"
 #include "docktabbar.h"
 #include "dockwidget.h"
+#include "dock_p.h"
+#include "dockcontainer.h"
 
 #include <QCursor>
 #include <QDebug>
@@ -24,11 +26,10 @@ void DockAreaPrivate::relayout()
 {
     updateUsableArea();
 
-    if (tabBarItem && displayType == Dock::TabbedView)
+    if (tabBarItem && (displayType == Dock::TabbedView || displayType == Dock::AutoHide))
         arrangeTabBar();
 
     reorderHandles();
-
     reorderItems();
 }
 
@@ -238,13 +239,15 @@ void DockAreaPrivate::reorderItems()
             dw->setPosition(q->position() + usableArea.topLeft());
             dw->setSize(usableArea.size());
             dw->setVisible(i == currentIndex);
-            dw->setVisibility(i == currentIndex ? DockWidget::Openned : DockWidget::Hidden);
+//            dw->setVisibility(i == currentIndex ? DockWidget::Openned : DockWidget::Hidden);
+            break;
+        case Dock::AutoHide:
+            dw->setPosition(q->position() + usableArea.topLeft());
+            dw->setSize(usableArea.size());
+            dw->setVisible(i == currentIndex);
             break;
 
-        case Dock::Hidden:
-            break;
         }
-
     }
 }
 
@@ -304,8 +307,11 @@ void DockAreaPrivate::normalizeItemSizes()
 
 void DockAreaPrivate::updateTabbedView()
 {
-    for (int i = 0; i < dockWidgets.count(); ++i)
+    for (int i = 0; i < dockWidgets.count(); ++i) {
         dockWidgets.at(i)->setVisible(i == currentIndex);
+        dockWidgets.at(i)->setVisibility(i == currentIndex ? DockWidget::Active : DockWidget::Hidden);
+    }
+
     if (tabBar)
         tabBar->setCurrentIndex(currentIndex);
 }
@@ -340,7 +346,7 @@ QRectF DockAreaPrivate::updateUsableArea()
     tabBarPosition.setX(usableArea.x() - 1);
     tabBarPosition.setY(usableArea.y() - 1);
     tabBarWidth = usableArea.width();
-    if (tabBarItem && displayType == Dock::TabbedView) {
+    if (tabBarItem && (displayType == Dock::TabbedView || displayType == Dock::AutoHide)) {
         switch (tabPosition) {
         case Qt::TopEdge:
             usableArea.setTop(usableArea.top() + tabBarItem->height());
@@ -545,8 +551,8 @@ void DockArea::updatePolish()
 void DockArea::dockWidget_closed()
 {
     Q_D(DockArea);
-    if (d->displayType == Dock::TabbedView
-        || d->displayType == Dock::StackedView) {
+    if (d->displayType == Dock::TabbedView || d->displayType == Dock::StackedView
+        || d->displayType == Dock::AutoHide) {
         removeDockWidget(qobject_cast<DockWidget *>(sender()));
     }
 }
@@ -554,14 +560,15 @@ void DockArea::dockWidget_closed()
 void DockArea::tabBar_tabClicked(int index)
 {
     Q_D(DockArea);
-    if (d->displayType != Dock::TabbedView
-        && d->displayType != Dock::StackedView)
+    if (d->displayType != Dock::TabbedView && d->displayType != Dock::StackedView
+        && d->displayType != Dock::AutoHide)
         return;
 
     //    for (int i = 0; i < d->dockWidgets.count(); ++i) {
     //        d->dockWidgets.at(i)->setVisible(i == index);
     //    }
     //    d->tabBar->setCurrentIndex(index);
+    d->dockWidgets.at(index)->setVisibility(DockWidget::Active);
     setCurrentIndex(index);
 }
 
@@ -708,7 +715,7 @@ void DockArea::componentComplete()
     if (!d->tabBarItem) {
         d->tabBar = new DockTabBar(this);
         d->tabBar->setVisible(false);
-        d->tabBar->setZ(10000);
+        d->tabBar->setZ(Dock::Private::Z::TabBar);
         d->tabBar->setTransformOrigin(QQuickItem::TopLeft);
         d->tabBar->setHeight(dockStyle->tabBarSize());
         d->tabBarItem = d->tabBar;
@@ -738,7 +745,7 @@ void DockArea::componentComplete()
         d->tabBar->setEdge(d->tabPosition);
     }
 
-    d->tabBarItem->setVisible(d->displayType == Dock::TabbedView);
+    d->tabBarItem->setVisible(d->displayType == Dock::TabbedView || d->displayType == Dock::AutoHide);
 }
 
 QQuickItem *DockArea::tabBar() const
@@ -766,8 +773,12 @@ void DockArea::addDockWidget(DockWidget *item)
     d->dockWidgets.append(item);
     d->normalizeItemSizes();
 
-    if (d->tabBar)
+    if (d->tabBar) {
         d->tabBar->addTab(item);
+//        qDebug() << item;
+//        for (auto &t: d->tabBar->tabs())
+//            qDebug() << "  *" << t;
+    }
 
     if (d->dockWidgets.count() > 1) {
         auto h = d->createHandlers();
@@ -891,7 +902,7 @@ void DockArea::setDisplayType(Dock::DockWidgetDisplayType displayType)
         return;
 
     if (d->tabBarItem)
-        d->tabBarItem->setVisible(displayType == Dock::TabbedView);
+        d->tabBarItem->setVisible(displayType == Dock::TabbedView || displayType == Dock::AutoHide);
     d->displayType = displayType;
     Q_EMIT displayTypeChanged(displayType);
 }
@@ -962,18 +973,27 @@ void DockArea::setTabPosition(Qt::Edge tabPosition)
 void DockArea::setCurrentIndex(int currentIndex)
 {
     Q_D(DockArea);
-    auto newIndex = qBound(0, currentIndex, d->dockWidgets.count() - 1);
+    auto newIndex = qBound(-1, currentIndex, d->dockWidgets.count() - 1);
 
     if (d->currentIndex == newIndex)
         return;
 
-    if (d->currentIndex > 0 && d->currentIndex < d->dockWidgets.size())
-        d->dockWidgets.at(d->currentIndex)->setIsActive(false);
+//    if (d->currentIndex > 0 && d->currentIndex < d->dockWidgets.size()) {
+//        d->dockWidgets.at(d->currentIndex)->setIsActive(false);
+//    }
+
+//    if (d->displayType == Dock::Hidden)
+//        qobject_cast<DockContainer *>(parentItem())
+//            ->setActiveWidget(d->dockWidgets.at(d->currentIndex));
 
     d->currentIndex = newIndex;
-    d->dockWidgets.at(d->currentIndex)->setIsActive(true);
+    if (-1 < newIndex) {
+//        d->dockWidgets.at(d->currentIndex)->setVisibility(DockWidget::Active);
+//        d->dockWidgets.at(d->currentIndex)->setIsActive(true);
+    }
 
-    if (d->displayType == Dock::TabbedView || d->displayType == Dock::StackedView)
+    if (d->displayType == Dock::TabbedView || d->displayType == Dock::StackedView
+        || d->displayType == Dock::AutoHide)
         d->updateTabbedView();
 
     Q_EMIT currentIndexChanged(d->currentIndex);

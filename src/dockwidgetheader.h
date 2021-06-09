@@ -16,8 +16,11 @@ class DockWidgetHeader : public QQuickPaintedItem
     bool _moveEmitted;
     QString _title;
 
+    QList<DockWidgetHeaderButton*> _buttons;
+
     DockWidgetHeaderButton *pinButton;
     DockWidgetHeaderButton *closeButton;
+
     DockWidgetMoveHandler *_moveHandler;
     enum ButtonStatus {
         Normal,
@@ -28,16 +31,8 @@ class DockWidgetHeader : public QQuickPaintedItem
 public:
     DockWidgetHeader(DockWidget *parent = nullptr);
 
-//Q_SIGNALS:
-//    void moveStarted();
-//    void moving(const QPointF &windowPos, const QPointF &cursorPos);
-//    void moveEnded();
+    void paint(QPainter *painter) override;
 
-    // QQuickPaintedItem interface
-public:
-    void paint(QPainter *painter);
-
-//    // QQuickItem interface
     QString title() const;
 
     bool closeButtonVisible() const;
@@ -56,13 +51,8 @@ public:
 public Q_SLOTS:
     void setTitle(const QString &title);
 
-//protected:
-//    void mousePressEvent(QMouseEvent *event);
-//    void mouseMoveEvent(QMouseEvent *event);
-//    void mouseReleaseEvent(QMouseEvent *event);
-
 protected:
-    void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
+    void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
 };
 
 #endif // DOCKWIDGETHEADER_H

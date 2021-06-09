@@ -98,7 +98,7 @@ void DockTabBar::removeTab(int index)
 
     if (index >= _tabs.count())
         setCurrentIndex(qBound(0, m_currentIndex, _tabs.count() - 1));
-
+    qDebug() << tab->title() << "removed";
     reorderTabs();
 }
 
@@ -111,7 +111,7 @@ void DockTabBar::reorderTabs()
 {
     qreal xx = (_edge == Qt::LeftEdge ? width() : 0)
         + _tabsStartPos;
-    for (auto btn : _tabs) {
+    for (auto &btn : _tabs) {
         btn->setY(0);
         btn->setHeight(height());
         btn->setWidth(btn->fitSize());

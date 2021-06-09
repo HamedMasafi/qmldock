@@ -26,13 +26,26 @@ Q_ENUM_NS(Area)
 Q_DECLARE_FLAGS(Areas, Area)
 Q_FLAG_NS(Areas)
 
-enum ButtonStatus { Normal, Hovered, Pressed, Checked };
+enum ButtonStatus
+{
+    Normal,
+    Hovered,
+    Pressed,
+    Checked
+};
 Q_ENUM_NS(ButtonStatus)
 
-enum DockWidgetDisplayType { Hidden, SplitView, TabbedView, StackedView };
+enum DockWidgetDisplayType
+{
+    AutoHide,
+    SplitView,
+    TabbedView,
+    StackedView
+};
 Q_ENUM_NS(DockWidgetDisplayType)
 
-enum Icon {
+enum Icon
+{
     CloseIcon,
     PinIcon,
     PopoutIcon,

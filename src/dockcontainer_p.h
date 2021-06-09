@@ -7,6 +7,7 @@ class DockWidget;
 class DockMoveGuide;
 class DockArea;
 class DockContainer;
+class DockActiveWidgetDim;
 class DockContainerPrivate {
     DockContainer *q_ptr;
     Q_DECLARE_PUBLIC(DockContainer);
@@ -23,8 +24,9 @@ public:
     Qt::Edge topRightOwner;
     Qt::Edge bottomLeftOwner;
     Qt::Edge bottomRightOwner;
-    DockWidget *activeDockWidget;
+    DockWidget *activeDockWidget{nullptr};
     Dock::DockWidgetDisplayType defaultDisplayType;
+    DockActiveWidgetDim *dim{nullptr};
 
     bool enableStateStoring;
 };

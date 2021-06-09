@@ -48,6 +48,13 @@ ApplicationWindow {
             tabPosition: Qt.LeftEdge
             panelSize: 200
         }
+        DockArea {
+            id: rightDockGroup
+            area: Dock.Right
+            displayType: Dock.Hidden
+            tabPosition: Qt.RightEdge
+            panelSize: 250
+        }
 
         CusomTitleBar {
         }

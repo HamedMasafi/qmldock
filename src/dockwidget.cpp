@@ -8,6 +8,7 @@
 #include "dockarea.h"
 #include "style/abstractstyle.h"
 #include "dockcontainer.h"
+#include "dock_p.h"
 
 #include <QDebug>
 #include <QPainter>
@@ -305,7 +306,7 @@ void DockWidget::setTitleBar(QQuickItem *titleBar)
         d->titleBar->deleteLater();
         d->titleBar = nullptr;
     }
-    titleBar->setZ(1000);
+    titleBar->setZ(Dock::Private::Z::TitleBar);
     titleBar->setParentItem(this);
     d->titleBarItem = titleBar;
     Q_EMIT titleBarChanged(d->titleBarItem);
@@ -486,7 +487,7 @@ void DockWidget::componentComplete()
         d->titleBar->setPosition(QPointF(p, p));
         d->titleBar->setSize(QSizeF(width(), 30));
         d->titleBar->setVisible(true);
-        d->titleBar->setZ(999);
+        d->titleBar->setZ(Dock::Private::Z::TitleBar);
         d->titleBar->setTitle(d->title);
         d->titleBar->setCloseButtonVisible(d->closable);
 

@@ -75,10 +75,13 @@ DockWidgetHeader::DockWidgetHeader(DockWidget *parent)
 
     pinButton->setIcon(Dock::PinIcon);
     pinButton->setY(5);
-    pinButton->setVisible(false);
+//    pinButton->setVisible(true);
 
     closeButton->setIcon(Dock::CloseIcon);
     closeButton->setY(5);
+
+    _buttons.append(closeButton);
+//    _buttons.append(pinButton);
 
     connect(closeButton,
             &DockWidgetHeaderButton::clicked,
@@ -101,58 +104,6 @@ void DockWidgetHeader::paint(QPainter *painter)
     dockStyle->paintDockWidgetHeader(painter, this);
 }
 
-//void DockWidgetHeader::mousePressEvent(QMouseEvent *event)
-//{
-//    if (!_enableMove) {
-//        event->ignore();
-//        return;
-//    }
-//    _moveEmitted = false;
-//    if (_parentDock->getIsDetached()) {
-//        _lastParentPos = _parentDock->dockWindow()->position();
-//        _lastMousePos = event->globalPos();
-//    } else {
-//        _lastMousePos = event->windowPos();
-//        _lastParentPos = _parentDock->position();
-//    }
-//    grabMouse();
-//}
-
-//void DockWidgetHeader::mouseMoveEvent(QMouseEvent *event)
-//{
-//    if (!_enableMove) {
-//        event->ignore();
-//        return;
-//    }
-//    if (_moveEmitted) {
-//        if (_parentDock->getIsDetached())
-//            Q_EMIT moving(_lastParentPos + (event->globalPos() - _lastMousePos),
-//                        event->pos() + _parentDock->dockWindow()->position());
-//        else
-//            Q_EMIT moving(_lastParentPos + (event->windowPos() - _lastMousePos),
-//                    event->pos() + _parentDock->position());
-//    } else {
-//        Q_EMIT moveStarted();
-//        _moveEmitted = true;
-//    }
-////    parentDock->setPosition(_lastParentPos + (event->windowPos() - _lastMousePos));
-//}
-
-//void DockWidgetHeader::mouseReleaseEvent(QMouseEvent *event)
-//{
-//    if (!_enableMove) {
-//        event->ignore();
-//        return;
-//    }
-//    Q_UNUSED(event)
-
-//    if (_moveEmitted)
-//        Q_EMIT moveEnded();
-
-//    _moveEmitted = false;
-//    ungrabMouse();
-//}
-
 void DockWidgetHeader::geometryChanged(const QRectF &newGeometry,
                                        const QRectF &oldGeometry)
 {
@@ -161,8 +112,12 @@ void DockWidgetHeader::geometryChanged(const QRectF &newGeometry,
     if (!isComponentComplete())
         return;
 
-    closeButton->setX(width() - 20);
-    pinButton->setX(width() - 40);
+    int buttonMargin{20};
+    for (auto &btn: _buttons) {
+        btn->setX(width() - buttonMargin);
+        buttonMargin += 20;
+    }
+
     _moveHandler->setHeight(height());
     _moveHandler->setWidth(width() - 40);
 }

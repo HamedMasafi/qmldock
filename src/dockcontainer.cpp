@@ -9,16 +9,12 @@
 #include "dockarea.h"
 #include "dockwidgetmovehandler.h"
 #include "dockwidgetheader.h"
+#include "dock_p.h"
+#include "dockactivewidgetdim.h"
 
 #include <QDebug>
 #include <QPainter>
 #include <QSettings>
-#define Z_GROUP 100
-#define Z_WIDGET 200
-#define Z_WIDGET_FLOAT 300
-#define Z_RESIZER 400
-#define Z_GUIDE 500
-
 
 DockContainerPrivate::DockContainerPrivate(DockContainer *parent)
     : q_ptr(parent)
@@ -55,6 +51,10 @@ DockContainer::~DockContainer()
 void DockContainer::componentComplete()
 {
     Q_D(DockContainer);
+
+    d->dim = new DockActiveWidgetDim(this);
+    d->dim->setZ(Dock::Private::Z::ActiveWidgetDim);
+    connect(d->dim, &DockActiveWidgetDim::clicked, this, &DockContainer::dim_clicked);
 
     auto areas = findChildren<DockArea*>();
     for (auto &a: areas)
@@ -135,6 +135,29 @@ QList<DockWidget *> DockContainer::dockWidgets() const
     return d->dockWidgets;
 }
 
+void DockContainer::setActiveWidget(DockWidget *widget)
+{
+    Q_D(DockContainer);
+
+    if (d->activeDockWidget) {
+        d->activeDockWidget->setZ(Dock::Private::Z::Widget);
+        if (d->activeDockWidget->dockArea()->displayType() == Dock::AutoHide) {
+            //d->activeDockWidget->setVisible(false);
+            d->activeDockWidget->dockArea()->setCurrentIndex(-1);
+        }
+    }
+
+    if (widget) {
+        qDebug() << Q_FUNC_INFO;
+        d->activeDockWidget = widget;
+        widget->setZ(Dock::Private::Z::ActiveWidget);
+
+        d->dim->setVisible(true);
+    } else {
+        d->dim->setVisible(false);
+    }
+}
+
 void DockContainer::itemChange(QQuickItem::ItemChange change,
                           const QQuickItem::ItemChangeData &data)
 {
@@ -175,7 +198,7 @@ void DockContainer::addDockWidget(DockWidget *widget)
 {
     Q_D(DockContainer);
 
-    widget->setZ(widget->area() == Dock::Float ? Z_WIDGET_FLOAT : Z_WIDGET);
+    widget->setZ(widget->area() == Dock::Float ? Dock::Private::Z::FloatWidget : Dock::Private::Z::Widget);
 
     widget->setDockContainer(this);
 //    widget->setParentItem(this);
@@ -191,6 +214,8 @@ void DockContainer::addDockWidget(DockWidget *widget)
     connect(widget, &DockWidget::moved, this, &DockContainer::dockWidget_moved);
     connect(widget, &DockWidget::closed, this, &DockContainer::dockWidget_closed);
     connect(widget, &DockWidget::opened, this, &DockContainer::dockWidget_opened);
+    connect(widget, &DockWidget::visibilityChanged, this, &DockContainer::dockWidget_visibilityChange);
+    connect(widget, &DockWidget::isActiveChanged, this, &DockContainer::dockWidget_isActiveChanged);
 //    connect(widget, &DockWidget::areaChanged, this, &DockContainer::dockWidget_areaChanged);
     connect(widget,
             &QQuickItem::visibleChanged,
@@ -247,12 +272,18 @@ void DockContainer::reorderDockAreas()
 {
     Q_D(DockContainer);
 
-    QRectF rc;
+    QRectF centerRect;
+    QRectF usableRect;
 
-    rc.setLeft(panelSize(Dock::Left));
-    rc.setTop(panelSize(Dock::Top));
-    rc.setWidth(width() - panelSize(Dock::Right) - panelSize(Dock::Left));
-    rc.setHeight(height() - panelSize(Dock::Top) - panelSize(Dock::Bottom));
+    usableRect.setLeft(panelSize(Dock::Left));
+    usableRect.setTop(panelSize(Dock::Top));
+    usableRect.setWidth(width() - panelSize(Dock::Right) - usableRect.left());
+    usableRect.setHeight(height() - panelSize(Dock::Bottom) - usableRect.top());
+
+    centerRect.setLeft(panelSize(Dock::Left, false));
+    centerRect.setTop(panelSize(Dock::Top, false));
+    centerRect.setWidth(width() - panelSize(Dock::Right, false) - centerRect.left());
+    centerRect.setHeight(height()- panelSize(Dock::Bottom, false) - centerRect.top());
 
     qreal leftStart, leftEnd;
     qreal topStart, topEnd;
@@ -261,49 +292,53 @@ void DockContainer::reorderDockAreas()
 
     if (d->topLeftOwner == Qt::LeftEdge) {
         leftStart = 0;
-        topStart = rc.left();
+        topStart = centerRect.left();
     } else {
-        leftStart = rc.top();
+        leftStart = centerRect.top();
         topStart = 0;
     }
 
     if (d->topRightOwner == Qt::RightEdge) {
-        topEnd = rc.right();
+        topEnd = centerRect.right();
         rightStart = 0;
     } else {
         topEnd = width();
-        rightStart = rc.top();
+        rightStart = centerRect.top();
     }
 
     if (d->bottomLeftOwner == Qt::LeftEdge) {
         leftEnd = height();
-        bottomStart = rc.left();
+        bottomStart = centerRect.left();
     } else {
-        leftEnd = rc.bottom();
+        leftEnd = centerRect.bottom();
         bottomStart = 0;
     }
 
     if (d->bottomRightOwner == Qt::RightEdge) {
-        bottomEnd = rc.right();
+        bottomEnd = centerRect.right();
         rightEnd = height();
     } else {
         bottomEnd = width();
-        rightEnd = rc.bottom();
+        rightEnd = centerRect.bottom();
     }
+
     d->dockAreas[Dock::Left]->setPosition(QPointF(0, leftStart));
-    d->dockAreas[Dock::Left]->setSize(QSizeF(rc.left(), leftEnd - leftStart));
+    d->dockAreas[Dock::Left]->setSize(QSizeF(usableRect.left(), leftEnd - leftStart));
 
     d->dockAreas[Dock::Top]->setPosition(QPointF(topStart, 0));
-    d->dockAreas[Dock::Top]->setSize(QSizeF(topEnd - topStart, rc.top()));
+    d->dockAreas[Dock::Top]->setSize(QSizeF(topEnd - topStart, usableRect.top()));
 
-    d->dockAreas[Dock::Right]->setPosition(QPointF(rc.right(), rightStart));
-    d->dockAreas[Dock::Right]->setSize(QSizeF(width() - rc.right(), rightEnd - rightStart));
+    d->dockAreas[Dock::Right]->setPosition(QPointF(usableRect.right(), rightStart));
+    d->dockAreas[Dock::Right]->setSize(QSizeF(width() - usableRect.right(), rightEnd - rightStart));
 
-    d->dockAreas[Dock::Bottom]->setPosition(QPointF(bottomStart, rc.bottom()));
-    d->dockAreas[Dock::Bottom]->setSize(QSizeF(bottomEnd - bottomStart, height() - rc.bottom()));
+    d->dockAreas[Dock::Bottom]->setPosition(QPointF(bottomStart, usableRect.bottom()));
+    d->dockAreas[Dock::Bottom]->setSize(QSizeF(bottomEnd - bottomStart, height() - usableRect.bottom()));
 
-    d->dockAreas[Dock::Center]->setPosition(rc.topLeft());
-    d->dockAreas[Dock::Center]->setSize(rc.size());
+    d->dockAreas[Dock::Center]->setPosition(centerRect.topLeft());
+    d->dockAreas[Dock::Center]->setSize(centerRect.size());
+
+//    d->dim->setPosition(centerRect.topLeft());
+    d->dim->setSize(size());
 }
 
 void DockContainer::setTopLeftOwner(Qt::Edge topLeftOwner)
@@ -399,6 +434,11 @@ void DockContainer::setDefaultDisplayType(Dock::DockWidgetDisplayType defaultDis
     Q_EMIT defaultDisplayTypeChanged(d->defaultDisplayType);
 }
 
+void DockContainer::dim_clicked()
+{
+    setActiveWidget(nullptr);
+}
+
 void DockContainer::dockWidget_beginMove()
 {
     Q_D(DockContainer);
@@ -407,7 +447,7 @@ void DockContainer::dockWidget_beginMove()
 
     for (auto d : d->dockWidgets)
         d->setZ(d->z() - 1);
-    dw->setZ(Z_WIDGET_FLOAT);
+    dw->setZ(Dock::Private::Z::FloatWidget);
 
     if (dw->dockArea()) {
         //        dw->beginDetach();
@@ -447,7 +487,7 @@ void DockContainer::dockWidget_moved()
         if (dw->dockArea() != d->dockAreas[d->dockMoveGuide->area()]) {
             d->dockAreas[d->dockMoveGuide->area()]->addDockWidget(dw);
         }
-        dw->setZ(Z_WIDGET);
+        dw->setZ(Dock::Private::Z::Widget);
         reorderDockAreas();
         break;
     case Dock::Float:
@@ -511,7 +551,7 @@ void DockContainer::dockWidget_visibleChanged()
 
     if (dw->dockArea()) {
         auto dt = dw->dockArea()->displayType();
-        if (dt == Dock::TabbedView)
+        if (dt == Dock::TabbedView || dt == Dock::AutoHide)
             return;
     }
 
@@ -538,6 +578,22 @@ void DockContainer::dockWidget_areaChanged(Dock::Area area)
         d->dockAreas[area]->addDockWidget(dw);
 }
 
+void DockContainer::dockWidget_isActiveChanged(bool isActive)
+{
+    qDebug() << isActive;
+}
+
+void DockContainer::dockWidget_visibilityChange()
+{
+    auto dw = qobject_cast<DockWidget *>(sender());
+    if (!dw)
+        return;
+
+    if (dw->dockArea()->displayType() == Dock::AutoHide && dw->visibility() == DockWidget::Active) {
+        setActiveWidget(dw);
+    }
+}
+
 void DockContainer::geometryChanged(const QRectF &newGeometry,
                                const QRectF &oldGeometry)
 {
@@ -546,9 +602,12 @@ void DockContainer::geometryChanged(const QRectF &newGeometry,
     QQuickItem::geometryChanged(newGeometry, oldGeometry);
 }
 
-int DockContainer::panelSize(Dock::Area area) const
+int DockContainer::panelSize(Dock::Area area, bool ignoreHidden) const
 {
     Q_D(const DockContainer);
+    if (!ignoreHidden && d->dockAreas[area]->displayType() == Dock::AutoHide)
+        return d->dockAreas[area]->tabBar()->height();
+
     return d->dockAreas[area]->isOpen()
                ? d->dockAreas[area]->panelSize()
                : 0.;
@@ -565,7 +624,7 @@ DockArea *DockContainer::createGroup(Dock::Area area, DockArea *item)
         item = new DockArea(this);
     item->setArea(area);
     item->setVisible(true);
-    item->setZ(Z_GROUP);
+    item->setZ(Dock::Private::Z::Group);
     item->setPanelSize(120);
     item->setDisplayType(d->defaultDisplayType);
 
@@ -595,7 +654,7 @@ QRectF DockContainer::panelRect(Dock::Area area) const
     Q_D(const DockContainer);
     auto da = d->dockAreas.value(area);
 
-    if (da->isOpen())
+    if (da->displayType() != Dock::AutoHide && da->isOpen())
         return QRectF(da->position(), da->size());
 
     constexpr qreal s{50};

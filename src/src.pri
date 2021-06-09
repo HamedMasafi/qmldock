@@ -22,6 +22,7 @@ SOURCES += \
     $$PWD/abstractmouseresponsiveitem.cpp \
     $$PWD/debugrect.cpp \
     $$PWD/dock.cpp \
+    $$PWD/dockactivewidgetdim.cpp \
     $$PWD/dockarea.cpp \
     $$PWD/dockcontainer.cpp \
     $$PWD/dockdockableitem.cpp \
@@ -51,6 +52,7 @@ HEADERS += \
     $$PWD/debugrect.h \
     $$PWD/dock.h \
     $$PWD/dock_p.h \
+    $$PWD/dockactivewidgetdim.h \
     $$PWD/dockarea.h \
     $$PWD/dockarea_p.h \
     $$PWD/dockcontainer.h \

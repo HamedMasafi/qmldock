@@ -35,6 +35,7 @@ public:
     void paint(QPainter *painter) override;
 
     QList<DockWidget *> dockWidgets() const;
+    void setActiveWidget(DockWidget *widget);
 
 Q_SIGNALS:
     void dockWidgetsChanged(QList<DockWidget *> dockWidgets);
@@ -71,6 +72,7 @@ public Q_SLOTS:
     void setDefaultDisplayType(Dock::DockWidgetDisplayType defaultDisplayType);
 
 private Q_SLOTS:
+    void dim_clicked();
     void dockWidget_beginMove();
     void dockWidget_moving(const QPointF &pt);
     void dockWidget_moved();
@@ -78,9 +80,11 @@ private Q_SLOTS:
     void dockWidget_closed();
     void dockWidget_visibleChanged();
     void dockWidget_areaChanged(Dock::Area area);
+    void dockWidget_isActiveChanged(bool isActive);
+    void dockWidget_visibilityChange();
 
 private:
-    inline int panelSize(Dock::Area area) const;
+    inline int panelSize(Dock::Area area, bool ignoreHidden = true) const;
     DockArea *createGroup(Dock::Area area, DockArea *item = nullptr);
     QRectF panelRect(Dock::Area area) const;
 
