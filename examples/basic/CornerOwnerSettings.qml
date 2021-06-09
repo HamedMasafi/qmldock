@@ -6,7 +6,7 @@ import Kaj.Dock 1.0
 Pane {
     clip: true
 
-    property DockArea dockArea: null
+    property DockContainer dockContainer: null
 
     ColumnLayout {
         RowLayout {
@@ -15,7 +15,7 @@ Pane {
             }
             ComboBox {
                 model: ["Top", "Left"]
-                onCurrentTextChanged: dockArea.topLeftOwner =
+                onCurrentTextChanged: dockContainer.topLeftOwner =
                                       (currentIndex == 0)
                                       ? Qt.TopEdge
                                       : Qt.LeftEdge
@@ -27,7 +27,7 @@ Pane {
             }
             ComboBox {
                 model: ["Top", "Right"]
-                onCurrentTextChanged: dockArea.topRightOwner =
+                onCurrentTextChanged: dockContainer.topRightOwner =
                                       (currentIndex == 0)
                                       ? Qt.TopEdge
                                       : Qt.RightEdge
@@ -39,7 +39,7 @@ Pane {
             }
             ComboBox {
                 model: ["Bottom", "Left"]
-                onCurrentTextChanged: dockArea.bottomLeftOwner =
+                onCurrentTextChanged: dockContainer.bottomLeftOwner =
                                       (currentIndex == 0)
                                       ? Qt.BottomEdge
                                       : Qt.LeftEdge
@@ -51,7 +51,7 @@ Pane {
             }
             ComboBox {
                 model: ["Bottom", "Right"]
-                onCurrentTextChanged: dockArea.bottomRightOwner =
+                onCurrentTextChanged: dockContainer.bottomRightOwner =
                                       (currentIndex == 0)
                                       ? Qt.BottomEdge
                                       : Qt.RightEdge

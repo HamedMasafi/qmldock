@@ -6,7 +6,7 @@
 DockTabBarArrorButton::DockTabBarArrorButton(QQuickItem *parent)
 : AbstractButton(parent)
 {
-    setCursor(Qt::WaitCursor);
+//    setCursor(Qt::WaitCursor);
 }
 
 void DockTabBarArrorButton::paint(QPainter *painter)

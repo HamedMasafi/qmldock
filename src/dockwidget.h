@@ -1,6 +1,7 @@
 #ifndef DOCKWIDGET_H
 #define DOCKWIDGET_H
 
+#include <QJSValue>
 #include <QQuickPaintedItem>
 #include "dock.h"
 
@@ -26,11 +27,23 @@ class DockWidget : public QQuickPaintedItem {
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     Q_PROPERTY(Dock::Areas allowedAreas READ allowedAreas WRITE setAllowedAreas NOTIFY allowedAreasChanged)
     Q_PROPERTY(bool isActive READ isActive WRITE setIsActive NOTIFY isActiveChanged)
+    Q_PROPERTY(QJSValue closeEvent READ closeEvent WRITE setCloseEvent NOTIFY closeEventChanged)
+    Q_PROPERTY(DockWidgetVisibility visibility READ visibility WRITE setVisibility NOTIFY visibilityChanged)
 
 //    Q_PROPERTY(DockWidgetFlags flags READ flags WRITE setFlags NOTIFY flagsChanged)
 
 public:
-    enum DockWidgetFlag {
+    enum DockWidgetVisibility
+    {
+        Openned,
+        Active,
+        Hidden,
+        Closed
+    };
+    Q_ENUM(DockWidgetVisibility)
+
+    enum DockWidgetFlag
+    {
         Movable,
         Detachable,
         Resizable
@@ -66,6 +79,11 @@ public:
 
     bool isActive() const;
 
+    QJSValue closeEvent() const;
+
+    DockWidgetVisibility visibility() const;
+    void setVisibility(DockWidgetVisibility newVisibility);
+
 public Q_SLOTS:
     Q_DECL_DEPRECATED
     void detach();
@@ -91,6 +109,8 @@ public Q_SLOTS:
 
     void setTitleBar(QQuickItem * titleBar);
 
+
+    void setCloseEvent(QJSValue closeEvent);
 
 private Q_SLOTS:
     void header_moveStarted();
@@ -121,17 +141,19 @@ Q_SIGNALS:
     void contentItemChanged(QQuickItem * contentItem);
     void titleChanged(QString title);
     void allowedAreasChanged(Dock::Areas allowedAreas);
-
-    friend class DockWidgetHeader;
     void titleBarChanged(QQuickItem * titleBar);
-
     void isActiveChanged(bool isActive);
+    void closeEventChanged(QJSValue closeEvent);
+    void visibilityChanged();
 
 private:
     void setIsActive(bool isActive);
 
     friend class DockContainer;
     friend class DockArea;
+    QJSValue m_closeEvent;
+
+    friend class DockWidgetHeader;
 };
 
 #endif // DOCKWIDGET_H

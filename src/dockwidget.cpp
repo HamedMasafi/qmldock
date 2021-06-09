@@ -33,6 +33,7 @@ DockWidgetPrivate::DockWidgetPrivate(DockWidget *parent)
       , isClosed{false}
       , autoCreateHeader{true}
       , isActive{false}
+      , visibility{DockWidget::Closed}
       , detachable{false}
       , isDetached{false}
 {
@@ -90,7 +91,6 @@ bool DockWidget::detachable() const
 void DockWidget::paint(QPainter *painter)
 {
     dockStyle->paintDockWidget(painter, this);
-//    QQuickPaintedItem::paint(painter);
 }
 
 DockWidget::DockWidget(QQuickItem *parent)
@@ -105,6 +105,7 @@ DockWidget::DockWidget(QQuickItem *parent)
 DockWidget::~DockWidget()
 {
     Q_D(DockWidget);
+    d->dockWindow->deleteLater();
     delete d;
 }
 
@@ -129,8 +130,10 @@ void DockWidget::open()
     //    else
     //        setVisible(false);
     //    d->isClosed = true;
-    if (!dockArea())
-        return;
+//    if (!dockArea()) {
+//        qDebug() << "I have no area";
+//        return;
+//    }
     Q_EMIT opened();
 }
 
@@ -143,7 +146,16 @@ void DockWidget::close()
 //        setVisible(false);
 //    d->isClosed = true;
 //    dockArea()->removeDockWidget(this);
-    Q_EMIT closed();
+    if (m_closeEvent.isCallable()) {
+        auto ret = m_closeEvent.call();
+
+        if (ret.isError())
+            qDebug() << ret.errorType();
+        if (ret.isBool() && ret.toBool())
+            Q_EMIT closed();
+    } else {
+        Q_EMIT closed();
+    }
 }
 
 void DockWidget::restoreSize()
@@ -162,7 +174,9 @@ void DockWidget::setArea(Dock::Area area)
     if (area == Dock::Detached) {
         auto wpos = mapToGlobal(QPointF(0, 0)).toPoint();
         if (!d->dockWindow)
-            d->dockWindow = new DockWindow(this);
+            d->dockWindow = new DockWindow;
+
+        d->dockWindow->setDockWidget(this);
         d->dockWindow->setPosition(wpos);
         d->dockWindow->setTitle(title());
         d->dockWindow->resize(size().toSize());
@@ -175,8 +189,6 @@ void DockWidget::setArea(Dock::Area area)
         setVisible(true);
         d->isDetached = false;
         d->dockWindow->hide();
-//        d->dockWindow->deleteLater();
-//        d->dockWindow = nullptr;
     }
     d->area = area;
     Q_EMIT areaChanged(d->area);
@@ -299,6 +311,12 @@ void DockWidget::setTitleBar(QQuickItem *titleBar)
     Q_EMIT titleBarChanged(d->titleBarItem);
 }
 
+void DockWidget::setCloseEvent(QJSValue closeEvent)
+{
+    m_closeEvent = closeEvent;
+    Q_EMIT closeEventChanged(m_closeEvent);
+}
+
 void DockWidget::setIsActive(bool isActive)
 {
     Q_D(DockWidget);
@@ -322,7 +340,7 @@ void DockWidget::header_moveStarted()
 void DockWidget::header_moving(const QPointF &windowPos, const QPointF &cursorPos)
 {
     Q_D(DockWidget);
-    if (d->isDetached) {
+    if (d->area == Dock::Detached) {
         Q_EMIT moving(d->dockContainer->mapFromGlobal(cursorPos));
         d->dockWindow->setPosition(windowPos.toPoint());
     } else {
@@ -496,6 +514,11 @@ bool DockWidget::isActive() const
     return d->isActive;
 }
 
+QJSValue DockWidget::closeEvent() const
+{
+    return m_closeEvent;
+}
+
 DockContainer *DockWidget::dockContainer() const
 {
     Q_D(const DockWidget);
@@ -612,3 +635,19 @@ QString DockWidget::title() const
     return d->title;
 }
 
+
+DockWidget::DockWidgetVisibility DockWidget::visibility() const
+{
+    Q_D(const DockWidget);
+    return d->visibility;
+}
+
+void DockWidget::setVisibility(DockWidgetVisibility newVisibility)
+{
+    Q_D(DockWidget);
+
+    if (d->visibility == newVisibility)
+        return;
+    d->visibility = newVisibility;
+    Q_EMIT visibilityChanged();
+}

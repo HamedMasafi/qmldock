@@ -230,13 +230,15 @@ void DockAreaPrivate::reorderItems()
                 if (isHorizontal())
                     handlers.at(i)->setX(ss - q->x() - dockStyle->resizeHandleSize());
             }
-            break;;
+            dw->setVisibility(DockWidget::Openned);
+            break;
 
         case Dock::TabbedView:
         case Dock::StackedView:
             dw->setPosition(q->position() + usableArea.topLeft());
             dw->setSize(usableArea.size());
             dw->setVisible(i == currentIndex);
+            dw->setVisibility(i == currentIndex ? DockWidget::Openned : DockWidget::Hidden);
             break;
 
         case Dock::Hidden:
@@ -251,7 +253,7 @@ void DockAreaPrivate::reorderHandles()
     Q_Q(DockArea);
 
     int index{0};
-    for (auto h : handlers) {
+    for (auto &h : handlers) {
         if (displayType == Dock::SplitView) {
             h->setIndex(index++);
             if (isVertical()) {
@@ -376,6 +378,12 @@ DockArea::DockArea(QQuickItem *parent)
     setAcceptedMouseButtons(Qt::LeftButton);
 
     AbstractStyle::registerThemableItem(this);
+}
+
+DockArea::~DockArea()
+{
+    Q_D(DockArea);
+    delete d;
 }
 
 void DockArea::hoverMoveEvent(QHoverEvent *event)
@@ -748,9 +756,13 @@ int DockArea::currentIndex() const
 void DockArea::addDockWidget(DockWidget *item)
 {
     Q_D(DockArea);
+
+    if (d->dockWidgets.contains(item))
+        return;
+
     item->setArea(d->area);
     item->setDockArea(this);
-    //    addItem(item);
+
     d->dockWidgets.append(item);
     d->normalizeItemSizes();
 

@@ -10,11 +10,7 @@
 
 void DockMoveGuide::insertToAreas(Dock::Area a, const QRectF &rc)
 {
-    if (_areas.contains(a))
-        qDebug() << "Check:" << rc << _areas.value(a);
     _areas.insert(a, qMakePair<QRectF, QRectF>(rc, {mapToGlobal(rc.topLeft()), rc.size()}));
-//    qDebug() << a << rc << "mapped to" << _globalAreas.value(a);
-//    qDebug() << _areas.keys();
 }
 
 DockMoveGuide::DockMoveGuide(DockContainer *parent) : QQuickPaintedItem(parent)
@@ -23,14 +19,15 @@ DockMoveGuide::DockMoveGuide(DockContainer *parent) : QQuickPaintedItem(parent)
     _window = new QQuickWindow;
     setParentItem(_window->contentItem());
     _window->hide();
-    _window->setFlags(Qt::FramelessWindowHint | Qt::Tool
-                      | Qt::WindowStaysOnTopHint);
+    _window->setFlags(Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint
+                      | Qt::X11BypassWindowManagerHint);
     setPosition(QPointF(0, 0));
 
     _dropArea = new MoveDropGuide(parent);
     _dropArea->setParentItem(parent);
     _dropArea->setVisible(false);
-    _dropArea->setZ(999);
+    _dropArea->setZ(9999999);
+    _dropArea->setSize({200, 200});
 
     setCursor(Qt::ArrowCursor);
 }
@@ -138,20 +135,11 @@ QPointF DockMoveGuide::mousePos() const
 void DockMoveGuide::setMousePos(const QPointF &mousePos)
 {
     _mousePos = mousePos;
-    update();
-}
 
-void DockMoveGuide::paint(QPainter *painter)
-{
     _area = Dock::Detached;
-
-    //    if (_allowedAreas & Dock::Float && clipRect().contains(_mousePos))
-    //        _area = Dock::Float;
-
-    auto mousePos = QCursor::pos();
+    auto mouse = QCursor::pos();
     for (auto i = _areas.begin(); i != _areas.end(); ++i) {
-        auto contains = i.value().second.contains(mousePos);
-        dockStyle->paintDropButton(painter, i.key(), i.value().first, contains);
+        auto contains = i.value().second.contains(mouse);
         if (contains) {
             _area = i.key();
             auto rc = _parentDockContainer->panelRect(_area);
@@ -160,7 +148,18 @@ void DockMoveGuide::paint(QPainter *painter)
             _dropArea->setVisible(true);
         }
     }
-
     if (_area == Dock::Detached || _area == Dock::Float)
         _dropArea->setVisible(false);
+
+
+    update();
+}
+
+void DockMoveGuide::paint(QPainter *painter)
+{
+    auto mousePos = QCursor::pos();
+    for (auto i = _areas.begin(); i != _areas.end(); ++i) {
+        auto contains = i.value().second.contains(mousePos);
+        dockStyle->paintDropButton(painter, i.key(), i.value().first, contains);
+    }
 }

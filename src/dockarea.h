@@ -36,8 +36,10 @@ class DockArea : public QQuickPaintedItem {
 
 public:
     DockArea(QQuickItem *parent = nullptr);
+    virtual ~DockArea();
 
-    void paint(QPainter *painter);
+    void paint(QPainter *painter) override;
+    void componentComplete() override;
     bool isOpen() const;
     qreal panelSize() const;
     Dock::Area area() const;
@@ -49,7 +51,6 @@ public:
     QList<DockWidget *> dockWidgets() const;
     int currentIndex() const;
     Qt::Edge tabPosition() const;
-    void componentComplete();
 
     QQuickItem * tabBar() const;
 
@@ -86,8 +87,13 @@ Q_SIGNALS:
     void tabBarChanged(QQuickItem * tabBar);
 
 protected:
-    void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
-    void updatePolish();
+    void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
+    void updatePolish() override;
+    void hoverMoveEvent(QHoverEvent *event) override;
+    bool childMouseEventFilter(QQuickItem *, QEvent *) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
 private Q_SLOTS:
     void dockWidget_closed();
@@ -95,13 +101,6 @@ private Q_SLOTS:
     void tabBar_closeButtonClicked(int index);
     void handler_moving(qreal pos, bool *ok);
     void handler_moved();
-
-protected:
-    void hoverMoveEvent(QHoverEvent *event);
-    bool childMouseEventFilter(QQuickItem *, QEvent *);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
 
     friend class DockContainer;
 };

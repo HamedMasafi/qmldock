@@ -55,6 +55,11 @@ DockContainer::~DockContainer()
 void DockContainer::componentComplete()
 {
     Q_D(DockContainer);
+
+    auto areas = findChildren<DockArea*>();
+    for (auto &a: areas)
+        d->dockAreas.insert(a->area(), a);
+
     if (!d->dockAreas.contains(Dock::Center)) {
         createGroup(Dock::Center);
         d->dockAreas[Dock::Center]->setDisplayType(Dock::TabbedView);
@@ -77,7 +82,8 @@ void DockContainer::componentComplete()
     for (auto &dw : d->initialWidgets)
         addDockWidget(dw);
 
-    for (auto &dg: d->dockAreas.values()) {
+    for (auto i = d->dockAreas.begin(); i != d->dockAreas.end(); i++) {
+        const auto &dg = *i;
         connect(dg, &DockArea::panelSizeChanged, this, &DockContainer::reorderDockAreas);
         connect(dg, &DockArea::isOpenChanged, this, &DockContainer::reorderDockAreas);
     }
@@ -88,7 +94,9 @@ void DockContainer::componentComplete()
     d->dockAreas[Dock::Bottom]->polish();
     d->dockAreas[Dock::Center]->polish();
     //    reorderDockAreas();
-    geometryChanged(QRectF(), QRectF());
+//    geometryChanged(QRectF(), QRectF());
+
+    reorderDockAreas();
 
     QQuickItem::componentComplete();
 }
@@ -134,10 +142,12 @@ void DockContainer::itemChange(QQuickItem::ItemChange change,
     if (change == QQuickItem::ItemChildAddedChange) {
         auto dw = qobject_cast<DockWidget *>(data.item);
         if (dw) {
-            if (isComponentComplete())
-                addDockWidget(dw);
-            else
+            if (isComponentComplete()) {
+                if (!d->dockWidgets.contains(dw))
+                    addDockWidget(dw);
+            } else {
                 d->initialWidgets.append(dw);
+            }
         }
 
         auto dg = qobject_cast<DockArea *>(data.item);
@@ -150,7 +160,9 @@ void DockContainer::itemChange(QQuickItem::ItemChange change,
     if (change == QQuickItem::ItemChildRemovedChange) {
         auto dw = qobject_cast<DockWidget *>(data.item);
         if (dw) {
-            d->dockWidgets.removeOne(dw);
+//            if (dw->visibility() == DockWidget::Closed)
+//                d->dockWidgets.removeOne(dw);
+
             if (dw->dockArea())
                 dw->dockArea()->removeDockWidget(dw);
       }
@@ -179,6 +191,7 @@ void DockContainer::addDockWidget(DockWidget *widget)
     connect(widget, &DockWidget::moved, this, &DockContainer::dockWidget_moved);
     connect(widget, &DockWidget::closed, this, &DockContainer::dockWidget_closed);
     connect(widget, &DockWidget::opened, this, &DockContainer::dockWidget_opened);
+//    connect(widget, &DockWidget::areaChanged, this, &DockContainer::dockWidget_areaChanged);
     connect(widget,
             &QQuickItem::visibleChanged,
             this,
@@ -447,13 +460,42 @@ void DockContainer::dockWidget_moved()
     }
 }
 
-void DockContainer::dockWidget_opened() {}
+void DockContainer::dockWidget_opened()
+{
+    Q_D(DockContainer);
+    auto widget = qobject_cast<DockWidget *>(sender());
+
+    widget->setParentItem(this);
+    switch (widget->area())
+    {
+        case Dock::Left :
+        case Dock::Right :
+        case Dock::Top :
+        case Dock::Bottom:
+        case Dock::Center:
+            d->dockAreas[widget->area()]->addDockWidget(widget);
+            d->dockAreas[widget->area()]->polish();
+            break;
+        //TODO: remove this or keep!
+        case Dock::NoArea:
+            d->dockAreas[Dock::Center]->addDockWidget(widget);
+            d->dockAreas[Dock::Center]->polish();
+            break;
+        default:
+            qWarning() << "dock has no area " << widget->title();
+        break;
+
+    }
+    widget->setVisible(true);
+}
 
 void DockContainer::dockWidget_closed()
 {
     auto w = qobject_cast<DockWidget *>(sender());
     if (w)
-        removeDockWidget(w);
+        w->setParentItem(nullptr);
+
+//        removeDockWidget(w);
 }
 
 void DockContainer::dockWidget_visibleChanged()
@@ -480,6 +522,20 @@ void DockContainer::dockWidget_visibleChanged()
             dw->dockArea()->removeDockWidget(dw);
         }
     }
+}
+
+void DockContainer::dockWidget_areaChanged(Dock::Area area)
+{
+    Q_D(DockContainer);
+
+    auto dw = qobject_cast<DockWidget *>(sender());
+    if (!dw)
+        return;
+
+    if (dw->dockArea())
+        dw->dockArea()->removeDockWidget(dw);
+    if (area < 16 && area)
+        d->dockAreas[area]->addDockWidget(dw);
 }
 
 void DockContainer::geometryChanged(const QRectF &newGeometry,

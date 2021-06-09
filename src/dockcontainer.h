@@ -77,6 +77,7 @@ private Q_SLOTS:
     void dockWidget_opened();
     void dockWidget_closed();
     void dockWidget_visibleChanged();
+    void dockWidget_areaChanged(Dock::Area area);
 
 private:
     inline int panelSize(Dock::Area area) const;
