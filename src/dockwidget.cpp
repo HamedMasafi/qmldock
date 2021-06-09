@@ -49,6 +49,9 @@ DockArea *DockWidget::dockArea() const
 
 void DockWidget::setDockArea(DockArea *dockArea)
 {
+    if (!dockArea) {
+        qDebug() << "FUCNL";
+    }
     Q_D(DockWidget);
     d->dockArea = dockArea;
 }

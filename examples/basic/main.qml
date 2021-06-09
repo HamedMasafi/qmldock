@@ -51,7 +51,7 @@ ApplicationWindow {
         DockArea {
             id: rightDockGroup
             area: Dock.Right
-            displayType: Dock.Hidden
+            displayType: Dock.AutoHide
             tabPosition: Qt.RightEdge
             panelSize: 250
         }

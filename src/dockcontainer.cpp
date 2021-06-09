@@ -141,9 +141,10 @@ void DockContainer::setActiveWidget(DockWidget *widget)
 
     if (d->activeDockWidget) {
         d->activeDockWidget->setZ(Dock::Private::Z::Widget);
-        if (d->activeDockWidget->dockArea()->displayType() == Dock::AutoHide) {
+        auto dockArea = d->activeDockWidget->dockArea();
+        if (dockArea &&  dockArea->displayType() == Dock::AutoHide) {
             //d->activeDockWidget->setVisible(false);
-            d->activeDockWidget->dockArea()->setCurrentIndex(-1);
+            dockArea->setCurrentIndex(-1);
         }
     }
 

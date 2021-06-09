@@ -530,7 +530,6 @@ void DockArea::geometryChanged(const QRectF &newGeometry,
         return;
 
     d->relayout();
-    d->arrangeTabBar();
 
     QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);
 }
