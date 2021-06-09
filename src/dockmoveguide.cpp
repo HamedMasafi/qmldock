@@ -19,8 +19,8 @@ DockMoveGuide::DockMoveGuide(DockContainer *parent) : QQuickPaintedItem(parent)
     _window = new QQuickWindow;
     setParentItem(_window->contentItem());
     _window->hide();
-    _window->setFlags(Qt::FramelessWindowHint | Qt::Tool
-                      | Qt::WindowStaysOnTopHint);
+    _window->setFlags(Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint
+                      | Qt::X11BypassWindowManagerHint);
     setPosition(QPointF(0, 0));
 
     _dropArea = new MoveDropGuide(parent);

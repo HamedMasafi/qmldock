@@ -33,6 +33,7 @@ DockWidgetPrivate::DockWidgetPrivate(DockWidget *parent)
       , isClosed{false}
       , autoCreateHeader{true}
       , isActive{false}
+      , visibility{DockWidget::Closed}
       , detachable{false}
       , isDetached{false}
 {
@@ -129,8 +130,10 @@ void DockWidget::open()
     //    else
     //        setVisible(false);
     //    d->isClosed = true;
-    if (!dockArea())
-        return;
+//    if (!dockArea()) {
+//        qDebug() << "I have no area";
+//        return;
+//    }
     Q_EMIT opened();
 }
 
@@ -337,7 +340,7 @@ void DockWidget::header_moveStarted()
 void DockWidget::header_moving(const QPointF &windowPos, const QPointF &cursorPos)
 {
     Q_D(DockWidget);
-    if (d->isDetached) {
+    if (d->area == Dock::Detached) {
         Q_EMIT moving(d->dockContainer->mapFromGlobal(cursorPos));
         d->dockWindow->setPosition(windowPos.toPoint());
     } else {
@@ -632,3 +635,19 @@ QString DockWidget::title() const
     return d->title;
 }
 
+
+DockWidget::DockWidgetVisibility DockWidget::visibility() const
+{
+    Q_D(const DockWidget);
+    return d->visibility;
+}
+
+void DockWidget::setVisibility(DockWidgetVisibility newVisibility)
+{
+    Q_D(DockWidget);
+
+    if (d->visibility == newVisibility)
+        return;
+    d->visibility = newVisibility;
+    Q_EMIT visibilityChanged();
+}

@@ -4,11 +4,31 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import Kaj.Dock 1.0
 
-Window {
+ApplicationWindow {
     visible: true
     width: 640
     height: 480
     title: qsTr("Hello World")
+
+    menuBar: MenuBar {
+        Menu {
+            title: "Windows"
+            Repeater {
+                model: dockArea.dockWidgets
+                MenuItem {
+                    text: modelData.title
+                    checkable: true
+                    checked: modelData.visibility !== DockWidget.Closed
+                    onCheckedChanged: {
+                        if (checked)
+                            modelData.open();
+                        else
+                            modelData.close();
+                    }
+                }
+            }
+        }
+    }
 
     DockContainer {
         id: dockArea

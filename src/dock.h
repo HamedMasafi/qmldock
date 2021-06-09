@@ -8,15 +8,16 @@
 namespace Dock {
 Q_NAMESPACE
 
-enum Area {
-    NoArea = 0,
-    Top = 1,
-    Bottom = 2,
-    Left = 4,
-    Right = 8,
-    Float = 16,
-    Detached = 32,
-    Center = 64,
+enum Area
+{
+    NoArea = 0x0,
+    Top = 0x1,
+    Bottom = 0x2,
+    Left = 0x4,
+    Right = 0x8,
+    Float = 0x10,
+    Detached = 0x20,
+    Center = 0x40,
     AllSides = Top | Left | Right | Bottom,
     AllInsides = AllSides | Center | Float,
     AllAreas = AllInsides | Detached
