@@ -328,6 +328,7 @@ void DockWidget::setIsActive(bool isActive)
         return;
 
     d->isActive = isActive;
+    setZ(isActive ? Dock::Private::Z::ActiveWidget : Dock::Private::Z::Widget);
     update();
     Q_EMIT isActiveChanged(d->isActive);
 }

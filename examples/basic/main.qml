@@ -36,12 +36,6 @@ ApplicationWindow {
         enableStateStoring: false
 
         DockArea {
-            id: centerDockGroup
-            area: Dock.Center
-            displayType: Dock.TabbedView
-        }
-
-        DockArea {
             id: leftDockGroup
             area: Dock.Left
             displayType: Dock.AutoHide
@@ -67,6 +61,12 @@ ApplicationWindow {
             displayType: Dock.AutoHide
             tabPosition: Qt.BottomEdge
             panelSize: 250
+        }
+
+        DockArea {
+            id: centerDockGroup
+            area: Dock.Center
+            displayType: Dock.TabbedView
         }
 
         CusomTitleBar {

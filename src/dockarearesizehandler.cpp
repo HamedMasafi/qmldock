@@ -1,4 +1,4 @@
-#include "dockgroupresizehandler.h"
+#include "dockarearesizehandler.h"
 #include "style/abstractstyle.h"
 
 #include "dock.h"

@@ -22,11 +22,12 @@ SOURCES += \
     $$PWD/abstractmouseresponsiveitem.cpp \
     $$PWD/debugrect.cpp \
     $$PWD/dock.cpp \
+    $$PWD/dock_p.cpp \
     $$PWD/dockactivewidgetdim.cpp \
     $$PWD/dockarea.cpp \
+    $$PWD/dockarearesizehandler.cpp \
     $$PWD/dockcontainer.cpp \
     $$PWD/dockdockableitem.cpp \
-    $$PWD/dockgroupresizehandler.cpp \
     $$PWD/dockmoveguide.cpp \
     $$PWD/dockplugin.cpp \
     $$PWD/docktabbar.cpp \
@@ -55,11 +56,11 @@ HEADERS += \
     $$PWD/dockactivewidgetdim.h \
     $$PWD/dockarea.h \
     $$PWD/dockarea_p.h \
+    $$PWD/dockarearesizehandler.h \
     $$PWD/dockcontainer.h \
     $$PWD/dockcontainer_p.h \
     $$PWD/dockdockableitem.h \
     $$PWD/dockdockableitem_p.h \
-    $$PWD/dockgroupresizehandler.h \
     $$PWD/dockmoveguide.h \
     $$PWD/dockplugin.h \
     $$PWD/docktabbar.h \

@@ -1,5 +1,5 @@
-#ifndef DOCKGROUPRESIZEHANDLER_H
-#define DOCKGROUPRESIZEHANDLER_H
+#ifndef DOCKAREARESIZEHANDLER_H
+#define DOCKAREARESIZEHANDLER_H
 
 #include <QQuickPaintedItem>
 
@@ -46,4 +46,4 @@ private:
     void drawCircle(QPainter *painter, const QPointF &center, bool hover = false);
 };
 
-#endif // DOCKGROUPRESIZEHANDLER_H
+#endif // DOCKAREARESIZEHANDLER_H

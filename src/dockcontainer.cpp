@@ -3,7 +3,7 @@
 #include "dockmoveguide.h"
 #include "dockwidget.h"
 #include "dockarea.h"
-#include "dockgroupresizehandler.h"
+#include "dockarearesizehandler.h"
 #include "style/abstractstyle.h"
 #include "dockwindow.h"
 #include "dockarea.h"
@@ -139,11 +139,13 @@ void DockContainer::setActiveWidget(DockWidget *widget)
 {
     Q_D(DockContainer);
 
+    if (widget == d->activeDockWidget)
+        return;
+
     if (d->activeDockWidget) {
-        d->activeDockWidget->setZ(Dock::Private::Z::Widget);
+        d->activeDockWidget->setIsActive(false);
         auto dockArea = d->activeDockWidget->dockArea();
         if (dockArea &&  dockArea->displayType() == Dock::AutoHide) {
-            //d->activeDockWidget->setVisible(false);
             dockArea->setCurrentIndex(-1);
         }
     }
@@ -151,7 +153,7 @@ void DockContainer::setActiveWidget(DockWidget *widget)
     if (widget) {
         qDebug() << Q_FUNC_INFO;
         d->activeDockWidget = widget;
-        widget->setZ(Dock::Private::Z::ActiveWidget);
+        widget->setIsActive(true);
 
         d->dim->setVisible(true);
     } else {
@@ -581,7 +583,10 @@ void DockContainer::dockWidget_areaChanged(Dock::Area area)
 
 void DockContainer::dockWidget_isActiveChanged(bool isActive)
 {
-    qDebug() << isActive;
+    if (isActive)
+        setActiveWidget(qobject_cast<DockWidget *>(sender()));
+    else
+        setActiveWidget(nullptr);
 }
 
 void DockContainer::dockWidget_visibilityChange()

@@ -141,7 +141,7 @@ void DockTabBar::reorderTabs()
 void DockTabBar::calculateTabsSize()
 {
     _tabsSize = 0;
-    for (auto btn : _tabs)
+    for (auto &btn : _tabs)
         _tabsSize += btn->width();
 }
 

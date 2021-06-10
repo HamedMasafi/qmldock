@@ -1,6 +1,7 @@
 #ifndef DOCK_P_H
 #define DOCK_P_H
 
+class QQuickItem;
 namespace Dock { namespace Private {
 
 namespace Z {
@@ -38,6 +39,8 @@ T *findInParents(QQuickItem *item)
     return nullptr;
 }
 #endif // QQUICKITEM_H
+
+QString printDebug(QQuickItem *o);
 
 } }
 

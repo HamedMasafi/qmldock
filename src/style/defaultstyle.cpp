@@ -2,7 +2,7 @@
 
 #include "dockcontainer.h"
 #include "dockarea.h"
-#include "dockgroupresizehandler.h"
+#include "dockarearesizehandler.h"
 #include "docktabbar.h"
 #include "docktabbutton.h"
 #include "dockwidget.h"
@@ -421,9 +421,8 @@ void DefaultStyle::paintDockArea(QPainter *p, DockArea *item)
 {
     Q_UNUSED(p)
     Q_UNUSED(item)
-//    p->fillRect(item->clipRect(), Qt::yellow);
 
-    if ((item->displayType() == Dock::TabbedView) && item->widgets().count()) {
+    if ((item->displayType() == Dock::TabbedView /*|| item->displayType() == Dock::AutoHide*/) && item->widgets().count()) {
         QRectF rc;
         rc.setTop(item->tabPosition() == Qt::TopEdge ? tabBarSize() - 1 : 0);
         rc.setLeft(item->tabPosition() == Qt::LeftEdge ? tabBarSize() - 1 : 0);
@@ -449,7 +448,8 @@ void DefaultStyle::paintDockArea(QPainter *p, DockArea *item)
         default:
             break;
         }
-        p->fillRect(rc, m_tabAreaColor);
+        if (item->displayType() == Dock::TabbedView)
+            p->fillRect(rc, m_tabAreaColor);
         p->setPen(m_borderColor);
         p->drawRect(rc);
     }
@@ -473,7 +473,9 @@ void DefaultStyle::paintDockWidget(QPainter *p, DockWidget *item)
 
 void DefaultStyle::paintDockWidgetHeader(QPainter *p, DockWidgetHeader *item)
 {
-    //    p->fillRect(item->clipRect(), mainColor());
+    if (item->parentDock()->isActive())
+        p->fillRect(item->clipRect(), m_pressColor);
+
     QBrush b(m_mainColor);
     b.setStyle(Qt::Dense6Pattern);
     auto tw = QFontMetrics(font()).horizontalAdvance(item->title());

@@ -2,7 +2,7 @@
 
 #include "debugrect.h"
 #include "dockarea_p.h"
-#include "dockgroupresizehandler.h"
+#include "dockarearesizehandler.h"
 #include "style/abstractstyle.h"
 #include "docktabbar.h"
 #include "dockwidget.h"
