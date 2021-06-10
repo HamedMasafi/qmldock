@@ -51,7 +51,6 @@ public:
     QList<DockWidget *> dockWidgets() const;
     int currentIndex() const;
     Qt::Edge tabPosition() const;
-
     QQuickItem * tabBar() const;
 
 private:
@@ -104,5 +103,7 @@ private Q_SLOTS:
 
     friend class DockContainer;
 };
+
+QDebug operator<<(QDebug debug, const DockArea *area);
 
 #endif // DOCKAREA_H

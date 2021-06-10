@@ -14,11 +14,11 @@ Pane {
                 text: "Top left owner"
             }
             ComboBox {
-                model: ["Top", "Left"]
+                model: ["Left", "Top"]
                 onCurrentTextChanged: dockContainer.topLeftOwner =
                                       (currentIndex == 0)
-                                      ? Qt.TopEdge
-                                      : Qt.LeftEdge
+                                      ? Qt.LeftEdge
+                                      : Qt.TopEdge
             }
         }
         RowLayout {
@@ -26,11 +26,11 @@ Pane {
                 text: "Top right owner"
             }
             ComboBox {
-                model: ["Top", "Right"]
+                model: ["Right", "Top"]
                 onCurrentTextChanged: dockContainer.topRightOwner =
                                       (currentIndex == 0)
-                                      ? Qt.TopEdge
-                                      : Qt.RightEdge
+                                      ? Qt.RightEdge
+                                      : Qt.TopEdge
             }
         }
         RowLayout {
@@ -38,11 +38,11 @@ Pane {
                 text: "Bottom left owner"
             }
             ComboBox {
-                model: ["Bottom", "Left"]
+                model: ["Left", "Bottom"]
                 onCurrentTextChanged: dockContainer.bottomLeftOwner =
                                       (currentIndex == 0)
-                                      ? Qt.BottomEdge
-                                      : Qt.LeftEdge
+                                      ? Qt.LeftEdge
+                                      : Qt.BottomEdge
             }
         }
         RowLayout {
@@ -50,11 +50,11 @@ Pane {
                 text: "Bottom Right owner"
             }
             ComboBox {
-                model: ["Bottom", "Right"]
+                model: ["Right", "Bottom"]
                 onCurrentTextChanged: dockContainer.bottomRightOwner =
                                       (currentIndex == 0)
-                                      ? Qt.BottomEdge
-                                      : Qt.RightEdge
+                                      ? Qt.RightEdge
+                                      : Qt.BottomEdge
             }
         }
     }

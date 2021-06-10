@@ -44,7 +44,7 @@ ApplicationWindow {
         DockArea {
             id: leftDockGroup
             area: Dock.Left
-            displayType: Dock.TabbedView
+            displayType: Dock.AutoHide
             tabPosition: Qt.LeftEdge
             panelSize: 200
         }
@@ -53,6 +53,19 @@ ApplicationWindow {
             area: Dock.Right
             displayType: Dock.AutoHide
             tabPosition: Qt.RightEdge
+            panelSize: 250
+        }
+
+        DockArea {
+            area: Dock.Top
+            displayType: Dock.AutoHide
+            tabPosition: Qt.TopEdge
+            panelSize: 250
+        }
+        DockArea {
+            area: Dock.Bottom
+            displayType: Dock.AutoHide
+            tabPosition: Qt.BottomEdge
             panelSize: 250
         }
 

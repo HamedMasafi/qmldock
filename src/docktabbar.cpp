@@ -75,7 +75,7 @@ int DockTabBar::addTab(DockWidget *widget)
     t->setFitSize(
         QFontMetrics(dockStyle->font()).horizontalAdvance(widget->title()) + 15);
     t->setY(0);
-    t->setShowCloseButton(widget->closable());
+    t->setShowCloseButton(false);//widget->closable());
     _tabsSize += t->width();
     connect(t, &DockTabButton::clicked, this, &DockTabBar::tabButton_clicked);
     connect(t, &DockTabButton::closeButtonClicked, this, &DockTabBar::tabButton_closeButtonClicked);

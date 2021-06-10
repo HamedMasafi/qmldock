@@ -902,6 +902,15 @@ void DockArea::setDisplayType(Dock::DockWidgetDisplayType displayType)
 
     if (d->tabBarItem)
         d->tabBarItem->setVisible(displayType == Dock::TabbedView || displayType == Dock::AutoHide);
+
+    if (displayType == Dock::AutoHide) {
+        setAcceptHoverEvents(false);
+        setAcceptedMouseButtons(Qt::NoButton);
+    } else {
+        setAcceptHoverEvents(true);
+        setAcceptedMouseButtons(Qt::LeftButton);
+    }
+
     d->displayType = displayType;
     Q_EMIT displayTypeChanged(displayType);
 }
@@ -1014,4 +1023,12 @@ void DockArea::setTabBar(QQuickItem *tabBar)
 void DockArea::paint(QPainter *painter)
 {
     dockStyle->paintDockArea(painter, this);
+}
+
+QDebug operator<<(QDebug debug, const DockArea *area)
+{
+    QDebugStateSaver saver(debug);
+    debug.nospace() << "DockArea(" << area->area() << ')';
+
+    return debug;
 }

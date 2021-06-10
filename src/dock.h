@@ -63,19 +63,5 @@ enum Icon
 
 };
 
-template<class T>
-T *findInParents(QQuickItem *item)
-{
-    auto i = item;
-
-    while (i) {
-        auto p = qobject_cast<T *>(i);
-        if (p)
-            return p;
-
-        i = i->parentItem();
-    }
-    return nullptr;
-}
 } // namespace Dock
 #endif // DOCK_H

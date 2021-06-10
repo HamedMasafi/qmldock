@@ -421,7 +421,9 @@ void DefaultStyle::paintDockArea(QPainter *p, DockArea *item)
 {
     Q_UNUSED(p)
     Q_UNUSED(item)
-    if (item->displayType() == Dock::TabbedView && item->widgets().count()) {
+//    p->fillRect(item->clipRect(), Qt::yellow);
+
+    if ((item->displayType() == Dock::TabbedView) && item->widgets().count()) {
         QRectF rc;
         rc.setTop(item->tabPosition() == Qt::TopEdge ? tabBarSize() - 1 : 0);
         rc.setLeft(item->tabPosition() == Qt::LeftEdge ? tabBarSize() - 1 : 0);

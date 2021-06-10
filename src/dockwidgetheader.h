@@ -16,8 +16,6 @@ class DockWidgetHeader : public QQuickPaintedItem
     bool _moveEmitted;
     QString _title;
 
-    QList<DockWidgetHeaderButton*> _buttons;
-
     DockWidgetHeaderButton *pinButton;
     DockWidgetHeaderButton *closeButton;
 

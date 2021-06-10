@@ -716,18 +716,29 @@ Dock::DockWidgetDisplayType DockContainer::defaultDisplayType() const
 
 bool DockContainer::childMouseEventFilter(QQuickItem *item, QEvent *event)
 {
+    Q_D(DockContainer);
 
     auto handler = qobject_cast<DockWidgetMoveHandler *>(item);
     if (handler) {
         if (event->type() == QEvent::MouseButtonPress) {
             auto me = static_cast<QMouseEvent *>(event);
 
-
             handler->mousePressEvent(me);
             handler->dockWidget()->setArea(Dock::Detached);
             return true;
         }
     }
+    if (event->type() == QEvent::MouseButtonPress) {
+        auto w = Dock::Private::findInParents<DockWidget>(item);
+        if (w && w != d->activeDockWidget) {
+            setActiveWidget(w);
+        }
 
+        auto a = Dock::Private::findInParents<DockArea>(item);
+        if (a)
+            qDebug() << a;
+        else
+            qDebug() << item;
+    }
     return false;
 }
