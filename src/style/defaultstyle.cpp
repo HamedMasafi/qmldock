@@ -473,7 +473,7 @@ void DefaultStyle::paintDockWidget(QPainter *p, DockWidget *item)
 
 void DefaultStyle::paintDockWidgetHeader(QPainter *p, DockWidgetHeader *item)
 {
-    if (item->parentDock()->isActive())
+    if (item->parentDock()->visibility() == DockWidget::Active)
         p->fillRect(item->clipRect(), m_pressColor);
 
     QBrush b(m_mainColor);

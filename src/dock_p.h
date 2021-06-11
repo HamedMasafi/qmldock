@@ -1,6 +1,9 @@
 #ifndef DOCK_P_H
 #define DOCK_P_H
 
+#include <QString>
+
+
 class QQuickItem;
 namespace Dock { namespace Private {
 
