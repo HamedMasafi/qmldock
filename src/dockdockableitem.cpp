@@ -1,6 +1,6 @@
 #include "dockdockableitem.h"
 #include "dockdockableitem_p.h"
-#include "dockwindow.h"
+#include "dockpopoutwindow.h"
 
 DockDockableItem::DockDockableItem(QQuickItem *parent) : QQuickItem(parent)
   , d_ptr(new DockDockableItemPrivate(this))
@@ -33,7 +33,7 @@ void DockDockableItem::popOut()
         return;
 
     if (!d->window)
-        d->window = new DockWindow{d->item};
+        d->window = new DockPopoutWindow{d->item};
 
     d->window->show();
 

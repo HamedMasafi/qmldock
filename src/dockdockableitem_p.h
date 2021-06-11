@@ -4,7 +4,7 @@
 #include <qglobal.h>
 
 class QQuickItem;
-class DockWindow;
+class DockPopoutWindow;
 class DockDockableItem;
 class DockDockableItemPrivate
 {
@@ -15,7 +15,7 @@ public:
     DockDockableItemPrivate(DockDockableItem *parent);
 
     bool isPopedOut{false};
-    DockWindow *window{nullptr};
+    DockPopoutWindow *window{nullptr};
     QQuickItem *item{nullptr};
 };
 

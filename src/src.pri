@@ -30,6 +30,7 @@ SOURCES += \
     $$PWD/dockdockableitem.cpp \
     $$PWD/dockmoveguide.cpp \
     $$PWD/dockplugin.cpp \
+    $$PWD/dockpopoutwindow.cpp \
     $$PWD/docktabbar.cpp \
     $$PWD/docktabbararrorbutton.cpp \
     $$PWD/docktabbutton.cpp \
@@ -63,6 +64,7 @@ HEADERS += \
     $$PWD/dockdockableitem_p.h \
     $$PWD/dockmoveguide.h \
     $$PWD/dockplugin.h \
+    $$PWD/dockpopoutwindow.h \
     $$PWD/docktabbar.h \
     $$PWD/docktabbararrorbutton.h \
     $$PWD/docktabbutton.h \
