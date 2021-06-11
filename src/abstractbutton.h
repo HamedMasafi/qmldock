@@ -10,6 +10,7 @@ class AbstractButton : public QQuickPaintedItem
 
 protected:
     Dock::ButtonStatus _status;
+    bool _hasFocus{false};
     Dock::Icon _icon;
 
 public:
@@ -22,11 +23,17 @@ Q_SIGNALS:
     void clicked();
 
 protected:
-    void hoverEnterEvent(QHoverEvent *event);
-    void hoverLeaveEvent(QHoverEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
+    void hoverEnterEvent(QHoverEvent *event) override;
+    void hoverLeaveEvent(QHoverEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
+    void keyReleaseEvent(QKeyEvent *event) override;
+    void focusInEvent(QFocusEvent *) override;
+    void focusOutEvent(QFocusEvent *) override;
+
+public:
+    void paint(QPainter *painter) override;
 };
 
 #endif // ABSTRACTBUTTON_H

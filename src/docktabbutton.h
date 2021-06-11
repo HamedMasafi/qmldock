@@ -44,6 +44,11 @@ protected:
     // QQuickItem interface
 protected:
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
+
+    // QQuickItem interface
+protected:
+    void focusInEvent(QFocusEvent *);
+    void focusOutEvent(QFocusEvent *);
 };
 
 #endif // DOCKTABBUTTON_H

@@ -611,6 +611,10 @@ void DockContainer::geometryChanged(const QRectF &newGeometry,
 int DockContainer::panelSize(Dock::Area area, bool ignoreHidden) const
 {
     Q_D(const DockContainer);
+    if (!ignoreHidden)
+        return d->dockAreas[area]->minSize();
+    return d->dockAreas[area]->realSize();
+
     if (!ignoreHidden && d->dockAreas[area]->displayType() == Dock::AutoHide)
         return d->dockAreas[area]->tabBar()->height();
 

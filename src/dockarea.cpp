@@ -563,10 +563,6 @@ void DockArea::tabBar_tabClicked(int index)
         && d->displayType != Dock::AutoHide)
         return;
 
-    //    for (int i = 0; i < d->dockWidgets.count(); ++i) {
-    //        d->dockWidgets.at(i)->setVisible(i == index);
-    //    }
-    //    d->tabBar->setCurrentIndex(index);
     d->dockWidgets.at(index)->setVisibility(DockWidget::Active);
     setCurrentIndex(index);
 }
@@ -751,6 +747,27 @@ QQuickItem *DockArea::tabBar() const
 {
     Q_D(const DockArea);
     return d->tabBarItem;
+}
+
+qreal DockArea::minSize() const
+{
+    Q_D(const DockArea);
+    if (!d->dockWidgets.size())
+        return 0;
+
+    return d->tabBarItem->height();
+}
+
+qreal DockArea::realSize() const
+{
+    Q_D(const DockArea);
+    if (!d->dockWidgets.size())
+        return 0;
+
+//    if (d->displayType == Dock::AutoHide)
+//        return d->tabBarItem->height();
+
+    return panelSize();
 }
 
 int DockArea::currentIndex() const
@@ -1031,4 +1048,20 @@ QDebug operator<<(QDebug debug, const DockArea *area)
     debug.nospace() << "DockArea(" << area->area() << ')';
 
     return debug;
+}
+
+bool DockArea::isPinned() const
+{
+    Q_D(const DockArea);
+    return d->isPinned;
+}
+
+void DockArea::setIsPinned(bool newIsPinned)
+{
+    Q_D(DockArea);
+
+    if (d->isPinned == newIsPinned)
+        return;
+    d->isPinned = newIsPinned;
+    emit isPinnedChanged();
 }

@@ -53,6 +53,7 @@ DockTabButton::DockTabButton(QString title, DockTabBar *parent)
             this,
             &DockTabButton::closeButtonClicked);
 
+    setActiveFocusOnTab(true);
     AbstractStyle::registerThemableItem(this);
 }
 
@@ -135,4 +136,16 @@ void DockTabButton::geometryChanged(const QRectF &newGeometry,
         _closeButton->setX(width() - 20);
     }
     QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);
+}
+
+void DockTabButton::focusInEvent(QFocusEvent *)
+{
+    _status = Dock::Hovered;
+    update();
+}
+
+void DockTabButton::focusOutEvent(QFocusEvent *)
+{
+    _status = Dock::Normal;
+    update();
 }

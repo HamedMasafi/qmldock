@@ -7,6 +7,7 @@ AbstractButton::AbstractButton(QQuickItem *parent)
     setSize(QSizeF(16, 16));
     setAcceptHoverEvents(true);
     setAcceptedMouseButtons(Qt::LeftButton);
+    setActiveFocusOnTab(true);
     AbstractStyle::registerThemableItem(this);
 }
 Dock::Icon AbstractButton::icon() const
@@ -50,6 +51,22 @@ void AbstractButton::mouseReleaseEvent(QMouseEvent *event)
     update();
     if (clipRect().contains(event->pos()))
         Q_EMIT clicked();
+}
+
+void AbstractButton::keyReleaseEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Space)
+        Q_EMIT clicked();
+}
+
+void AbstractButton::focusInEvent(QFocusEvent *)
+{
+    _hasFocus = true;
+}
+
+void AbstractButton::focusOutEvent(QFocusEvent *)
+{
+    _hasFocus = false;
 }
 
 

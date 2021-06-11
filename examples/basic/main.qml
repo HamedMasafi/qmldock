@@ -41,6 +41,7 @@ ApplicationWindow {
             displayType: Dock.AutoHide
             tabPosition: Qt.LeftEdge
             panelSize: 200
+            isPinned: false
         }
         DockArea {
             id: rightDockGroup
@@ -48,6 +49,7 @@ ApplicationWindow {
             displayType: Dock.AutoHide
             tabPosition: Qt.RightEdge
             panelSize: 250
+            isPinned: false
         }
 
         DockArea {
@@ -55,12 +57,14 @@ ApplicationWindow {
             displayType: Dock.AutoHide
             tabPosition: Qt.TopEdge
             panelSize: 250
+            isPinned: false
         }
         DockArea {
             area: Dock.Bottom
             displayType: Dock.AutoHide
             tabPosition: Qt.BottomEdge
             panelSize: 250
+            isPinned: false
         }
 
         DockArea {

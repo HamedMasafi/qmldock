@@ -30,6 +30,7 @@ class DockArea : public QQuickPaintedItem {
     Q_PROPERTY(Qt::Edge tabPosition READ tabPosition WRITE setTabPosition NOTIFY
                    tabPositionChanged)
     Q_PROPERTY(QQuickItem *tabBar READ tabBar WRITE setTabBar NOTIFY tabBarChanged)
+    Q_PROPERTY(bool isPinned READ isPinned WRITE setIsPinned NOTIFY isPinnedChanged)
 
     Q_DECLARE_PRIVATE(DockArea);
     DockAreaPrivate *d_ptr;
@@ -53,7 +54,11 @@ public:
     Qt::Edge tabPosition() const;
     QQuickItem * tabBar() const;
 
+    bool isPinned() const;
+
 private:
+    qreal minSize() const;
+    qreal realSize() const;
     void addDockWidget(DockWidget *item);
     void removeDockWidget(DockWidget *item);
 
@@ -67,8 +72,8 @@ public Q_SLOTS:
     void setMaximumSize(qreal maximumSize);
     void setTabPosition(Qt::Edge tabPosition);
     void setCurrentIndex(int currentIndex);
-
     void setTabBar(QQuickItem * tabBar);
+    void setIsPinned(bool newIsPinned);
 
 Q_SIGNALS:
     void requestResize(const QRectF &rect, bool *ok);
@@ -84,6 +89,8 @@ Q_SIGNALS:
     void tabPositionChanged(Qt::Edge tabPosition);
 
     void tabBarChanged(QQuickItem * tabBar);
+
+    void isPinnedChanged();
 
 protected:
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;

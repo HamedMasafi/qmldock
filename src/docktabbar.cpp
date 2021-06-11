@@ -67,6 +67,8 @@ DockTabBar::DockTabBar(QQuickItem *parent)
             &AbstractButton::clicked,
             this,
             &DockTabBar::nextButton_clicked);
+
+    setActiveFocusOnTab(true);
 }
 
 int DockTabBar::addTab(DockWidget *widget)

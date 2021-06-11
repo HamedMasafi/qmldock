@@ -37,6 +37,7 @@ public:
     Dock::DockWidgetDisplayType displayType;
     QPointF tabBarPosition;
     qreal tabBarWidth;
+    bool isPinned{true};
 
     void relayout();
     void arrangeTabBar();
