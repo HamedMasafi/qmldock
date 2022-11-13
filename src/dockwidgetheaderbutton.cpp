@@ -3,12 +3,10 @@
 
 #include <QPainter>
 
-DockWidgetHeaderButton::DockWidgetHeaderButton(QQuickItem *parent)
-    : AbstractButton(parent)
-{
-    setSize(QSizeF(16, 16));
+DockWidgetHeaderButton::DockWidgetHeaderButton(QQuickItem *parent) : AbstractButton(parent) {
+  setSize(QSizeF(16, 16));
 }
-void DockWidgetHeaderButton::paint(QPainter *painter)
-{
-    dockStyle->paintWidgetButton(painter, this, _status);
+
+void DockWidgetHeaderButton::paint(QPainter *painter) {
+  dockStyle->paintWidgetButton(painter, this, _status);
 }

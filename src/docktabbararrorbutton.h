@@ -3,11 +3,10 @@
 
 #include "abstractbutton.h"
 
-class DockTabBarArrorButton : public AbstractButton
-{
+class DockTabBarArrorButton : public AbstractButton {
 public:
-    DockTabBarArrorButton(QQuickItem *parent = nullptr);
-    void paint(QPainter *painter);
+  DockTabBarArrorButton(QQuickItem *parent = nullptr);
+  void paint(QPainter *painter);
 };
 
 #endif // DOCKTABBARARRORBUTTON_H

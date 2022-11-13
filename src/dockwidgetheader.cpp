@@ -8,143 +8,122 @@
 #include <QDebug>
 #include <QPainter>
 
-QString DockWidgetHeader::title() const
-{
-    return _title;
+QString DockWidgetHeader::title() const {
+  return _title;
 }
 
-void DockWidgetHeader::setTitle(const QString &title)
-{
-    _title = title;
-    update();
+void DockWidgetHeader::setTitle(const QString &title) {
+  _title = title;
+  update();
 }
 
-bool DockWidgetHeader::closeButtonVisible() const
-{
-    return closeButton->isVisible();
+bool DockWidgetHeader::closeButtonVisible() const {
+  return closeButton->isVisible();
 }
 
-void DockWidgetHeader::setCloseButtonVisible(bool closeButtonVisible)
-{
-    closeButton->setVisible(closeButtonVisible);
+void DockWidgetHeader::setCloseButtonVisible(bool closeButtonVisible) {
+  closeButton->setVisible(closeButtonVisible);
 }
 
-bool DockWidgetHeader::enableMove() const
-{
-    return _enableMove;
+bool DockWidgetHeader::enableMove() const {
+  return _enableMove;
 }
 
-void DockWidgetHeader::setEnableMove(bool enableMove)
-{
-    _enableMove = enableMove;
+void DockWidgetHeader::setEnableMove(bool enableMove) {
+  _enableMove = enableMove;
 }
 
-bool DockWidgetHeader::pinButtonVisible() const
-{
-    return pinButton->isVisible();
+bool DockWidgetHeader::pinButtonVisible() const {
+  return pinButton->isVisible();
 }
 
-void DockWidgetHeader::setPinButtonVisible(bool pinButtonVisible)
-{
-    pinButton->setVisible(pinButtonVisible);
+void DockWidgetHeader::setPinButtonVisible(bool pinButtonVisible) {
+  pinButton->setVisible(pinButtonVisible);
 }
 
-DockWidget *DockWidgetHeader::parentDock() const
-{
-    return _parentDock;
+DockWidget *DockWidgetHeader::parentDock() const {
+  return _parentDock;
 }
 
-DockWidgetMoveHandler *DockWidgetHeader::moveHandler() const
-{
-    return _moveHandler;
+DockWidgetMoveHandler *DockWidgetHeader::moveHandler() const {
+  return _moveHandler;
 }
 
 DockWidgetHeader::DockWidgetHeader(DockWidget *parent)
-    : QQuickPaintedItem(parent),
-      _parentDock(parent)
-      , pinButton{new DockWidgetHeaderButton(this)}
-      , closeButton{new DockWidgetHeaderButton(this)}
-      , _moveHandler{new DockWidgetMoveHandler(this)}
-      , _enableMove(true)
+    : QQuickPaintedItem(parent), _parentDock(parent), pinButton{new DockWidgetHeaderButton(this)},
+      closeButton{new DockWidgetHeaderButton(this)}, _moveHandler{new DockWidgetMoveHandler(this)}, _enableMove(true)
 
 {
-    setHeight(20);
-//    setAcceptedMouseButtons(Qt::LeftButton);
-    setClip(true);
-//    setAcceptHoverEvents(true);
+  setHeight(20);
+  //    setAcceptedMouseButtons(Qt::LeftButton);
+  setClip(true);
+  //    setAcceptHoverEvents(true);
 
-    pinButton->setIcon(Dock::PinIcon);
-    pinButton->setY(5);
-    pinButton->setVisible(false);
+  pinButton->setIcon(Dock::PinIcon);
+  pinButton->setY(5);
+  pinButton->setVisible(false);
 
-    closeButton->setIcon(Dock::CloseIcon);
-    closeButton->setY(5);
+  closeButton->setIcon(Dock::CloseIcon);
+  closeButton->setY(5);
 
-    connect(closeButton,
-            &DockWidgetHeaderButton::clicked,
-            parent,
-            &DockWidget::close);
+  connect(closeButton, &DockWidgetHeaderButton::clicked, parent, &DockWidget::close);
 
-    connect(pinButton,
-            &DockWidgetHeaderButton::clicked,
-            parent,
-            &DockWidget::detach);
+  connect(pinButton, &DockWidgetHeaderButton::clicked, parent, &DockWidget::detach);
 
-    _moveHandler->setParentItem(this);
-    _moveHandler->setDockWidget(parent);
+  _moveHandler->setParentItem(this);
+  _moveHandler->setDockWidget(parent);
 
-    AbstractStyle::registerThemableItem(this);
+  AbstractStyle::registerThemableItem(this);
 }
 
-void DockWidgetHeader::paint(QPainter *painter)
-{
-    dockStyle->paintDockWidgetHeader(painter, this);
+void DockWidgetHeader::paint(QPainter *painter) {
+  dockStyle->paintDockWidgetHeader(painter, this);
 }
 
-//void DockWidgetHeader::mousePressEvent(QMouseEvent *event)
+// void DockWidgetHeader::mousePressEvent(QMouseEvent *event)
 //{
-//    if (!_enableMove) {
-//        event->ignore();
-//        return;
-//    }
-//    _moveEmitted = false;
-//    if (_parentDock->getIsDetached()) {
-//        _lastParentPos = _parentDock->dockWindow()->position();
-//        _lastMousePos = event->globalPos();
-//    } else {
-//        _lastMousePos = event->windowPos();
-//        _lastParentPos = _parentDock->position();
-//    }
-//    grabMouse();
-//}
+//     if (!_enableMove) {
+//         event->ignore();
+//         return;
+//     }
+//     _moveEmitted = false;
+//     if (_parentDock->getIsDetached()) {
+//         _lastParentPos = _parentDock->dockWindow()->position();
+//         _lastMousePos = event->globalPos();
+//     } else {
+//         _lastMousePos = event->windowPos();
+//         _lastParentPos = _parentDock->position();
+//     }
+//     grabMouse();
+// }
 
-//void DockWidgetHeader::mouseMoveEvent(QMouseEvent *event)
+// void DockWidgetHeader::mouseMoveEvent(QMouseEvent *event)
 //{
-//    if (!_enableMove) {
-//        event->ignore();
-//        return;
-//    }
-//    if (_moveEmitted) {
-//        if (_parentDock->getIsDetached())
-//            Q_EMIT moving(_lastParentPos + (event->globalPos() - _lastMousePos),
-//                        event->pos() + _parentDock->dockWindow()->position());
-//        else
-//            Q_EMIT moving(_lastParentPos + (event->windowPos() - _lastMousePos),
-//                    event->pos() + _parentDock->position());
-//    } else {
-//        Q_EMIT moveStarted();
-//        _moveEmitted = true;
-//    }
+//     if (!_enableMove) {
+//         event->ignore();
+//         return;
+//     }
+//     if (_moveEmitted) {
+//         if (_parentDock->getIsDetached())
+//             Q_EMIT moving(_lastParentPos + (event->globalPos() - _lastMousePos),
+//                         event->pos() + _parentDock->dockWindow()->position());
+//         else
+//             Q_EMIT moving(_lastParentPos + (event->windowPos() - _lastMousePos),
+//                     event->pos() + _parentDock->position());
+//     } else {
+//         Q_EMIT moveStarted();
+//         _moveEmitted = true;
+//     }
 ////    parentDock->setPosition(_lastParentPos + (event->windowPos() - _lastMousePos));
 //}
 
-//void DockWidgetHeader::mouseReleaseEvent(QMouseEvent *event)
+// void DockWidgetHeader::mouseReleaseEvent(QMouseEvent *event)
 //{
-//    if (!_enableMove) {
-//        event->ignore();
-//        return;
-//    }
-//    Q_UNUSED(event)
+//     if (!_enableMove) {
+//         event->ignore();
+//         return;
+//     }
+//     Q_UNUSED(event)
 
 //    if (_moveEmitted)
 //        Q_EMIT moveEnded();
@@ -153,16 +132,14 @@ void DockWidgetHeader::paint(QPainter *painter)
 //    ungrabMouse();
 //}
 
-void DockWidgetHeader::geometryChange(const QRectF &newGeometry,
-                                       const QRectF &oldGeometry)
-{
-    QQuickPaintedItem::geometryChange(newGeometry, oldGeometry);
+void DockWidgetHeader::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry) {
+  QQuickPaintedItem::geometryChange(newGeometry, oldGeometry);
 
-    if (!isComponentComplete())
-        return;
+  if (!isComponentComplete())
+    return;
 
-    closeButton->setX(width() - 20);
-    pinButton->setX(width() - 40);
-    _moveHandler->setHeight(height());
-    _moveHandler->setWidth(width() - 40);
+  closeButton->setX(width() - 20);
+  pinButton->setX(width() - 40);
+  _moveHandler->setHeight(height());
+  _moveHandler->setWidth(width() - 40);
 }

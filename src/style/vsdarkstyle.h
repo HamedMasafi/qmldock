@@ -3,12 +3,11 @@
 
 #include "defaultstyle.h"
 
-class VSDarkStyle : public DefaultStyle
-{
-    Q_OBJECT
+class VSDarkStyle : public DefaultStyle {
+  Q_OBJECT
 
 public:
-    VSDarkStyle(QObject *parent = nullptr);
+  VSDarkStyle(QObject *parent = nullptr);
 };
 
 #endif // VSDARKSTYLE_H

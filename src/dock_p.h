@@ -1,7 +1,6 @@
 #ifndef DOCK_P_H
 #define DOCK_P_H
 
-namespace Dock {
-}
+namespace Dock {}
 
 #endif // DOCK_P_H
