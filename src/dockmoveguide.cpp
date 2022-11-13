@@ -8,9 +8,8 @@
 #include "dockcontainer.h"
 #include "movedropguide.h"
 
-void DockMoveGuide::insertToAreas(Dock::Area a, const QRectF &rc)
-{
-    _areas.insert(a, qMakePair<QRectF, QRectF>(rc, {mapToGlobal(rc.topLeft()), rc.size()}));
+void DockMoveGuide::insertToAreas(Dock::Area a, const QRectF &rc) {
+  _areas.insert(a, qMakePair<QRectF, QRectF>(std::move(const_cast<QRectF &>(rc)), {mapToGlobal(rc.topLeft()), rc.size()}));
 }
 
 DockMoveGuide::DockMoveGuide(DockContainer *parent) : QQuickPaintedItem(parent)
