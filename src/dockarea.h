@@ -87,7 +87,7 @@ Q_SIGNALS:
     void tabBarChanged(QQuickItem * tabBar);
 
 protected:
-    void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
+    void geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry) override;
     void updatePolish() override;
     void hoverMoveEvent(QHoverEvent *event) override;
     bool childMouseEventFilter(QQuickItem *, QEvent *) override;

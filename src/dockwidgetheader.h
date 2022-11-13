@@ -62,7 +62,7 @@ public Q_SLOTS:
 //    void mouseReleaseEvent(QMouseEvent *event);
 
 protected:
-    void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
+    void geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry);
 };
 
 #endif // DOCKWIDGETHEADER_H

@@ -65,13 +65,13 @@ void DockDockableItem::setStatus(DockDockableItem::Status status)
     }
 }
 
-void DockDockableItem::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
+void DockDockableItem::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry)
 {
     for (auto &ch: childItems()) {
         ch->setPosition({0, 0});
         ch->setSize(newGeometry.size());
     }
-    QQuickItem::geometryChanged(newGeometry, oldGeometry);
+    QQuickItem::geometryChange(newGeometry, oldGeometry);
 }
 
 DockDockableItemPrivate::DockDockableItemPrivate(DockDockableItem *parent)

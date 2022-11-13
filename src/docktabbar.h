@@ -51,7 +51,7 @@ private:
     void calculateTabsSize();
 
 protected:
-    void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
+    void geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry);
     void updatePolish();
 
 };

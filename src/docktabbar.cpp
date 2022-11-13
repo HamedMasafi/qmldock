@@ -165,7 +165,7 @@ void DockTabBar::tabButton_closeButtonClicked()
     Q_EMIT closeButtonClicked(index);
 }
 
-void DockTabBar::geometryChanged(const QRectF &newGeometry,
+void DockTabBar::geometryChange(const QRectF &newGeometry,
                                  const QRectF &oldGeometry)
 {
     calculateTabsSize();
@@ -176,7 +176,7 @@ void DockTabBar::geometryChanged(const QRectF &newGeometry,
         _tabsStartPos = 0;
 
     reorderTabs();
-    QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);
+    QQuickPaintedItem::geometryChange(newGeometry, oldGeometry);
 }
 
 void DockTabBar::updatePolish()

@@ -32,7 +32,7 @@ Q_SIGNALS:
     void statusChanged(Status status);
 
 protected:
-    void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
+    void geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry) override;
 };
 
 #endif // DOCKDOCKABLEITEM_H

@@ -120,7 +120,7 @@ private Q_SLOTS:
 protected:
     bool childMouseEventFilter(QQuickItem *, QEvent *) override;
     void itemChange(ItemChange, const ItemChangeData &) override;
-    void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
+    void geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry) override;
     void hoverMoveEvent(QHoverEvent *event) override;
     void hoverLeaveEvent(QHoverEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;

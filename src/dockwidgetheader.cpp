@@ -153,10 +153,10 @@ void DockWidgetHeader::paint(QPainter *painter)
 //    ungrabMouse();
 //}
 
-void DockWidgetHeader::geometryChanged(const QRectF &newGeometry,
+void DockWidgetHeader::geometryChange(const QRectF &newGeometry,
                                        const QRectF &oldGeometry)
 {
-    QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);
+    QQuickPaintedItem::geometryChange(newGeometry, oldGeometry);
 
     if (!isComponentComplete())
         return;

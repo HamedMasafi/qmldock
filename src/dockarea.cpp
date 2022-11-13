@@ -515,7 +515,7 @@ void DockArea::mouseReleaseEvent(QMouseEvent *event)
     setKeepMouseGrab(false);
 }
 
-void DockArea::geometryChanged(const QRectF &newGeometry,
+void DockArea::geometryChange(const QRectF &newGeometry,
                                 const QRectF &oldGeometry)
 {
     Q_D(DockArea);
@@ -526,7 +526,7 @@ void DockArea::geometryChanged(const QRectF &newGeometry,
     d->relayout();
     d->arrangeTabBar();
 
-    QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);
+    QQuickPaintedItem::geometryChange(newGeometry, oldGeometry);
 }
 
 void DockArea::updatePolish()
@@ -834,7 +834,7 @@ void DockArea::removeDockWidget(DockWidget *item)
 //        update();
 //    }
 
-//    geometryChanged(QRect(), QRect());
+//    geometryChange(QRect(), QRect());
 
 //    if (d->displayType == Dock::SplitView)
 //        d->reorderHandles();
@@ -955,7 +955,7 @@ void DockArea::setTabPosition(Qt::Edge tabPosition)
 
     if (d->tabBar)
         d->tabBar->setEdge(tabPosition);
-    geometryChanged(QRectF(), QRectF());
+    geometryChange(QRectF(), QRectF());
     update();
     Q_EMIT tabPositionChanged(d->tabPosition);
 }

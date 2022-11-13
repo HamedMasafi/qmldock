@@ -128,11 +128,11 @@ void DockTabButton::hoverLeaveEvent(QHoverEvent *event)
     }
 }
 
-void DockTabButton::geometryChanged(const QRectF &newGeometry,
+void DockTabButton::geometryChange(const QRectF &newGeometry,
                                     const QRectF &oldGeometry)
 {
     if (_showCloseButton) {
         _closeButton->setX(width() - 20);
     }
-    QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);
+    QQuickPaintedItem::geometryChange(newGeometry, oldGeometry);
 }

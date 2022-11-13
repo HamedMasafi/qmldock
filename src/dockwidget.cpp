@@ -266,7 +266,7 @@ void DockWidget::setContentItem(QQuickItem *contentItem)
 //                                   (d->showHeader ? d->titleBarItem->height() : 0)
 //                                    +dockStyle->widgetPadding()
 //                                   ));
-    geometryChanged(QRectF(), QRectF());
+    geometryChange(QRectF(), QRectF());
     Q_EMIT contentItemChanged(d->contentItem);
 }
 
@@ -413,11 +413,11 @@ void DockWidget::itemChange(QQuickItem::ItemChange change,
 
 }
 
-void DockWidget::geometryChanged(const QRectF &newGeometry,
+void DockWidget::geometryChange(const QRectF &newGeometry,
                                  const QRectF &oldGeometry)
 {
     Q_D(DockWidget);
-    QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);
+    QQuickPaintedItem::geometryChange(newGeometry, oldGeometry);
     if (!isComponentComplete())
         return;
 

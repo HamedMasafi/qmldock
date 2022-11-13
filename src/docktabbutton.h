@@ -43,7 +43,7 @@ protected:
 
     // QQuickItem interface
 protected:
-    void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
+    void geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry);
 };
 
 #endif // DOCKTABBUTTON_H

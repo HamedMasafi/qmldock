@@ -48,7 +48,7 @@ Q_SIGNALS:
     void defaultDisplayTypeChanged(Dock::DockWidgetDisplayType defaultDisplayType);
 
 protected:
-    void geometryChanged(const QRectF &newGeometry,
+    void geometryChange(const QRectF &newGeometry,
                          const QRectF &oldGeometry) override;
     void itemChange(ItemChange, const ItemChangeData &) override;
     void componentComplete() override;

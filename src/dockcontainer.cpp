@@ -94,7 +94,7 @@ void DockContainer::componentComplete()
     d->dockAreas[Dock::Bottom]->polish();
     d->dockAreas[Dock::Center]->polish();
     //    reorderDockAreas();
-//    geometryChanged(QRectF(), QRectF());
+//    geometryChange(QRectF(), QRectF());
 
     reorderDockAreas();
 
@@ -538,12 +538,12 @@ void DockContainer::dockWidget_areaChanged(Dock::Area area)
         d->dockAreas[area]->addDockWidget(dw);
 }
 
-void DockContainer::geometryChanged(const QRectF &newGeometry,
+void DockContainer::geometryChange(const QRectF &newGeometry,
                                const QRectF &oldGeometry)
 {
     if (isComponentComplete())
         reorderDockAreas();
-    QQuickItem::geometryChanged(newGeometry, oldGeometry);
+    QQuickItem::geometryChange(newGeometry, oldGeometry);
 }
 
 int DockContainer::panelSize(Dock::Area area) const
