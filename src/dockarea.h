@@ -2,12 +2,13 @@
 #define DOCKAREA_H
 
 #include "dock.h"
+#include <dockwidget.h>
 
 #include <QQuickPaintedItem>
 //#include <QtQuickTemplates2/private/qquicksplitview_p.h>
 
 class DockAreaPrivate;
-class DockWidget;
+//class DockWidget;
 class DockAreaResizeHandler;
 class DockArea : public QQuickPaintedItem {
     Q_OBJECT
