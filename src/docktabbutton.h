@@ -6,44 +6,44 @@
 
 class DockTabBar;
 class DockWidgetHeaderButton;
-class DockTabButton : public QQuickPaintedItem
-{
-    Q_OBJECT
-    DockTabBar *_parentTabBar;
-    QString _title;
-    Dock::ButtonStatus _status;
-    qreal _fitSize;
-    bool _showCloseButton;
-    DockWidgetHeaderButton *_closeButton;
+
+class DockTabButton : public QQuickPaintedItem {
+  Q_OBJECT
+  DockTabBar *_parentTabBar;
+  QString _title;
+  Dock::ButtonStatus _status;
+  qreal _fitSize;
+  bool _showCloseButton;
+  DockWidgetHeaderButton *_closeButton;
 
 public:
-    DockTabButton(QString title, DockTabBar *parent = nullptr);
-    void paint(QPainter *painter);
-    QString title() const;
-    DockTabBar *parentTabBar() const;
-    bool showCloseButton() const;
-    qreal fitSize() const;
+  DockTabButton(QString title, DockTabBar *parent = nullptr);
+  void paint(QPainter *painter);
+  QString title() const;
+  DockTabBar *parentTabBar() const;
+  bool showCloseButton() const;
+  qreal fitSize() const;
 
 Q_SIGNALS:
-    void clicked();
-    void closeButtonClicked();
+  void clicked();
+  void closeButtonClicked();
 
-    // QQuickPaintedItem interface
+  // QQuickPaintedItem interface
 public Q_SLOTS:
-    void setTitle(const QString &title);
-    void setChecked(bool checked);
-    void setFitSize(const qreal &fitSize);
-    void setShowCloseButton(bool showCloseButton);
+  void setTitle(const QString &title);
+  void setChecked(bool checked);
+  void setFitSize(const qreal &fitSize);
+  void setShowCloseButton(bool showCloseButton);
 
 protected:
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
-    void hoverEnterEvent(QHoverEvent *event);
-    void hoverLeaveEvent(QHoverEvent *event);
+  void mousePressEvent(QMouseEvent *event);
+  void mouseReleaseEvent(QMouseEvent *event);
+  void hoverEnterEvent(QHoverEvent *event);
+  void hoverLeaveEvent(QHoverEvent *event);
 
-    // QQuickItem interface
+  // QQuickItem interface
 protected:
-    void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
+  void geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry);
 };
 
 #endif // DOCKTABBUTTON_H

@@ -3,13 +3,8 @@
 
 #include <QPainter>
 
-DockWidgetBackground::DockWidgetBackground(QQuickItem *parent)
-    : QQuickPaintedItem(parent)
-{
+DockWidgetBackground::DockWidgetBackground(QQuickItem *parent) : QQuickPaintedItem(parent) {}
 
-}
-
-void DockWidgetBackground::paint(QPainter *painter)
-{
-    dockStyle->paintDockWidgetBackground(painter, this);
+void DockWidgetBackground::paint(QPainter *painter) {
+  dockStyle->paintDockWidgetBackground(painter, this);
 }

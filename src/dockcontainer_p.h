@@ -7,26 +7,28 @@ class DockWidget;
 class DockMoveGuide;
 class DockArea;
 class DockContainer;
+
 class DockContainerPrivate {
-    DockContainer *q_ptr;
-    Q_DECLARE_PUBLIC(DockContainer);
+  DockContainer *q_ptr;
+  Q_DECLARE_PUBLIC(DockContainer);
+
 public:
-    DockContainerPrivate(DockContainer *parent);
-    QList<DockWidget *> initialWidgets;
-    QList<DockWidget *> dockWidgets;
-    QList<DockWidget *> removedDockWidgets;
-    QMap<Dock::Area, DockArea *> dockAreas;
+  DockContainerPrivate(DockContainer *parent);
+  QList<DockWidget *> initialWidgets;
+  QList<DockWidget *> dockWidgets;
+  QList<DockWidget *> removedDockWidgets;
+  QMap<Dock::Area, DockArea *> dockAreas;
 
-    DockMoveGuide *dockMoveGuide;
+  DockMoveGuide *dockMoveGuide;
 
-    Qt::Edge topLeftOwner;
-    Qt::Edge topRightOwner;
-    Qt::Edge bottomLeftOwner;
-    Qt::Edge bottomRightOwner;
-    DockWidget *activeDockWidget;
-    Dock::DockWidgetDisplayType defaultDisplayType;
+  Qt::Edge topLeftOwner;
+  Qt::Edge topRightOwner;
+  Qt::Edge bottomLeftOwner;
+  Qt::Edge bottomRightOwner;
+  DockWidget *activeDockWidget;
+  Dock::DockWidgetDisplayType defaultDisplayType;
 
-    bool enableStateStoring;
+  bool enableStateStoring;
 };
 
 #endif // DOCKCONTAINER_P_H

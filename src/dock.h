@@ -8,19 +8,18 @@
 namespace Dock {
 Q_NAMESPACE
 
-enum Area
-{
-    NoArea = 0x0,
-    Top = 0x1,
-    Bottom = 0x2,
-    Left = 0x4,
-    Right = 0x8,
-    Float = 0x10,
-    Detached = 0x20,
-    Center = 0x40,
-    AllSides = Top | Left | Right | Bottom,
-    AllInsides = AllSides | Center | Float,
-    AllAreas = AllInsides | Detached
+enum Area {
+  NoArea = 0x0,
+  Top = 0x1,
+  Bottom = 0x2,
+  Left = 0x4,
+  Right = 0x8,
+  Float = 0x10,
+  Detached = 0x20,
+  Center = 0x40,
+  AllSides = Top | Left | Right | Bottom,
+  AllInsides = AllSides | Center | Float,
+  AllAreas = AllInsides | Detached
 };
 Q_ENUM_NS(Area)
 Q_DECLARE_FLAGS(Areas, Area)
@@ -33,36 +32,34 @@ enum DockWidgetDisplayType { Hidden, SplitView, TabbedView, StackedView };
 Q_ENUM_NS(DockWidgetDisplayType)
 
 enum Icon {
-    CloseIcon,
-    PinIcon,
-    PopoutIcon,
+  CloseIcon,
+  PinIcon,
+  PopoutIcon,
 
-    CenterDropIcon,
-    LeftDropIcon,
-    RightDropIcon,
-    UpDropIcon,
-    DownDropIcon,
+  CenterDropIcon,
+  LeftDropIcon,
+  RightDropIcon,
+  UpDropIcon,
+  DownDropIcon,
 
-    LeftArrowIcon,
-    RightArrowIcon,
-    UpArrowIcon,
-    DownArrowIcon,
+  LeftArrowIcon,
+  RightArrowIcon,
+  UpArrowIcon,
+  DownArrowIcon,
 
 };
 
-template<class T>
-T *findInParents(QQuickItem *item)
-{
-    auto i = item;
+template <class T> T *findInParents(QQuickItem *item) {
+  auto i = item;
 
-    while (i) {
-        auto p = qobject_cast<T *>(i);
-        if (p)
-            return p;
+  while (i) {
+    auto p = qobject_cast<T *>(i);
+    if (p)
+      return p;
 
-        i = i->parentItem();
-    }
-    return nullptr;
+    i = i->parentItem();
+  }
+  return nullptr;
 }
 } // namespace Dock
 #endif // DOCK_H

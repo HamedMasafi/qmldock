@@ -3,15 +3,13 @@
 
 #include <QObject>
 
-class DockPlugin : public QObject
-{
-    Q_OBJECT
+class DockPlugin : public QObject {
+  Q_OBJECT
 public:
-    explicit DockPlugin(QObject *parent = nullptr);
+  explicit DockPlugin(QObject *parent = nullptr);
 
-    static void registerDockPlugin();
+  static void registerDockPlugin();
 Q_SIGNALS:
-
 };
 
 #endif // DOCKPLUGIN_H

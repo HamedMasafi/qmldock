@@ -4,30 +4,28 @@
 #include <QQuickPaintedItem>
 #include "dock.h"
 
-class AbstractMouseResponsiveItem : public QQuickPaintedItem
-{
-    Q_OBJECT
-    Dock::ButtonStatus _status;
+class AbstractMouseResponsiveItem : public QQuickPaintedItem {
+  Q_OBJECT
+  Dock::ButtonStatus _status;
 
 public:
-    AbstractMouseResponsiveItem(QQuickItem *parent = nullptr);
+  AbstractMouseResponsiveItem(QQuickItem *parent = nullptr);
 
 Q_SIGNALS:
 
-
-    // QQuickItem interface
+  // QQuickItem interface
 protected:
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
-    void hoverEnterEvent(QHoverEvent *event);
-    void hoverLeaveEvent(QHoverEvent *event);
+  void mousePressEvent(QMouseEvent *event);
+  void mouseReleaseEvent(QMouseEvent *event);
+  void hoverEnterEvent(QHoverEvent *event);
+  void hoverLeaveEvent(QHoverEvent *event);
 
-    // QQuickPaintedItem interface
+  // QQuickPaintedItem interface
 public:
-    void paint(QPainter *painter);
+  void paint(QPainter *painter);
 
 protected:
-    Dock::ButtonStatus status() const;
+  Dock::ButtonStatus status() const;
 };
 
 #endif // ABSTRACTMOUSERESPONSIVEITEM_H

@@ -3,13 +3,10 @@
 
 #include <QCursor>
 
-DockTabBarArrorButton::DockTabBarArrorButton(QQuickItem *parent)
-: AbstractButton(parent)
-{
-//    setCursor(Qt::WaitCursor);
+DockTabBarArrorButton::DockTabBarArrorButton(QQuickItem *parent) : AbstractButton(parent) {
+  //    setCursor(Qt::WaitCursor);
 }
 
-void DockTabBarArrorButton::paint(QPainter *painter)
-{
-    dockStyle->paintDockTabBarArrowButton(painter, this, _status);
+void DockTabBarArrorButton::paint(QPainter *painter) {
+  dockStyle->paintDockTabBarArrowButton(painter, this, _status);
 }
