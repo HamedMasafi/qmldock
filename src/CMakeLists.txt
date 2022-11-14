@@ -1,4 +1,4 @@
-FILE(GLOB SOURCE_LIST "*.cpp" "*.h")
+FILE(GLOB_RECURSE SOURCE_LIST "*.cpp" "*.h")
 
 qt_add_library(DockWidget
         SHARED
@@ -15,5 +15,7 @@ target_link_libraries(DockWidget
 
 target_include_directories(DockWidget
         PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
         )
