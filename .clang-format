@@ -1,0 +1,8 @@
+BasedOnStyle: LLVM
+SortIncludes: Never
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortBlocksOnASingleLine: Never
+ColumnLimit: 130
+MaxEmptyLinesToKeep: 1
+KeepEmptyLinesAtTheStartOfBlocks: true
+SeparateDefinitionBlocks: Always

@@ -8,38 +8,39 @@
 class QQuickWindow;
 class DockContainer;
 class MoveDropGuide;
-class DockMoveGuide : public QQuickPaintedItem
-{
-    Q_OBJECT
-    QPointF _mousePos;
-    DockContainer *_parentDockContainer;
-    Dock::Area _area;
-    Dock::Areas _allowedAreas;
-    QQuickWindow *_window;
-    using LocalAndGlobalRect = QPair<QRectF, QRectF>;
 
-    QMultiMap<Dock::Area, LocalAndGlobalRect> _areas;
-//    QMultiMap<Dock::Area, QRectF> _globalAreas;
-    MoveDropGuide *_dropArea;
+class DockMoveGuide : public QQuickPaintedItem {
+  Q_OBJECT
+  QPointF _mousePos;
+  DockContainer *_parentDockContainer;
+  Dock::Area _area;
+  Dock::Areas _allowedAreas;
+  QQuickWindow *_window;
+  using LocalAndGlobalRect = QPair<QRectF, QRectF>;
 
-    void insertToAreas(Dock::Area, const QRectF &);
-public:
-    DockMoveGuide(DockContainer *parent = nullptr);
+  QMultiMap<Dock::Area, LocalAndGlobalRect> _areas;
+  //    QMultiMap<Dock::Area, QRectF> _globalAreas;
+  MoveDropGuide *_dropArea;
+
+  void insertToAreas(Dock::Area, const QRectF &);
 
 public:
-    void begin(const QPointF &pos, const QSizeF &size);
-    void end();
-    void paint(QPainter *painter);
-    QPointF mousePos() const;
-    void setMousePos(const QPointF &mousePos);
+  DockMoveGuide(DockContainer *parent = nullptr);
 
-    Dock::Area area() const;
+public:
+  void begin(const QPointF &pos, const QSizeF &size);
+  void end();
+  void paint(QPainter *painter);
+  QPointF mousePos() const;
+  void setMousePos(const QPointF &mousePos);
 
-    Dock::Areas allowedAreas() const;
-    void setAllowedAreas(const Dock::Areas &allowedAreas);
+  Dock::Area area() const;
+
+  Dock::Areas allowedAreas() const;
+  void setAllowedAreas(const Dock::Areas &allowedAreas);
 
 Q_SIGNALS:
-    void dropped(Dock::Area area);
+  void dropped(Dock::Area area);
 };
 
 #endif // DOCKMOVEGUIDE_H
