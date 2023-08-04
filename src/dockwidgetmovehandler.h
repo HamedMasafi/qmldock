@@ -4,6 +4,11 @@
 #include <QQuickItem>
 
 class DockWidget;
+#ifndef OPAQUE_DockWidget
+#define OPAQUE_DockWidget
+// To avoid Qt6 error: Type argument
+Q_DECLARE_OPAQUE_POINTER(DockWidget *)
+#endif
 
 class DockWidgetMoveHandler : public QQuickItem {
   Q_OBJECT
