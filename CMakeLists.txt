@@ -4,6 +4,7 @@ project(DockWidget)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD 99)
 
+
 # Qt 6 dependency and configurations
 find_package(Qt6
         COMPONENTS
